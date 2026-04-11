@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onchain Signal Bot v5</title>
+<style>
+/* ── LIGHT THEME ── */
+:root {
+  --bg:     #f4f6f9;
+  --bg2:    #ffffff;
+  --bg3:    #f0f2f5;
+  --border: #dde1e7;
+  --brd2:   #e8eaed;
+  --txt:    #1a1d23;
+  --txt2:   #5a6474;
+  --txt3:   #9aa0ad;
+  --bull:   #0a9e74;
+  --bullg:  rgba(10,158,116,.1);
+  --bear:   #e03535;
+  --bearg:  rgba(224,53,53,.1);
+  --neu:    #d97706;
+  --neug:   rgba(217,119,6,.1);
+  --acc:    #2563eb;
+  --accg:   rgba(37,99,235,.08);
+  --sh:     0 1px 4px rgba(0,0,0,.08);
+  --sh2:    0 4px 16px rgba(0,0,0,.1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;font-weight:500;line-height:1.5;min-height:100vh;overflow-x:hidden}
+
+/* ── HEADER ── */
+.hd{display:flex;align-items:center;justify-content:space-between;padding:7px 20px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;gap:10px;flex-wrap:nowrap;box-shadow:var(--sh)}
+.hd-left{display:flex;align-items:center;gap:10px}
+.logo{font-size:16px;font-weight:700;color:var(--acc)}
+.v-badge{background:var(--acc);color:#fff;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:700}
+.hd-center{display:flex;align-items:center;gap:10px}
+#btc-price{font-size:19px;font-weight:700}
+.chg{padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.chg-pos{background:var(--bullg);color:var(--bull)}
+.chg-neg{background:var(--bearg);color:var(--bear)}
+.dom{font-size:11px;color:var(--txt2)}
+.hd-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.api-inp{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:4px 8px;font-size:10px;color:var(--txt);width:140px;outline:none;font-family:monospace}
+.api-inp:focus{border-color:var(--acc)}
+.btn-xs{padding:4px 9px;border:1px solid var(--border);background:var(--bg3);color:var(--txt2);border-radius:5px;font-size:10px;cursor:pointer;transition:all .2s}
+.btn-xs:hover{border-color:var(--acc);color:var(--acc)}
+.ind{display:flex;align-items:center;gap:4px;font-size:9px;padding:3px 8px;border-radius:5px;border:1px solid;font-weight:600}
+.ind-ok{background:var(--bullg);color:var(--bull);border-color:rgba(10,158,116,.25)}
+.ind-dim{background:var(--bg3);color:var(--txt3);border-color:var(--border)}
+.ind-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.cd{font-size:10px;color:var(--txt2);background:var(--bg3);border:1px solid var(--border);padding:3px 8px;border-radius:5px;font-variant-numeric:tabular-nums}
+.btn-refresh{padding:5px 12px;background:var(--acc);color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:opacity .2s}
+.btn-refresh:hover{opacity:.85}
+.btn-refresh:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── LAYOUT ── */
+.wrap{width:100%;padding:14px 24px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:18px;box-shadow:var(--sh)}
+.sec-ttl{font-size:13px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px}
+
+/* ── SECTION 1: gauge / strategy / consensus / alerts ── */
+.s1{display:grid;grid-template-columns:2fr 1.5fr 1.2fr 2fr;gap:12px;margin-bottom:12px}
+/* compact consensus card */
+.con-card{display:flex;flex-direction:column;gap:7px}
+.con-big{font-size:42px;font-weight:700;line-height:1}
+.con-sub{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:.15em;margin-bottom:2px}
+.con-verdict{font-size:14px;font-weight:700}
+.con-counts{display:flex;gap:5px}
+.con-ct{flex:1;text-align:center;background:var(--bg3);border:1px solid var(--brd2);border-radius:5px;padding:5px 2px}
+.con-cv{font-size:16px;font-weight:700;line-height:1}
+.con-cl{font-size:10px;color:var(--txt2);margin-top:2px;text-transform:uppercase;font-weight:600}
+.scan-mini{width:100%;padding:7px 8px;background:var(--acc);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;transition:opacity .2s;margin-top:auto}
+.scan-mini:hover{opacity:.85}
+.scan-mini:disabled{opacity:.35;cursor:not-allowed}
+.data-src{font-size:10px;color:var(--txt2);text-align:center;line-height:1.4;font-weight:500}
+
+/* gauge */
+.gauge-card{display:flex;flex-direction:column;align-items:center}
+#g-svg{width:100%;max-width:220px}
+.z-row{display:flex;gap:3px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+.z-pill{font-size:10px;padding:2px 8px;border-radius:8px;font-weight:600}
+.bd-grid{width:100%;margin-top:8px;display:flex;flex-direction:column;gap:5px}
+.bd-row{display:flex;align-items:center;gap:6px;font-size:12px}
+.bd-lbl{width:110px;color:var(--txt2);flex-shrink:0;font-size:11px}
+.bd-bg{flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;border:1px solid var(--brd2)}
+.bd-fill{height:100%;border-radius:3px;transition:width .5s}
+.bd-n{width:24px;text-align:right;font-weight:700;font-size:11px}
+.entry-wrap{width:100%;margin-top:10px;padding-top:8px;border-top:1px solid var(--brd2)}
+.entry-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.entry-lbl{font-size:10px;color:var(--txt2);text-transform:uppercase;letter-spacing:.1em;font-weight:600}
+.entry-hint{font-size:10px;color:var(--txt2);font-weight:500}
+.ebar-row{display:flex;align-items:center;gap:7px}
+.ebar-bg{flex:1;height:7px;background:var(--bg3);border-radius:4px;overflow:hidden;border:1px solid var(--brd2)}
+.ebar-fill{height:100%;border-radius:4px;transition:width .7s}
+
+/* strategy */
+.strat-box{text-align:center;padding:16px 12px;border-radius:9px;margin-bottom:10px;border:2px solid var(--border)}
+.s-icon{font-size:32px;display:block;margin-bottom:6px}
+.s-text{font-size:16px;font-weight:700;margin-bottom:5px}
+.s-detail{font-size:12px;color:var(--txt2);line-height:1.6;white-space:pre-line;font-weight:500}
+.sc-row{display:flex;gap:7px;margin-bottom:10px}
+.sc-box{flex:1;text-align:center;padding:9px 6px;background:var(--bg3);border:1px solid var(--border);border-radius:7px}
+.sc-val{font-size:22px;font-weight:700;line-height:1}
+.sc-lbl{font-size:10px;color:var(--txt2);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;font-weight:600}
+.strat-note{font-size:11px;color:var(--txt2);text-align:center;line-height:1.5;margin-top:8px;font-weight:500}
+
+/* alerts — compact */
+.alerts-card{display:flex;flex-direction:column;gap:4px;overflow-y:auto;max-height:185px}
+.al-row{display:flex;align-items:flex-start;gap:7px;padding:7px 10px;border-radius:6px;font-size:12px;font-weight:500;line-height:1.4}
+.al-bear{background:var(--bearg);border:1px solid rgba(224,53,53,.2);color:var(--bear)}
+.al-neu{background:var(--neug);border:1px solid rgba(217,119,6,.2);color:var(--neu)}
+.al-entry{background:var(--accg);border:1px solid rgba(37,99,235,.2);color:var(--acc)}
+.no-al{color:var(--txt2);text-align:center;padding:20px;font-size:12px}
+
+/* ── SECTION 2: onchain metrics ── */
+.s2{margin-bottom:12px}
+.m-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.mc{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:15px;box-shadow:var(--sh);transition:border-color .2s}
+.mc:hover{border-color:var(--acc)}
+.mc-hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px}
+.mc-nm{font-size:12px;color:var(--txt2);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.mc-dsc{font-size:11px;color:var(--txt2);margin-bottom:7px;line-height:1.4;font-weight:500}
+.mc-val{font-size:30px;font-weight:700;line-height:1.15;margin-bottom:4px}
+.mc-itp{font-size:11px;color:var(--txt);font-weight:500;min-height:28px;line-height:1.4;margin-bottom:6px}
+.badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;flex-shrink:0}
+.b-bull{background:var(--bullg);color:var(--bull)}
+.b-bear{background:var(--bearg);color:var(--bear)}
+.b-neu{background:var(--neug);color:var(--neu)}
+.b-auto{background:var(--accg);color:var(--acc);font-size:9px}
+
+/* zone bar */
+.zbar-wrap{margin:6px 0 10px}
+.zbar-ttl{font-size:9px;color:var(--txt2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.zbar{position:relative;height:8px;background:var(--bg3);border-radius:4px;margin-bottom:14px;overflow:visible}
+.zbar-seg{position:absolute;top:0;height:100%}
+.zbar-ptr{position:absolute;top:-3px;transform:translateX(-50%);transition:left .5s;pointer-events:none}
+.zbar-line{width:2px;height:14px;background:#1a1d23;border-radius:1px;margin:0 auto}
+.zbar-dot{width:8px;height:8px;background:#1a1d23;border-radius:50%;position:absolute;top:3px;left:-3px;border:2px solid var(--bg2)}
+.zbar-lbls{display:flex;font-size:9px;margin-top:2px}
+.zbar-lbl{text-align:center;flex:1;font-weight:600;line-height:1.2;color:var(--txt2)}
+
+/* manual input */
+.mc-inp{display:flex;align-items:center;gap:5px;padding-top:7px;border-top:1px solid var(--brd2)}
+.mc-inp label{font-size:10px;color:var(--txt2);white-space:nowrap;flex-shrink:0;font-weight:600}
+.mc-inp input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--txt);padding:4px 7px;font-size:12px;outline:none;min-width:0}
+.mc-inp input:focus{border-color:var(--acc)}
+
+/* ── SECTION 3: analyst ── */
+.s3{margin-bottom:12px;min-width:0;overflow:hidden}
+.ch-track{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;width:100%;border:1px solid var(--brd2)}
+.ch-fill{height:100%;border-radius:3px;transition:width 1s}
+
+/* analyst cards — 2-row grid */
+.ag-scroll{width:100%}
+.ag{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.ac{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;transition:border-color .2s;box-shadow:var(--sh)}
+.ac:hover{border-color:var(--acc)}
+.ac-hd{padding:8px 9px 6px;border-bottom:1px solid var(--brd2)}
+.ac-nm{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ac-hdl{font-size:12px;font-weight:600;color:#1d9bf0;margin-top:1px}
+.ac-role{font-size:11px;font-weight:500;color:var(--txt2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ac-mid{padding:6px 9px;border-bottom:1px solid var(--brd2)}
+.pt{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:4px;border:1px solid;margin-bottom:5px}
+.pt-bull{background:var(--bullg);color:var(--bull);border-color:rgba(10,158,116,.25)}
+.pt-bear{background:var(--bearg);color:var(--bear);border-color:rgba(224,53,53,.25)}
+.pt-neu{background:var(--neug);color:var(--neu);border-color:rgba(217,119,6,.25)}
+.br{display:flex;align-items:center;gap:4px;margin-bottom:3px}
+.br-l{font-size:7px;color:var(--txt3);width:18px;flex-shrink:0;text-transform:uppercase}
+.br-t{flex:1;height:3px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.br-f{height:100%;border-radius:2px;transition:width 1s}
+.br-p{font-size:11px;font-weight:700;min-width:28px;text-align:right}
+.ac-sum{padding:7px 10px;font-size:12px;font-weight:500;color:var(--txt);line-height:1.5;min-height:40px;border-bottom:1px solid var(--brd2)}
+.ac-sum.dim{color:var(--txt3);font-style:italic}
+.ac-sl{padding:5px 9px 8px}
+.a-slider{width:100%;-webkit-appearance:none;height:3px;border-radius:2px;background:var(--border);outline:none;cursor:pointer;margin:5px 0 3px}
+.a-slider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--acc);cursor:pointer;border:2px solid var(--bg2);box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.a-pct{font-size:17px;font-weight:700;text-align:center}
+.ac-ft{display:flex;align-items:center;justify-content:space-between;padding:4px 9px;background:var(--bg3)}
+.ac-ts{font-size:10px;font-weight:500;color:var(--txt2)}
+.rescan{font-size:10px;font-weight:600;padding:3px 8px;background:var(--bg2);color:var(--acc);border:1px solid rgba(37,99,235,.3);border-radius:3px;cursor:pointer}
+.rescan:hover{background:var(--accg)}
+
+/* footer */
+.footer{text-align:center;padding:14px;color:var(--txt3);font-size:10px;border-top:1px solid var(--border);margin-top:4px}
+
+/* ── ANALYST MANAGER MODAL ── */
+.mgr-btn{font-size:10px;font-weight:600;padding:3px 9px;background:var(--bg3);color:var(--txt2);border:1px solid var(--border);border-radius:5px;cursor:pointer;margin-left:10px;vertical-align:middle}
+.mgr-btn:hover{border-color:var(--acc);color:var(--acc)}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:22px 24px;width:min(680px,92vw);max-height:85vh;overflow-y:auto;box-shadow:var(--sh2)}
+.modal h3{font-size:15px;font-weight:700;margin-bottom:4px}
+.modal-sub{font-size:11px;color:var(--txt2);margin-bottom:16px}
+.modal-sub a{color:var(--acc)}
+.mgr-list{display:flex;flex-direction:column;gap:6px;margin-bottom:18px}
+.mgr-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg3);border:1px solid var(--brd2);border-radius:7px}
+.mgr-info{flex:1;min-width:0}
+.mgr-name{font-size:12px;font-weight:700}
+.mgr-meta{font-size:10px;color:var(--txt2);margin-top:1px}
+.mgr-del{padding:3px 10px;background:var(--bearg);color:var(--bear);border:1px solid rgba(224,53,53,.25);border-radius:5px;font-size:10px;font-weight:700;cursor:pointer}
+.mgr-del:hover{background:var(--bear);color:#fff}
+.mgr-add{border-top:1px solid var(--border);padding-top:16px}
+.mgr-add h4{font-size:12px;font-weight:700;margin-bottom:10px;color:var(--txt)}
+.mgr-form{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mgr-field{display:flex;flex-direction:column;gap:3px}
+.mgr-field label{font-size:10px;font-weight:600;color:var(--txt2)}
+.mgr-field input,.mgr-field textarea{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--txt);outline:none;font-family:inherit}
+.mgr-field input:focus,.mgr-field textarea:focus{border-color:var(--acc)}
+.mgr-field.full{grid-column:1/-1}
+.mgr-actions{display:flex;gap:8px;margin-top:12px;justify-content:flex-end}
+.btn-add-analyst{padding:6px 16px;background:var(--acc);color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer}
+.btn-add-analyst:hover{opacity:.85}
+.btn-modal-close{padding:6px 14px;background:var(--bg3);color:var(--txt2);border:1px solid var(--border);border-radius:6px;font-size:11px;cursor:pointer}
+.btn-modal-close:hover{border-color:var(--acc);color:var(--acc)}
+
+/* responsive */
+@media(max-width:1400px){.m-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:1100px){.s1{grid-template-columns:1fr 1fr 1fr}}
+@media(max-width:900px){.s1{grid-template-columns:1fr 1fr}.m-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.s1{grid-template-columns:1fr}.m-grid{grid-template-columns:1fr}.hd{flex-direction:column;align-items:flex-start}}
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header class="hd">
+  <div class="hd-left">
+    <span class="logo">⛓ Onchain Signal</span>
+    <span class="v-badge">v5</span>
+  </div>
+  <div class="hd-center">
+    <span id="btc-price">로딩...</span>
+    <span id="btc-chg" class="chg chg-pos">—</span>
+    <span id="btc-dom" class="dom">DOM —%</span>
+  </div>
+  <div class="hd-right">
+    <input class="api-inp" id="api-key-inp" type="password" placeholder="Claude API Key (선택)">
+    <button class="btn-xs" onclick="saveApiKey()">저장</button>
+    <div id="ind-claude" class="ind ind-dim"><span class="ind-dot" style="background:var(--txt3)"></span>AI</div>
+    <span id="last-ts" style="font-size:10px;color:var(--txt2)">—</span>
+    <span class="cd" id="countdown">5:00</span>
+    <button class="btn-refresh" id="btn-rf" onclick="manualRefresh()">↻ 새로고침</button>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- ════════════════════════════════════════
+     SECTION 1 — 종합 시그널 / 전략 / 알림
+════════════════════════════════════════ -->
+<div class="s1">
+
+  <!-- 사이클 위치 게이지 -->
+  <div class="card gauge-card">
+    <div class="sec-ttl" style="align-self:flex-start;width:100%">사이클 위치 (Cycle Position)</div>
+    <svg id="g-svg" viewBox="0 0 220 130">
+      <path d="M25 115 A90 90 0 0 1 195 115" fill="none" stroke="#e8eaed" stroke-width="16" stroke-linecap="round"/>
+      <path id="g-fill" d="M25 115 A90 90 0 0 1 195 115" fill="none" stroke="#2563eb" stroke-width="16"
+            stroke-linecap="round" stroke-dasharray="283" stroke-dashoffset="283"/>
+      <text id="g-num" x="110" y="103" text-anchor="middle" font-size="44" font-weight="700" fill="#1a1d23">—</text>
+      <text id="g-lbl" x="110" y="122" text-anchor="middle" font-size="12" fill="#5a6474">로딩 중</text>
+    </svg>
+    <div class="z-row">
+      <span class="z-pill" style="background:rgba(224,53,53,.12);color:var(--bear)">0~20 바닥</span>
+      <span class="z-pill" style="background:rgba(224,53,53,.06);color:#e05555">20~40 하락</span>
+      <span class="z-pill" style="background:var(--neug);color:var(--neu)">40~60 회복</span>
+      <span class="z-pill" style="background:var(--bullg);color:var(--bull)">60~75 상승</span>
+      <span class="z-pill" style="background:rgba(217,119,6,.12);color:var(--neu)">75+ 과열</span>
+    </div>
+    <div class="bd-grid" id="bd-grid"></div>
+    <div class="entry-wrap">
+      <div class="entry-hd">
+        <span class="entry-lbl">역발상 매수 기회 지수</span>
+        <span id="entry-hint" class="entry-hint">—</span>
+      </div>
+      <div class="ebar-row">
+        <div class="ebar-bg"><div id="entry-bar" class="ebar-fill" style="width:0%"></div></div>
+        <span id="entry-num" style="font-size:13px;font-weight:700;min-width:28px;text-align:right">—</span>
+      </div>
+      <div style="font-size:8px;color:var(--txt3);margin-top:3px">사이클 낮을수록 역발상 매수 기회 ↑</div>
+    </div>
+  </div>
+
+  <!-- 전략 매트릭스 -->
+  <div class="card">
+    <div class="sec-ttl">📐 전략 매트릭스</div>
+    <div class="sc-row">
+      <div class="sc-box"><div class="sc-val" id="sc-cycle">—</div><div class="sc-lbl">사이클 위치</div></div>
+      <div class="sc-box"><div class="sc-val" id="sc-con">—</div><div class="sc-lbl">애널 컨센서스</div></div>
+    </div>
+    <div class="strat-box" id="strat-box">
+      <span class="s-icon" id="s-icon">⏳</span>
+      <div class="s-text" id="s-text">계산 중...</div>
+      <p class="s-detail" id="s-detail">데이터 로딩 중입니다.</p>
+    </div>
+    <div class="strat-note">
+      사이클: MVRV 45% · NUPL 35% · F&amp;G 20%<br>
+      매수기회: MVRV 25% · NUPL 20% · F&amp;G 20% · SOPR 15% · Netflow 10% · Stable 10%
+    </div>
+  </div>
+
+  <!-- 애널리스트 컨센서스 (compact — 상단 배치) -->
+  <div class="card con-card">
+    <div class="sec-ttl" style="margin-bottom:6px">👥 애널리스트 컨센서스</div>
+    <div style="display:flex;align-items:baseline;gap:8px">
+      <span class="con-big" id="ch-num" style="color:var(--txt3)">—</span>
+      <div>
+        <div class="con-sub">TOP 10 ANALYSTS</div>
+        <div class="con-verdict" id="ch-verdict" style="color:var(--txt3)">집계 중...</div>
+      </div>
+    </div>
+    <div class="ch-track"><div class="ch-fill" id="ch-fill" style="width:0%;background:var(--txt3)"></div></div>
+    <div class="con-counts">
+      <div class="con-ct"><div class="con-cv" id="cnt-bull" style="color:var(--bull)">0</div><div class="con-cl">강세</div></div>
+      <div class="con-ct"><div class="con-cv" id="cnt-neu" style="color:var(--neu)">0</div><div class="con-cl">중립</div></div>
+      <div class="con-ct"><div class="con-cv" id="cnt-bear" style="color:var(--bear)">0</div><div class="con-cl">약세</div></div>
+    </div>
+    <div class="data-src" id="data-src-note">연구 기반 데이터 (2026.04)<br>AI 업데이트: Claude Key 필요</div>
+    <button class="scan-mini" style="background:var(--bg3);color:var(--txt);border:1px solid var(--border)" onclick="openMgr()">⚙ 애널리스트 관리</button>
+    <button class="scan-mini" id="scan-btn" onclick="scanAll()">⚡ AI로 재분석</button>
+  </div>
+
+  <!-- 자동 알림 시그널 (compact) -->
+  <div class="card" style="display:flex;flex-direction:column;gap:8px">
+    <div class="sec-ttl" style="margin-bottom:0">🚨 자동 알림 시그널</div>
+    <div id="alert-list"><div class="no-al">데이터 로딩 중...</div></div>
+    <!-- 텔레그램 알림 설정 -->
+    <div style="border-top:1px solid var(--brd2);padding-top:10px;margin-top:auto">
+      <div style="font-size:13px;font-weight:700;color:var(--txt);margin-bottom:8px">📲 알림 전송 설정</div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div style="display:flex;align-items:center;gap:7px">
+          <span style="font-size:11px;font-weight:600;color:var(--txt2);width:72px;flex-shrink:0">Bot Token</span>
+          <input id="tg-token" type="password" placeholder="123456:ABC-..." style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--txt);outline:none;font-family:monospace;min-width:0">
+        </div>
+        <div style="display:flex;align-items:center;gap:7px">
+          <span style="font-size:11px;font-weight:600;color:var(--txt2);width:72px;flex-shrink:0">Chat ID</span>
+          <input id="tg-chatid" placeholder="본인 또는 그룹 ID" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--txt);outline:none;min-width:0">
+        </div>
+        <div style="display:flex;gap:6px">
+          <button onclick="saveTgConfig()" class="scan-mini" style="flex:1;margin-top:0">💾 저장</button>
+          <button onclick="testTelegram()" class="scan-mini" style="flex:1;margin-top:0;background:var(--bg3);color:var(--txt);border:1px solid var(--border)">📤 테스트</button>
+        </div>
+        <div id="tg-status" style="font-size:11px;font-weight:500;color:var(--txt2);text-align:center;min-height:16px"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════════════════════════════════════════
+     SECTION 2 — 온체인 지표
+════════════════════════════════════════ -->
+<div class="s2">
+  <div class="sec-ttl">📊 온체인 지표 <span style="font-weight:400;font-size:10px;text-transform:none;letter-spacing:0">(수동 입력값은 Glassnode 등에서 확인 후 업데이트)</span></div>
+  <div class="m-grid" id="m-grid"></div>
+</div>
+
+<!-- ════════════════════════════════════════
+     SECTION 3 — 애널리스트 상세 포지션
+════════════════════════════════════════ -->
+<div class="s3">
+  <div class="sec-ttl" style="margin-bottom:8px">
+    📋 애널리스트 상세 포지션
+    <span style="font-size:9px;font-weight:400;color:var(--txt3);text-transform:none;letter-spacing:0;margin-left:6px">슬라이더로 수동 조정 · AI 재분석은 Claude Key 필요</span>
+  </div>
+  <div class="ag-scroll"><div class="ag" id="ag"></div></div>
+</div>
+
+<!-- ── ANALYST MANAGER MODAL ── -->
+<div class="modal-bg" id="mgr-modal" onclick="if(event.target===this)closeMgr()">
+  <div class="modal">
+    <h3>⚙ 애널리스트 관리</h3>
+    <p class="modal-sub">현재 등록된 애널리스트를 삭제하거나 새로운 애널리스트를 추가할 수 있습니다.<br>우수 애널리스트 참고: <a href="https://unbias.fyi" target="_blank">unbias.fyi</a></p>
+    <div class="mgr-list" id="mgr-list"></div>
+    <div class="mgr-add">
+      <h4>+ 새 애널리스트 추가</h4>
+      <div class="mgr-form">
+        <div class="mgr-field"><label>이름</label><input id="mgr-name" placeholder="예: PlanB"></div>
+        <div class="mgr-field"><label>핸들 (Twitter)</label><input id="mgr-handle" placeholder="예: @100trillionUSD"></div>
+        <div class="mgr-field"><label>전문 분야</label><input id="mgr-spec" placeholder="예: S2F 모델 · 수량 분석"></div>
+        <div class="mgr-field"><label>초기 강세% (0~100)</label><input id="mgr-pct" type="number" min="0" max="100" value="50"></div>
+        <div class="mgr-field full"><label>현재 포지션 요약 (한국어 60자 이내)</label><input id="mgr-sum" placeholder="예: 현재 관점 한 줄 요약"></div>
+      </div>
+      <div class="mgr-actions">
+        <button class="btn-modal-close" onclick="closeMgr()">닫기</button>
+        <button class="btn-add-analyst" onclick="addAnalyst()">추가</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  ⛓ Onchain Signal Bot v5 &nbsp;|&nbsp; 자동 새로고침 5분 &nbsp;|&nbsp;
+  <strong>면책:</strong> 분석 보조용이며, 투자 결과는 사용자 책임입니다.
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  ★ 애널리스트 수정 구역 — 추가/삭제/수정 가능 ★
+//  bullPct: 현재 강세 확률 (0~100), 0~39=약세, 40~59=중립, 60~100=강세
+// ═══════════════════════════════════════════════════════════════
+// ★ 연구 기반 데이터 (2026.04 조사) — AI 재분석 버튼으로 최신화 가능
+let ANALYSTS = [
+  { id:'capriole',    name:'Charles Edwards', handle:'@caprioleio',      specialty:'해시 리본 · 온체인 정량 모델', rank:'#1',  bullPct:45, summary:'가치 구간 진입, 딥밸류 미도달. 기관 순매수 재개',      lastScan:'2026.04 조사', scanning:false },
+  { id:'checkmate',   name:'Checkmate',        handle:'@_Checkmatey_',    specialty:'UTXO · 사이클 온체인 분석',   rank:'#2',  bullPct:30, summary:'공급 절반 손실권. 시간+가격 고통 공존, LTH 버팀',      lastScan:'2026.04 조사', scanning:false },
+  { id:'kiyoungju',   name:'Ki Young Ju',      handle:'@ki_young_ju',     specialty:'거래소 플로우 · 고래 추적',   rank:'#3',  bullPct:25, summary:'명백한 약세장. $55k 실현가 하락 후 회복 가능',          lastScan:'2026.04 조사', scanning:false },
+  { id:'willclemente',name:'Will Clemente',    handle:'@WClementeIII',    specialty:'기관 온체인 · 수요 분석',     rank:'#4',  bullPct:40, summary:'기관 주도 구조 변화. 온체인 지표 바닥권 탐색 중',        lastScan:'2026.04 조사', scanning:false },
+  { id:'bencowen',    name:'Ben Cowen',        handle:'@intocryptoverse', specialty:'수학 사이클 · 확률 기반 모델',rank:'#5',  bullPct:20, summary:'200주 SMA $60-70k 목표. 다음 하락 임박 경고',          lastScan:'2026.04 조사', scanning:false },
+  { id:'maartunn',    name:'Maartunn',          handle:'@JA_Maartun',      specialty:'OI · 레버리지 분석',         rank:'#6',  bullPct:28, summary:'OG 고래 숏 유지. 관세 충격 후 약세 신호 다수',          lastScan:'2026.04 조사', scanning:false },
+  { id:'axeladler',   name:'Axel Adler Jr',    handle:'@AxelAdlerJr',     specialty:'거시 경제 + 온체인 통합',     rank:'#7',  bullPct:32, summary:'방어 국면. 자본 순유출·스테이블 축적 없음',              lastScan:'2026.04 조사', scanning:false },
+  { id:'cryptoviz',   name:'CryptoVizArt',     handle:'@CryptovizArt',    specialty:'알트코인 · 네트워크 지표',    rank:'#8',  bullPct:38, summary:'실현 손실 $3억/일. 과도한 이익실현 소화 중',            lastScan:'2026.04 조사', scanning:false },
+  { id:'skew',        name:'Skew',              handle:'@52kskew',         specialty:'파생상품 · OI 심층 분석',    rank:'#9',  bullPct:30, summary:'코인베이스 프리미엄 음수. 현물 수요 지속 약세',          lastScan:'2026.04 조사', scanning:false },
+  { id:'carpenoctom', name:'CarpeNoctom',       handle:'@CarpeNoctom',     specialty:'포지션 트레이딩 · 거시 전략',rank:'#10', bullPct:42, summary:'매크로 변동성 지속. ETF·기관 수요가 구조적 하단 지지',  lastScan:'2026.04 조사', scanning:false }
+];
+
+// ═══════════════════════════════════════════════════════════════
+//  수동 온체인 데이터 (Glassnode / CryptoQuant 에서 업데이트)
+// ═══════════════════════════════════════════════════════════════
+const MANUAL = { mvrvZ:0.43, nupl:0.15, sopr:0.98, netflow:-5000, funding:0.008, puell:0.62 };
+
+// ── live ──
+const LIVE = { fearGreed:null, fearGreedLabel:null, stableMcap:null, defiTvl:null, btcPrice:null, btcChange:null, btcDom:null, lastUpdated:null };
+
+// ── api key ──
+let CLAUDE_KEY = sessionStorage.getItem('claude_key') || '';
+
+// ═══════════════════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════════════════
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function fmt(n){ return (n==null||isNaN(n))?'—':n.toLocaleString('en-US',{maximumFractionDigits:0}); }
+function fmtP(n){ if(!n)return'—'; if(n>=1000)return'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); return'$'+n.toFixed(4); }
+function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+
+// ═══════════════════════════════════════════════════════════════
+//  SCORE 1: 사이클 위치 (낮음=하락장  높음=과열)
+// ═══════════════════════════════════════════════════════════════
+function calcCycle(){
+  const z=MANUAL.mvrvZ, n=MANUAL.nupl, fg=LIVE.fearGreed??50;
+  const mv=z<0?8:z<0.5?16:z<1?25:z<1.5?34:z<2?44:z<2.5?53:z<3?61:z<3.5?68:z<4.5?76:z<6?84:92;
+  const np=n<0?8:n<0.1?18:n<0.25?28:n<0.4?42:n<0.5?55:n<0.65?68:n<0.75?78:88;
+  const fg2=fg<15?8:fg<25?18:fg<35?28:fg<45?40:fg<55?52:fg<65?62:fg<75?71:fg<85?79:86;
+  return { score:Math.round(mv*0.45+np*0.35+fg2*0.20), bd:{mvrv:mv,nupl:np,fg:fg2} };
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SCORE 2: 역발상 매수 기회 지수 (낮은 사이클 = 높은 기회)
+// ═══════════════════════════════════════════════════════════════
+function calcEntry(){
+  const z=MANUAL.mvrvZ,n=MANUAL.nupl,fg=LIVE.fearGreed??50,nf=MANUAL.netflow,s=MANUAL.sopr,pu=MANUAL.puell??1.0;
+  const mv=z<0?96:z<0.5?88:z<1?78:z<2?62:z<3?44:z<4?28:13;
+  const np=n<0?96:n<0.15?85:n<0.25?74:n<0.4?60:n<0.5?45:n<0.65?30:16;
+  const fg2=fg<15?92:fg<25?82:fg<35?70:fg<45?58:fg<55?46:fg<65?36:fg<75?26:16;
+  const sp=s<0.95?88:s<0.97?78:s<1.0?66:s<1.03?50:s<1.05?36:20;
+  const nfe=nf<-20000?84:nf<-5000?73:nf<0?60:nf<5000?44:nf<15000?28:14;
+  const pue=pu<0.5?88:pu<0.8?76:pu<1.5?52:pu<2.0?30:14;
+  return Math.round(mv*0.25+np*0.20+fg2*0.20+sp*0.15+nfe*0.10+pue*0.10);
+}
+
+function calcCon(){ return Math.round(ANALYSTS.reduce((s,a)=>s+a.bullPct,0)/ANALYSTS.length); }
+
+// ═══════════════════════════════════════════════════════════════
+//  COLOR / LABEL
+// ═══════════════════════════════════════════════════════════════
+function cycleCol(s){ return s>=75?'var(--neu)':s>=60?'var(--bull)':s>=40?'var(--acc)':s>=20?'#e05555':'var(--bear)'; }
+function cycleLbl(s){ return s>=75?'상승 후기 / 과열권':s>=60?'상승 중기':s>=40?'회복 / 상승 초기':s>=20?'하락장':'바닥권 (극하락장)'; }
+function entryCol(s){ return s>=70?'var(--bull)':s>=50?'var(--acc)':s>=35?'var(--neu)':'var(--bear)'; }
+function entryLbl(s){ return s>=78?'역발상 매수 적기 ★':s>=62?'매수 기회 높음':s>=46?'중립 진입':s>=30?'매수 기회 낮음':'고점권 — 비추'; }
+function conCol(s){ return s>=65?'var(--bull)':s>=45?'var(--acc)':s>=35?'var(--neu)':'var(--bear)'; }
+function conLbl(s){ return s>=65?'전문가 강세 우세':s>=45?'전문가 중립 / 혼재':s>=35?'전문가 약세 경향':'전문가 약세 우세'; }
+
+// ═══════════════════════════════════════════════════════════════
+//  STRATEGY MATRIX
+// ═══════════════════════════════════════════════════════════════
+function getStrategy(cy,co){
+  const ck=cy>=65?'H':cy>=35?'M':'L', cc=co>=65?'H':co>=35?'M':'L';
+  const M={
+    HH:{icon:'🔴',text:'과열권 — 익절 타이밍',      detail:'사이클 고점 + 전문가 낙관 = 위험\n30~50% 단계적 익절, 추격 매수 금지',    color:'var(--bear)'},
+    HM:{icon:'🟡',text:'상승 후기 — 부분 익절',     detail:'사이클 고점권, 컨센서스 혼재\n20~30% 익절 시작, 기존 비중 유지',         color:'var(--neu)'},
+    HL:{icon:'🟡',text:'사이클↑ + 전문가 약세',      detail:'고점권인데 전문가도 꺾임\n비중 축소 방향 전환 검토',                    color:'var(--neu)'},
+    MH:{icon:'🔵',text:'상승 초기 — 홀드',           detail:'회복 구간 + 전문가 낙관\n기존 포지션 유지, 추격 매수 자제',              color:'var(--acc)'},
+    MM:{icon:'⚪',text:'방향성 대기 — 관망',          detail:'중립 사이클 + 혼재 컨센서스\n관망 최우선, 현금 40%',                    color:'var(--txt3)'},
+    ML:{icon:'🟡',text:'회복 중 + 전문가 약세',       detail:'온체인 회복이지만 전문가 비관\n현금 50% 유지, 신중 접근',                color:'var(--neu)'},
+    LH:{icon:'🟢',text:'하락장 + 낙관 — 분할 매수',  detail:'사이클 저점 + 역발상 낙관 신호\n역사적 분할 매수 구간 (추가 하락 감안)',   color:'var(--bull)'},
+    LM:{icon:'🟢',text:'하락장 — 소량 분할',          detail:'사이클 저점, 컨센서스 혼재\n현금 60% 유지하며 소량 분할',               color:'var(--bull)'},
+    LL:{icon:'🔴',text:'하락장 + 약세 — 관망',        detail:'사이클 저점 + 전문가 모두 비관\n바닥 확인 전 진입 금지, 현금 80%+',      color:'var(--bear)'}
+  };
+  return M[ck+cc]||M['MM'];
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  METRIC STATUS
+// ═══════════════════════════════════════════════════════════════
+function metricSt(id,v){
+  if(v==null||isNaN(v)) return {cls:'b-neu',lbl:'—',itp:'데이터 없음'};
+  switch(id){
+    case'fg':
+      if(v<=15) return{cls:'b-bear',lbl:'극도공포',itp:`극도 공포(${v}) — 패닉 구간, 역발상 주목`};
+      if(v<=25) return{cls:'b-bear',lbl:'공포',    itp:`공포(${v}) — 약세 지속, 손절선 관리`};
+      if(v<=40) return{cls:'b-neu', lbl:'공포',    itp:`공포(${v}) — 약세 분위기, 소량 접근 가능`};
+      if(v<=55) return{cls:'b-neu', lbl:'중립',    itp:`중립(${v}) — 방향성 불확실, 관망`};
+      if(v<=70) return{cls:'b-bull',lbl:'탐욕',    itp:`탐욕(${v}) — 건전한 상승 분위기, 홀드`};
+      if(v<=80) return{cls:'b-neu', lbl:'과탐욕',  itp:`과탐욕(${v}) — 신규 매수 자제, 익절 시작`};
+      return          {cls:'b-bear',lbl:'극탐욕',  itp:`극도 탐욕(${v}) — 고점 신호, 즉시 익절`};
+    case'mvrv':
+      if(v<0)   return{cls:'b-bear',lbl:'극저평가',itp:`극저평가(${v}) — 역사적 매수 구간`};
+      if(v<=2)  return{cls:'b-neu', lbl:'저평가',  itp:`저평가(${v}) — 상승 초기 진입 가능`};
+      if(v<=3.5)return{cls:'b-bull',lbl:'적정',    itp:`적정(${v}) — 상승 중기, 홀드`};
+      if(v<=6)  return{cls:'b-neu', lbl:'고평가',  itp:`고평가(${v}) — 30~50% 익절 준비`};
+      return          {cls:'b-bear',lbl:'극과열',  itp:`극과열(${v}) — 전량 익절 검토`};
+    case'nupl':
+      if(v<0)    return{cls:'b-bear',lbl:'항복',  itp:`Capitulation(${v}) — 역사적 매수 구간`};
+      if(v<=0.25)return{cls:'b-neu', lbl:'희망',  itp:`Hope(${v}) — 회복 초기, 분할 매수 시작`};
+      if(v<=0.5) return{cls:'b-bull',lbl:'낙관',  itp:`Optimism(${v}) — 상승 중기, 홀드`};
+      if(v<=0.75)return{cls:'b-neu', lbl:'믿음',  itp:`Belief(${v}) — 상승 후기, 익절 준비`};
+      return           {cls:'b-bear',lbl:'행복',  itp:`Euphoria(${v}) — 고점권, 단계적 익절`};
+    case'sopr':
+      if(v<0.97) return{cls:'b-bear',lbl:'패닉',  itp:`패닉 매도(${v}) — 손실 투매, 역발상 진입 가능`};
+      if(v<1.0)  return{cls:'b-neu', lbl:'손익',  itp:`손익분기(${v}) — 지지 확인 중`};
+      if(v<1.05) return{cls:'b-bull',lbl:'건전',  itp:`건전 이익실현(${v}) — 홀드`};
+      return           {cls:'b-neu', lbl:'과잉',  itp:`이익실현 과잉(${v}) — 단기 조정 대비`};
+    case'netflow':
+      if(v<-20000)return{cls:'b-bull',lbl:'강유출',itp:`강한 HODLing(${fmt(v)} BTC) — 매수 유지`};
+      if(v<0)     return{cls:'b-bull',lbl:'유출',  itp:`순유출(${fmt(v)} BTC) — 축적 중`};
+      if(v<5000)  return{cls:'b-neu', lbl:'중립',  itp:`소폭 유입(${fmt(v)} BTC) — 주의`};
+      return            {cls:'b-bear',lbl:'유입',  itp:`강한 매도 압력(+${fmt(v)} BTC) — 비중 축소`};
+    case'funding':
+      if(v<-0.01) return{cls:'b-bull',lbl:'숏과다',itp:`숏 과다(${v}%) — 숏스퀴즈 가능`};
+      if(v<=0.01) return{cls:'b-neu', lbl:'중립',  itp:`중립(${v}%) — 레버리지 정상`};
+      if(v<=0.03) return{cls:'b-neu', lbl:'롱주의',itp:`롱 과다(${v}%) — 레버리지 축소`};
+      return            {cls:'b-bear',lbl:'극과열',itp:`극과열(${v}%) — 즉시 레버리지 청산`};
+    case'puell':
+      if(v<0.5) return{cls:'b-bear',lbl:'채굴자항복',itp:`퓰 멀티플(${v}) — 채굴자 항복 구간, 역사적 매수 타이밍`};
+      if(v<0.8) return{cls:'b-neu', lbl:'저평가',   itp:`퓰 멀티플(${v}) — 채굴 수익 낮음, 하락장 후기`};
+      if(v<1.5) return{cls:'b-bull',lbl:'적정',     itp:`퓰 멀티플(${v}) — 정상 범위`};
+      if(v<2.0) return{cls:'b-neu', lbl:'과열주의', itp:`퓰 멀티플(${v}) — 채굴 수익 급증, 고점 주의`};
+      return          {cls:'b-bear',lbl:'극과열',   itp:`퓰 멀티플(${v}) — 역사적 고점 구간, 익절 신호`};
+    case'tvl':
+      if(v>100)return{cls:'b-bull',lbl:'건강',itp:`$${v}B — DeFi 생태계 건강`};
+      if(v>60) return{cls:'b-neu', lbl:'보통',itp:`$${v}B — DeFi 정상`};
+      return         {cls:'b-bear',lbl:'위축',itp:`$${v}B — DeFi 자금 이탈 주의`};
+    default: return{cls:'b-neu',lbl:'—',itp:'—'};
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  ZONE BAR CONFIG — 각 지표의 기준값 구역
+// ═══════════════════════════════════════════════════════════════
+const ZONES = {
+  fg:      { desc:'시장 심리 지수. 공포(매도 과다) ↔ 탐욕(매수 과다) — 역발상: 극도공포가 매수 기회',
+             min:0, max:100,
+             segs:[{max:25,color:'#e03535',lbl:'극도공포'},{max:45,color:'#f97316',lbl:'공포'},{max:55,color:'#eab308',lbl:'중립'},{max:75,color:'#84cc16',lbl:'탐욕'},{max:100,color:'#dc2626',lbl:'극탐욕'}] },
+  mvrv:    { desc:'시장가 ÷ 실현가. 높으면 수익자 많아 과열. 2 이하 = 역사적 매수 구간',
+             min:-2, max:8,
+             segs:[{max:0,  color:'#e03535',lbl:'극저평가'},{max:2,  color:'#f97316',lbl:'저평가'},{max:3.5,color:'#22c55e',lbl:'적정'},{max:6,  color:'#eab308',lbl:'고평가'},{max:8,  color:'#dc2626',lbl:'극과열'}] },
+  nupl:    { desc:'보유자 전체 미실현 손익. 음수 = 항복 구간 (역사적 최적 진입점)',
+             min:-0.4, max:1.0,
+             segs:[{max:0,   color:'#e03535',lbl:'항복'},{max:0.25,color:'#f97316',lbl:'희망'},{max:0.5, color:'#22c55e',lbl:'낙관'},{max:0.75,color:'#eab308',lbl:'믿음'},{max:1.0, color:'#dc2626',lbl:'행복'}] },
+  sopr:    { desc:'이동 코인 수익률. 1 이하 = 손실 매도 = 바닥 신호 (SOPR < 0.97 최적 매수)',
+             min:0.92, max:1.12,
+             segs:[{max:0.97,color:'#e03535',lbl:'패닉'},{max:1.0, color:'#f97316',lbl:'손익분기'},{max:1.05,color:'#22c55e',lbl:'건전'},{max:1.12,color:'#eab308',lbl:'이익과잉'}] },
+  netflow: { desc:'거래소 유입-유출 BTC. 음수 = HODLing(강세), 양수 = 매도 압력(약세)',
+             min:-40000, max:30000,
+             segs:[{max:-20000,color:'#16a34a',lbl:'강유출'},{max:0,    color:'#84cc16',lbl:'유출'},{max:10000, color:'#eab308',lbl:'소유입'},{max:30000, color:'#e03535',lbl:'강유입'}] },
+  funding: { desc:'선물 자금조달률. 음수 = 숏 과다(숏스퀴즈↑), 양수 과열 = 조정 위험',
+             min:-0.05, max:0.10,
+             segs:[{max:-0.01,color:'#22c55e',lbl:'숏과다'},{max:0.01, color:'#eab308',lbl:'중립'},{max:0.03, color:'#f97316',lbl:'롱주의'},{max:0.10, color:'#e03535',lbl:'극과열'}] },
+  puell:   { desc:'채굴자 일일 수익 ÷ 365일 이동평균. 0.5 이하 = 채굴자 항복 구간 (역사적 매수 타이밍)',
+             min:0, max:3,
+             segs:[{max:0.5,color:'#e03535',lbl:'채굴자항복'},{max:0.8,color:'#f97316',lbl:'저평가'},{max:1.5,color:'#22c55e',lbl:'적정'},{max:2.0,color:'#eab308',lbl:'과열주의'},{max:3,color:'#dc2626',lbl:'극과열'}] },
+  tvl:     { desc:'DeFi 예치 총 자산. 생태계 건전성 및 시장 신뢰도 지표',
+             min:0, max:120,
+             segs:[{max:40, color:'#e03535',lbl:'위축'},{max:80, color:'#eab308',lbl:'보통'},{max:120,color:'#22c55e',lbl:'건강'}] }
+};
+
+function makeZoneBar(id, val){
+  const z = ZONES[id]; if(!z) return '';
+  const rng = z.max - z.min;
+  let prev = z.min;
+  const segs = z.segs.map((s,i)=>{
+    const from = ((prev-z.min)/rng*100).toFixed(2);
+    const w    = ((s.max-prev)/rng*100).toFixed(2);
+    prev = s.max;
+    const br = i===0?'4px 0 0 4px':i===z.segs.length-1?'0 4px 4px 0':'0';
+    return `<div class="zbar-seg" style="left:${from}%;width:${w}%;background:${s.color};border-radius:${br};opacity:.75"></div>`;
+  }).join('');
+  const mp = val!=null ? clamp((val-z.min)/rng*100,0,100) : 50;
+  return `<div class="zbar-wrap">
+    <div class="zbar-ttl">기준값 대비 위치</div>
+    <div class="zbar">${segs}
+      <div class="zbar-ptr" style="left:${mp}%">
+        <div class="zbar-line"><div class="zbar-dot"></div></div>
+      </div>
+    </div>
+    <div class="zbar-lbls">${z.segs.map(s=>`<div class="zbar-lbl" style="color:${s.color}">${s.lbl}</div>`).join('')}</div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  ALERTS
+// ═══════════════════════════════════════════════════════════════
+function checkAlerts(){
+  const al=[], {fearGreed:fg,stableMcap:st}=LIVE, {mvrvZ:z,nupl:n,sopr:s,netflow:nf,funding:fr}=MANUAL;
+  if(fg!=null&&fg<=15)   al.push({t:'bear',m:`시장 극도 공포 (F&G ${fg}) — 패닉 구간. 추가 하락 위험`});
+  else if(fg!=null&&fg<=25) al.push({t:'bear',m:`시장 공포 (F&G ${fg}) — 약세 지속, 손절선 관리 필요`});
+  if(fg!=null&&fg>=80)   al.push({t:'bear',m:`시장 극도 탐욕 (F&G ${fg}) — 고점 신호, 즉시 익절`});
+  else if(fg!=null&&fg>=70) al.push({t:'neu', m:`시장 과탐욕 (F&G ${fg}) — 신규 매수 자제, 분할 익절 시작`});
+  if(z>=5.0)  al.push({t:'bear',m:`MVRV Z ${z} — 극과열. 전량 익절 검토`});
+  else if(z>=3.5) al.push({t:'bear',m:`MVRV Z ${z} — 고평가 경고. 30~50% 익절 준비`});
+  if(n>=0.75) al.push({t:'bear',m:`NUPL ${n} — Euphoria 고점권. 즉시 단계적 익절`});
+  if(fr>0.05) al.push({t:'bear',m:`Funding ${fr}% — 레버리지 극과열. 즉시 청산`});
+  if(nf>20000)al.push({t:'bear',m:`Netflow +${fmt(nf)} BTC — 거래소 유입 급증. 매도 압력`});
+  if(fg!=null&&fg<=20&&z<1.5) al.push({t:'entry',m:`📍 역발상 구간 — 극도공포 + 저평가 동시 발생. 분할 매수 타이밍`});
+  if(z<0&&n<0)                al.push({t:'entry',m:`📍 항복 구간 — MVRV(${z}) + NUPL(${n}) 음수. 역사적 최적 진입`});
+  if(s<0.97)                  al.push({t:'entry',m:`📍 SOPR ${s} — 손실 투매 구간 = 바닥 신호. 분할 매수 가능`});
+  if(nf<-20000)               al.push({t:'entry',m:`📍 Netflow ${fmt(nf)} BTC — 강한 HODLing. 장기 축적 신호`});
+  if(st!=null&&st>300)        al.push({t:'entry',m:`📍 스테이블코인 $${st.toFixed(0)}B — 대기 매수력 최대`});
+  return al;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  529 / 429 / 503 에러 대응 — Exponential Backoff 재시도
+//  에러 코드 매뉴얼:
+//    429 Rate Limit   — 요청 과다. 백오프 후 재시도
+//    529 Overloaded   — Anthropic 서버 과부하. 백오프 후 재시도
+//    503 Unavailable  — 서비스 불가. 백오프 후 재시도
+//    401 Unauthorized — API 키 오류. 재시도 없음
+//    400 Bad Request  — 요청 형식 오류. 재시도 없음
+//    timeout          — 네트워크 타임아웃. 재시도 가능
+// ═══════════════════════════════════════════════════════════════
+async function fetchWithRetry(url, opts={}, maxRetries=3){
+  for(let i=0;i<maxRetries;i++){
+    try{
+      const res = await fetch(url, {...opts, signal:AbortSignal.timeout(45000)});
+      if(res.status===529||res.status===503||res.status===429){
+        if(i===maxRetries-1) throw new Error(`HTTP ${res.status}: 최대 재시도 초과`);
+        const wait = Math.pow(2,i)*2000 + Math.random()*500; // 2s, 4s, 8s + jitter
+        console.warn(`HTTP ${res.status} — ${(wait/1000).toFixed(1)}s 후 재시도 (${i+1}/${maxRetries})`);
+        await sleep(wait); continue;
+      }
+      return res;
+    }catch(e){
+      if(i===maxRetries-1) throw e;
+      await sleep(Math.pow(2,i)*1500);
+    }
+  }
+}
+
+async function callClaude(payload, maxRetries=3){
+  if(!CLAUDE_KEY) throw new Error('API 키 없음');
+  for(let i=0;i<maxRetries;i++){
+    try{
+      const res = await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':CLAUDE_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body:JSON.stringify(payload),
+        signal:AbortSignal.timeout(45000)
+      });
+      if(res.status===529||res.status===503||res.status===429){
+        if(i===maxRetries-1) throw new Error(`Claude ${res.status}: 최대 재시도 초과`);
+        const wait=Math.pow(2,i)*2000+Math.random()*500;
+        console.warn(`Claude 과부하(${res.status}) → ${(wait/1000).toFixed(1)}s 재시도 (${i+1}/${maxRetries})`);
+        await sleep(wait); continue;
+      }
+      if(res.status===401) throw new Error('API 키 인증 실패 (401) — 키를 확인해주세요');
+      if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(`Claude ${res.status}: ${e.error?.message||'오류'}`); }
+      return await res.json();
+    }catch(e){
+      if(e.name==='AbortError') throw new Error('Claude API 타임아웃');
+      if(i===maxRetries-1||e.message.includes('401')) throw e;
+      await sleep(Math.pow(2,i)*2000);
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  API FETCHERS
+// ═══════════════════════════════════════════════════════════════
+async function fetchLive(){
+  await Promise.allSettled([
+    fetchWithRetry('https://api.alternative.me/fng/?limit=1&format=json')
+      .then(r=>r.json()).then(d=>{ LIVE.fearGreed=parseInt(d.data[0].value); LIVE.fearGreedLabel=d.data[0].value_classification; }).catch(()=>{}),
+    fetchWithRetry('https://stablecoins.llama.fi/stablecoins?includePrices=true')
+      .then(r=>r.json()).then(d=>{ LIVE.stableMcap=d.peggedAssets.reduce((s,a)=>s+((a.circulating?.peggedUSD)||0),0)/1e9; }).catch(()=>{}),
+    fetchWithRetry('https://api.llama.fi/v2/chains')
+      .then(r=>r.json()).then(d=>{ LIVE.defiTvl=d.reduce((s,c)=>s+(c.tvl||0),0)/1e9; }).catch(()=>{}),
+    fetchWithRetry('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true')
+      .then(r=>r.json()).then(d=>{ const b=d.bitcoin; if(b){LIVE.btcPrice=b.usd;LIVE.btcChange=b.usd_24h_change;} }).catch(()=>{}),
+    fetchWithRetry('https://api.coingecko.com/api/v3/global')
+      .then(r=>r.json()).then(d=>{ LIVE.btcDom=d.data?.market_cap_percentage?.btc; }).catch(()=>{})
+  ]);
+  LIVE.lastUpdated=new Date();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  ANALYST AI SCAN
+// ═══════════════════════════════════════════════════════════════
+async function scanOne(id){
+  const a=ANALYSTS.find(x=>x.id===id); if(!a||a.scanning) return;
+  if(!CLAUDE_KEY){
+    const note=document.getElementById('data-src-note');
+    if(note) note.style.color='var(--bear)';
+    setTimeout(()=>{ if(note) note.style.color=''; }, 2000);
+    return;
+  }
+  a.scanning=true; refreshCard(id);
+  const prompt=`암호화폐 애널리스트 포지션 분석. 대상: ${a.name} (${a.handle}) — ${a.specialty} 전문.
+웹서치로 최근 7일(없으면 30일) 발언/분석을 찾아 강세/중립/약세로 분류.
+JSON만 응답(마크다운 없이): {"position":"bull"|"bear"|"neutral","bullPct":0~100,"summary":"현재 관점 한국어 60자 이내"}
+못 찾으면 summary에 "(추정)" 표시.`;
+  try{
+    const data=await callClaude({model:'claude-sonnet-4-20250514',max_tokens:300,
+      tools:[{type:'web_search_20250305',name:'web_search'}],
+      messages:[{role:'user',content:prompt}]});
+    const txt=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+    const m=txt.match(/\{[\s\S]*?\}/);
+    if(m){ const p=JSON.parse(m[0]); a.bullPct=clamp(parseInt(p.bullPct)||50,0,100); a.summary=p.summary||'분석 완료'; a.lastScan=new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}); }
+  }catch(e){ a.summary=`분석 실패: ${e.message}`; }
+  a.scanning=false; refreshCard(id); updateConUI(); recalc();
+}
+
+async function scanAll(){
+  if(!CLAUDE_KEY){
+    const note=document.getElementById('data-src-note');
+    if(note){ note.textContent='헤더에서 Claude API Key를 저장하면\nAI 실시간 재분석이 가능합니다.'; note.style.color='var(--bear)'; }
+    return;
+  }
+  const btn=document.getElementById('scan-btn'); btn.disabled=true; btn.textContent='스캔 중...';
+  for(const a of ANALYSTS){ await scanOne(a.id); await sleep(1000); }
+  btn.disabled=false; btn.textContent='⚡ AI로 재분석'; saveState();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════════════════════════
+function renderHeader(){
+  const p=LIVE.btcPrice; document.getElementById('btc-price').textContent=p?fmtP(p):'—';
+  const chg=LIVE.btcChange, ce=document.getElementById('btc-chg');
+  if(chg!=null){ ce.textContent=(chg>=0?'+':'')+chg.toFixed(2)+'%'; ce.className='chg '+(chg>=0?'chg-pos':'chg-neg'); }
+  if(LIVE.btcDom) document.getElementById('btc-dom').textContent=`DOM ${LIVE.btcDom.toFixed(1)}%`;
+  if(LIVE.lastUpdated) document.getElementById('last-ts').textContent=LIVE.lastUpdated.toLocaleTimeString('ko-KR');
+}
+
+function renderGauge(cy,en){
+  const TOTAL=283, col=cycleCol(cy), off=TOTAL-(cy/100)*TOTAL;
+  const gf=document.getElementById('g-fill'); if(gf){gf.setAttribute('stroke-dashoffset',off.toFixed(1));gf.setAttribute('stroke',col);}
+  const gn=document.getElementById('g-num'); if(gn){gn.textContent=cy;gn.setAttribute('fill',col);}
+  const gl=document.getElementById('g-lbl'); if(gl) gl.textContent=cycleLbl(cy);
+  const ec=entryCol(en), eb=document.getElementById('entry-bar'), eN=document.getElementById('entry-num'), eH=document.getElementById('entry-hint');
+  if(eb){eb.style.width=en+'%';eb.style.background=ec;}
+  if(eN){eN.textContent=en;eN.style.color=ec;}
+  if(eH) eH.textContent=entryLbl(en);
+}
+
+function renderBreakdown(bd){
+  document.getElementById('bd-grid').innerHTML=[
+    {k:'mvrv',l:'MVRV Z (45%)'},{k:'nupl',l:'NUPL (35%)'},{k:'fg',l:'F&G (20%)'}
+  ].map(({k,l})=>{
+    const s=Math.round(bd[k]||0);
+    return `<div class="bd-row"><span class="bd-lbl">${l}</span><div class="bd-bg"><div class="bd-fill" style="width:${s}%;background:${cycleCol(s)}"></div></div><span class="bd-n" style="color:${cycleCol(s)}">${s}</span></div>`;
+  }).join('');
+}
+
+function renderAlerts(als){
+  const el=document.getElementById('alert-list');
+  if(!als.length){ el.innerHTML='<div class="no-al" style="color:var(--bull)">✅ 주의 트리거 없음 — 안전 구간</div>'; return; }
+  const sorted=[...als].sort((a,b)=>({bear:0,neu:1,entry:2}[a.t]??3)-({bear:0,neu:1,entry:2}[b.t]??3));
+  el.innerHTML=sorted.map(a=>`<div class="al-row al-${a.t}"><span>${a.t==='bear'?'🔴':a.t==='neu'?'🟡':'📍'}</span><span>${a.m}</span></div>`).join('');
+}
+
+function renderMetrics(){
+  const {fearGreed:fg,fearGreedLabel:fgl,defiTvl:tvl}=LIVE;
+  const {mvrvZ,nupl,sopr,netflow,funding,puell}=MANUAL;
+  const metrics=[
+    {id:'fg',    nm:'Fear & Greed Index',     val:fg,          auto:true,  disp:fg!=null?`${fg}`:      '—',  sub:fgl||''},
+    {id:'mvrv',  nm:'MVRV Z-Score',           val:mvrvZ,                   disp:`${mvrvZ}`,                  field:'mvrvZ',   step:'0.01'},
+    {id:'nupl',  nm:'NUPL',                   val:nupl,                    disp:`${nupl}`,                   field:'nupl',    step:'0.01'},
+    {id:'sopr',  nm:'SOPR',                   val:sopr,                    disp:`${sopr}`,                   field:'sopr',    step:'0.001'},
+    {id:'netflow',nm:'Exchange Netflow (7d)', val:netflow,                 disp:`${netflow>=0?'+':''}${fmt(netflow)} BTC`, field:'netflow', step:'100'},
+    {id:'funding',nm:'Funding Rate',          val:funding,                 disp:`${funding>=0?'+':''}${funding}%`, field:'funding', step:'0.001'},
+    {id:'puell', nm:'Puell Multiple',           val:MANUAL.puell,                             disp:`${MANUAL.puell}`,               field:'puell',   step:'0.01'},
+    {id:'tvl',   nm:'DeFi TVL',               val:tvl!=null?Math.round(tvl):null, auto:true, disp:tvl!=null?`$${tvl.toFixed(1)}B`:'—'}
+  ];
+  document.getElementById('m-grid').innerHTML=metrics.map(m=>{
+    const st2=metricSt(m.id,m.val);
+    const valCol=st2.cls==='b-bull'?'var(--bull)':st2.cls==='b-bear'?'var(--bear)':'var(--neu)';
+    const desc=ZONES[m.id]?.desc||'';
+    const zbar=m.val!=null?makeZoneBar(m.id,m.val):'';
+    return `<div class="mc" id="mc-${m.id}">
+      <div class="mc-hd"><span class="mc-nm">${m.nm}</span>
+        <div style="display:flex;gap:4px;align-items:center">
+          ${m.auto?'<span class="badge b-auto">AUTO</span>':''}
+          <span class="badge ${st2.cls}" id="badge-${m.id}">${st2.lbl}</span>
+        </div>
+      </div>
+      <div class="mc-dsc">${desc}</div>
+      <div class="mc-val" style="color:${valCol}">${m.disp}${m.sub?`<span style="font-size:12px;color:var(--txt2);margin-left:6px">${m.sub}</span>`:''}</div>
+      <div class="mc-itp" id="itp-${m.id}">${st2.itp}</div>
+      ${zbar}
+      ${m.field?`<div class="mc-inp"><label>수동 입력</label><input type="number" id="inp-${m.field}" value="${m.val}" step="${m.step}" onchange="updateManual('${m.field}',this.value)"></div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function renderStrategy(cy,co){
+  const scC=document.getElementById('sc-cycle'), scCo=document.getElementById('sc-con');
+  if(scC){scC.textContent=cy;scC.style.color=cycleCol(cy);}
+  if(scCo){scCo.textContent=co;scCo.style.color=conCol(co);}
+  const st=getStrategy(cy,co);
+  const sb=document.getElementById('strat-box'); if(sb) sb.style.borderColor=st.color;
+  const si=document.getElementById('s-icon'); if(si) si.textContent=st.icon;
+  const stx=document.getElementById('s-text'); if(stx){stx.textContent=st.text;stx.style.color=st.color;}
+  const sd=document.getElementById('s-detail'); if(sd) sd.textContent=st.detail;
+}
+
+function renderAnalysts(){
+  document.getElementById('ag').innerHTML=ANALYSTS.map((a,i)=>{
+    const p=a.bullPct, ptC=p>=60?'pt-bull':p>=40?'pt-neu':'pt-bear', ptT=p>=60?'강세':p>=40?'중립':'약세';
+    const fc=p>=60?'var(--bull)':p>=40?'var(--neu)':'var(--bear)';
+    return `<div class="ac" id="ac-${a.id}">
+      <div class="ac-hd">
+        <div class="ac-nm">${a.name}</div>
+        <div class="ac-hdl">${a.handle}</div>
+        <div class="ac-role">${a.rank} · ${a.specialty}</div>
+      </div>
+      <div class="ac-mid">
+        <span class="pt ${ptC}" id="pt-${a.id}">${ptT}</span>
+        <div class="br"><span class="br-l">강세</span><div class="br-t"><div class="br-f" id="brf-${a.id}" style="width:${p}%;background:${fc}"></div></div><span class="br-p" id="brp-${a.id}" style="color:${fc}">${p}%</span></div>
+      </div>
+      <div class="ac-sum${a.summary?'':' dim'}" id="sum-${a.id}">${a.summary||(a.scanning?'분석 중...':'슬라이더로 조정 가능')}</div>
+      <div class="ac-sl">
+        <input type="range" class="a-slider" min="0" max="100" value="${p}" id="sl-${a.id}" oninput="updateAnalyst(${i},this.value)">
+        <div class="a-pct" id="apct-${a.id}" style="color:${fc}">${p}%</div>
+      </div>
+      <div class="ac-ft">
+        <span class="ac-ts">${a.lastScan?'스캔: '+a.lastScan:'미스캔'}</span>
+        <span class="rescan" onclick="scanOne('${a.id}')">재스캔</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function refreshCard(id){
+  const a=ANALYSTS.find(x=>x.id===id); if(!a) return;
+  const p=a.bullPct, ptC=p>=60?'pt-bull':p>=40?'pt-neu':'pt-bear', ptT=p>=60?'강세':p>=40?'중립':'약세';
+  const fc=p>=60?'var(--bull)':p>=40?'var(--neu)':'var(--bear)';
+  const set=(sel,fn)=>{ const e=document.getElementById(sel); if(e) fn(e); };
+  set(`pt-${id}`,  e=>{ e.className=`pt ${ptC}`; e.textContent=ptT; });
+  set(`brf-${id}`, e=>{ e.style.width=p+'%'; e.style.background=fc; });
+  set(`brp-${id}`, e=>{ e.textContent=p+'%'; e.style.color=fc; });
+  set(`sum-${id}`, e=>{ e.textContent=a.scanning?'분석 중...':(a.summary||'슬라이더로 조정 가능'); e.className='ac-sum'+(a.summary&&!a.scanning?'':' dim'); });
+  set(`sl-${id}`,  e=>{ e.value=p; });
+  set(`apct-${id}`,e=>{ e.textContent=p+'%'; e.style.color=fc; });
+}
+
+function updateConUI(){
+  const avg=calcCon(), col=conCol(avg);
+  const set=(id,fn)=>{ const e=document.getElementById(id); if(e) fn(e); };
+  set('ch-num',   e=>{ e.textContent=avg; e.style.color=col; });
+  set('ch-verdict',e=>{ e.textContent=conLbl(avg); e.style.color=col; });
+  set('ch-fill',  e=>{ e.style.width=avg+'%'; e.style.background=col; });
+  set('sc-con',   e=>{ e.textContent=avg; e.style.color=col; });
+  const bulls=ANALYSTS.filter(a=>a.bullPct>=60).length;
+  const neus =ANALYSTS.filter(a=>a.bullPct>=40&&a.bullPct<60).length;
+  const bears=ANALYSTS.filter(a=>a.bullPct<40).length;
+  set('cnt-bull',e=>e.textContent=bulls);
+  set('cnt-neu', e=>e.textContent=neus);
+  set('cnt-bear',e=>e.textContent=bears);
+}
+
+function recalc(){
+  const {score:cy,bd}=calcCycle(), en=calcEntry(), co=calcCon();
+  renderGauge(cy,en); renderBreakdown(bd); renderAlerts(checkAlerts()); renderStrategy(cy,co); updateConUI();
+  // update metric badges only
+  ['fg','mvrv','nupl','sopr','netflow','funding','puell','tvl'].forEach(id=>{
+    let v; switch(id){
+      case'fg':v=LIVE.fearGreed;break; case'mvrv':v=MANUAL.mvrvZ;break;
+      case'nupl':v=MANUAL.nupl;break; case'sopr':v=MANUAL.sopr;break;
+      case'netflow':v=MANUAL.netflow;break; case'funding':v=MANUAL.funding;break;
+      case'puell':v=MANUAL.puell;break;
+      case'tvl':v=LIVE.defiTvl!=null?Math.round(LIVE.defiTvl):null;break;
+    }
+    const st=metricSt(id,v);
+    const b=document.getElementById(`badge-${id}`); if(b){b.className=`badge ${st.cls}`;b.textContent=st.lbl;}
+    const i=document.getElementById(`itp-${id}`);   if(i) i.textContent=st.itp;
+  });
+}
+
+function renderAll(){
+  renderHeader();
+  const {score:cy,bd}=calcCycle(), en=calcEntry(), co=calcCon();
+  renderGauge(cy,en); renderBreakdown(bd); renderAlerts(checkAlerts());
+  renderMetrics(); renderStrategy(cy,co); updateConUI();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  INPUT HANDLERS
+// ═══════════════════════════════════════════════════════════════
+function updateManual(field,val){
+  MANUAL[field]=parseFloat(val); saveState(); recalc();
+  // zone bar 갱신
+  const idMap={mvrvZ:'mvrv',nupl:'nupl',sopr:'sopr',netflow:'netflow',funding:'funding'};
+  const mid=idMap[field]; if(!mid) return;
+  const mc=document.getElementById(`mc-${mid}`); if(!mc) return;
+  const zw=mc.querySelector('.zbar-wrap');
+  if(zw){ const newBar=document.createElement('div'); newBar.innerHTML=makeZoneBar(mid,MANUAL[field]); zw.replaceWith(newBar.firstElementChild); }
+}
+function updateAnalyst(idx,val){
+  ANALYSTS[idx].bullPct=parseInt(val); refreshCard(ANALYSTS[idx].id); saveState(); updateConUI(); recalc();
+}
+function saveApiKey(){
+  const k=document.getElementById('api-key-inp').value.trim(); if(!k) return;
+  CLAUDE_KEY=k; sessionStorage.setItem('claude_key',k);
+  document.getElementById('api-key-inp').value='';
+  const ind=document.getElementById('ind-claude');
+  if(ind){ ind.className='ind ind-ok'; ind.innerHTML='<span class="ind-dot" style="background:var(--bull)"></span>AI 준비'; }
+  alert('Claude API 키 저장 완료. AI 전체 스캔을 사용할 수 있습니다.');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  LOCAL STORAGE
+// ═══════════════════════════════════════════════════════════════
+//  TELEGRAM NOTIFICATION
+// ═══════════════════════════════════════════════════════════════
+let TG = { token:'', chatId:'' };
+let _lastAlertKeys = new Set();
+
+function loadTgConfig(){
+  try{ const s=localStorage.getItem('oc_tg'); if(s){ const d=JSON.parse(s); TG.token=d.token||''; TG.chatId=d.chatId||''; } }catch(e){}
+  if(TG.token){ document.getElementById('tg-token').value=TG.token; }
+  if(TG.chatId){ document.getElementById('tg-chatid').value=TG.chatId; }
+}
+function saveTgConfig(){
+  TG.token=document.getElementById('tg-token').value.trim();
+  TG.chatId=document.getElementById('tg-chatid').value.trim();
+  try{ localStorage.setItem('oc_tg',JSON.stringify(TG)); }catch(e){}
+  setTgStatus(TG.token?'✅ 저장됨':'❌ 토큰 없음');
+}
+function setTgStatus(msg,color='var(--txt2)'){ const e=document.getElementById('tg-status'); if(e){e.textContent=msg;e.style.color=color;} }
+
+async function sendTelegram(text){
+  if(!TG.token||!TG.chatId) return false;
+  try{
+    const res=await fetch(`https://api.telegram.org/bot${TG.token}/sendMessage`,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({chat_id:TG.chatId, text, parse_mode:'HTML'})
+    });
+    return res.ok;
+  }catch(e){ return false; }
+}
+
+async function testTelegram(){
+  saveTgConfig();
+  if(!TG.token||!TG.chatId){ setTgStatus('❌ Token과 Chat ID를 먼저 입력하세요','var(--bear)'); return; }
+  setTgStatus('전송 중...','var(--txt3)');
+  const ok=await sendTelegram(`🔔 <b>Onchain Signal v5 테스트</b>\n연결이 정상적으로 설정되었습니다.\n현재 BTC: $${LIVE.btcPrice?.toLocaleString()||'—'}`);
+  setTgStatus(ok?'✅ 전송 성공!':'❌ 전송 실패 — Token/ID 확인','var(--'+(ok?'bull':'bear')+')');
+}
+
+async function checkAndNotify(){
+  if(!TG.token||!TG.chatId) return;
+  const als=checkAlerts();
+  const newAls=als.filter(a=>!_lastAlertKeys.has(a.m));
+  if(newAls.length){
+    const emoji={'bear':'🔴','neu':'🟡','entry':'📍'};
+    const lines=newAls.map(a=>`${emoji[a.t]||'•'} ${a.m}`).join('\n');
+    const txt=`🚨 <b>Onchain Signal 알림</b>\n\n${lines}\n\n💰 BTC $${LIVE.btcPrice?.toLocaleString()||'—'}\n📊 사이클: ${calcCycle().score} | 매수기회: ${calcEntry()}`;
+    await sendTelegram(txt);
+  }
+  _lastAlertKeys=new Set(als.map(a=>a.m));
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  ANALYST MANAGER
+// ═══════════════════════════════════════════════════════════════
+function openMgr(){
+  renderMgrList();
+  document.getElementById('mgr-modal').classList.add('open');
+}
+function closeMgr(){ document.getElementById('mgr-modal').classList.remove('open'); }
+
+function renderMgrList(){
+  document.getElementById('mgr-list').innerHTML = ANALYSTS.map((a,i)=>`
+    <div class="mgr-row">
+      <div class="mgr-info">
+        <div class="mgr-name">${a.name} <span style="color:var(--txt3);font-weight:400;font-size:10px">${a.handle}</span></div>
+        <div class="mgr-meta">${a.specialty}</div>
+      </div>
+      <button class="mgr-del" onclick="removeAnalyst(${i})">삭제</button>
+    </div>`).join('');
+}
+
+function removeAnalyst(i){
+  if(ANALYSTS.length<=2){ alert('최소 2명은 유지해야 합니다.'); return; }
+  ANALYSTS.splice(i,1);
+  ANALYSTS.forEach((a,j)=>{ a.rank='#'+(j+1); });
+  saveState(); renderMgrList(); renderAnalysts(); updateConUI(); recalc();
+}
+
+function addAnalyst(){
+  const nm=document.getElementById('mgr-name').value.trim();
+  const hn=document.getElementById('mgr-handle').value.trim();
+  const sp=document.getElementById('mgr-spec').value.trim();
+  const pt=Math.min(100,Math.max(0,parseInt(document.getElementById('mgr-pct').value)||50));
+  const sm=document.getElementById('mgr-sum').value.trim();
+  if(!nm||!hn){ alert('이름과 핸들은 필수입니다.'); return; }
+  const id=hn.replace(/[^a-z0-9]/gi,'').toLowerCase()||('analyst'+Date.now());
+  ANALYSTS.push({id,name:nm,handle:hn,specialty:sp||'온체인 분석',rank:'#'+(ANALYSTS.length+1),bullPct:pt,summary:sm,lastScan:'직접 추가',scanning:false});
+  saveState(); renderMgrList(); renderAnalysts(); updateConUI(); recalc();
+  ['mgr-name','mgr-handle','mgr-spec','mgr-sum'].forEach(id=>{ document.getElementById(id).value=''; });
+  document.getElementById('mgr-pct').value=50;
+}
+
+// ═══════════════════════════════════════════════════════════════
+function saveState(){
+  try{ localStorage.setItem('oc_v5',JSON.stringify({manual:MANUAL,analysts:ANALYSTS.map(({id,bullPct,summary,lastScan})=>({id,bullPct,summary,lastScan}))})); }catch(e){}
+}
+function loadState(){
+  try{
+    const s=localStorage.getItem('oc_v5'); if(!s) return;
+    const {manual,analysts}=JSON.parse(s);
+    if(manual) Object.assign(MANUAL,manual);
+    if(analysts) analysts.forEach(s=>{ const a=ANALYSTS.find(x=>x.id===s.id); if(a){ a.bullPct=s.bullPct; const ok=s.summary&&!s.summary.includes('키없음')&&!s.summary.includes('스캔가능')&&!s.summary.includes('AI 키'); if(ok){a.summary=s.summary;a.lastScan=s.lastScan;} } });
+  }catch(e){}
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TIMER / REFRESH
+// ═══════════════════════════════════════════════════════════════
+let timer=300, timerIv=null;
+function updateCd(){ const e=document.getElementById('countdown'); const m=Math.floor(timer/60),s=timer%60; if(e) e.textContent=`${m}:${s.toString().padStart(2,'0')}`; }
+function startTimer(){ if(timerIv) clearInterval(timerIv); timerIv=setInterval(()=>{ timer--; updateCd(); if(timer<=0){timer=300;fetchLive().then(()=>{ renderAll(); checkAndNotify(); });} },1000); }
+async function manualRefresh(){
+  timer=300; updateCd();
+  const b=document.getElementById('btn-rf'); if(b){b.textContent='로딩 중...';b.disabled=true;}
+  await fetchLive(); renderAll();
+  if(b){b.textContent='↻ 새로고침';b.disabled=false;}
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════
+async function init(){
+  loadState(); loadTgConfig();
+  if(CLAUDE_KEY){ const ind=document.getElementById('ind-claude'); if(ind){ind.className='ind ind-ok';ind.innerHTML='<span class="ind-dot" style="background:var(--bull)"></span>AI 준비';} }
+  // 초기 렌더 (live 없이)
+  const {score:cy,bd}=calcCycle(), en=calcEntry(), co=calcCon();
+  renderGauge(cy,en); renderBreakdown(bd); renderAlerts(checkAlerts());
+  renderMetrics(); renderAnalysts(); renderStrategy(cy,co); updateConUI();
+  // live 데이터 fetch
+  await fetchLive();
+  renderAll();
+  startTimer(); updateCd();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

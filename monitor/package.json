@@ -1,0 +1,12 @@
+{
+  "name": "onchain-signal-monitor",
+  "version": "1.0.0",
+  "description": "24/7 onchain signal alert monitor with Telegram notifications",
+  "main": "monitor.js",
+  "scripts": {
+    "start": "node monitor.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

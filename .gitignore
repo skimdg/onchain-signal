@@ -1,0 +1,19 @@
+# 민감 정보 제외
+.env
+.env.*
+secrets.json
+
+# Claude 내부 파일
+.claude/
+
+# Node
+node_modules/
+npm-debug.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 구버전 파일
+onchain-signal-v3.html
+analyst-signal-v2.html

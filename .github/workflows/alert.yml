@@ -1,0 +1,24 @@
+name: Onchain Signal Alert
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'   # 15분마다 실행 (GitHub 서버 시간 기준)
+  workflow_dispatch:          # 수동 실행 버튼
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run alert check
+        env:
+          TG_TOKEN:   ${{ secrets.TG_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        run: node monitor/check-once.js
