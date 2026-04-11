@@ -836,9 +836,19 @@ function renderAnalysts(){
         <div class="a-pct" id="apct-${a.id}" style="color:${fc}">${p}%</div>
       </div>
       <div class="ac-ft">
-        <span class="ac-ts">${a.lastScan?'스캔: '+a.lastScan:'미스캔'}</span>
+        <span class="ac-ts" title="${(a.headlines||[])[0]||''}">${(()=>{
+          const h=(a.headlines||[])[0]||'';
+          const d4=h.match(/(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})/);
+          if(d4) return '의견: '+d4[2].padStart(2,'0')+'.'+d4[3].padStart(2,'0')+'('+d4[1]+')';
+          const d2=h.match(/^(\d{1,2})\.\s*(\d{1,2})/);
+          if(d2) return '의견: '+d2[1].padStart(2,'0')+'.'+d2[2].padStart(2,'0');
+          return a.lastScan?'스캔: '+a.lastScan:'미스캔';
+        })()}</span>
         <div style="display:flex;align-items:center;gap:4px">
-          ${(a.sourceUrls||[]).slice(0,3).map((u,i)=>`<a href="${u}" target="_blank" rel="noopener" title="출처 ${i+1}" style="font-size:13px;text-decoration:none;opacity:.7" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">🔗</a>`).join('')}
+          ${(a.sourceUrls||[]).length
+            ? (a.sourceUrls||[]).slice(0,3).map((u,i)=>`<a href="${u}" target="_blank" rel="noopener" title="${((a.headlines||[])[i]||'출처 '+(i+1)).replace(/^[\d. ]+[—-]\s*/,'').substring(0,60)}" style="font-size:13px;text-decoration:none;opacity:.7" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">🔗</a>`).join('')
+            : `<span style="font-size:10px;color:var(--txt3)" title="${(a.headlines||[]).slice(0,3).map(h=>h.replace(/^[\d. ]+[—-]\s*/,'')).join('&#10;')}">📰미확인</span>`
+          }
           <span class="rescan" onclick="scanOne('${a.id}')">재스캔</span>
         </div>
       </div>

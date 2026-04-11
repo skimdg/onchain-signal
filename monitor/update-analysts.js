@@ -196,7 +196,7 @@ async function scanOne(analyst) {
     .slice(0, 3);
 
   const headlines  = recentItems.map(it => {
-    const d = it.pubDate ? new Date(it.pubDate).toLocaleDateString('ko-KR', { month:'2-digit', day:'2-digit' }) : '';
+    const d = it.pubDate ? new Date(it.pubDate).toLocaleDateString('ko-KR', { year:'numeric', month:'2-digit', day:'2-digit' }) : '';
     return `${d} — ${it.title.substring(0, 70)}`;
   });
   const sourceUrls = recentItems.map(it => it.url).filter(Boolean);
