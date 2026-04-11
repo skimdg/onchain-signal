@@ -130,10 +130,69 @@
       ],
       "lastScan": "2026.04.11",
       "scanning": false
+    },
+    {
+      "id": "route2fi",
+      "bullPct": 30,
+      "summary": "단기 약세 포지션. 주요 지지선 이탈 시 추가 하락 경고 (트위터 활동 기반)",
+      "headlines": [],
+      "sourceUrls": [],
+      "lastScan": "2026.04.11",
+      "scanning": false
+    },
+    {
+      "id": "alexkruger",
+      "bullPct": 65,
+      "summary": "관세 리스크 완화 기대, 단기 반등 여지 존재. 거시 데이터 주시 (트위터 활동 기반)",
+      "headlines": [],
+      "sourceUrls": [],
+      "lastScan": "2026.04.11",
+      "scanning": false
+    },
+    {
+      "id": "crypnuevo",
+      "bullPct": 30,
+      "summary": "단기 구조 약세 지속. 핵심 저항 돌파 전까지 매수 자제 권고 (트위터 활동 기반)",
+      "headlines": [],
+      "sourceUrls": [],
+      "lastScan": "2026.04.11",
+      "scanning": false
+    },
+    {
+      "id": "ecoinometrics",
+      "bullPct": 22,
+      "summary": "Bitcoin Bear Market Bottom or Another Leg Down? 5 Signals That Will Decide ",
+      "headlines": [
+        "2026. 02. 22. — Bitcoin Bear Market Bottom or Another Leg Down? 5 Signals That Will De",
+        "2026. 02. 22. — Ecoinometrics Warns Bitcoin at Risk if Equities Roll Over - Live Bitco",
+        "2026. 02. 21. — Bitcoin Bear Market Bottom or Another Leg Down? 5 Signals That Will De"
+      ],
+      "sourceUrls": [
+        "https://news.google.com/rss/articles/CBMiWEFVX3lxTE15Y3BpdTNCekRMU0lkM1RVNkZMWFZHdnJLOGduTGRPSzcwSDUxbXRpTmNXQlhSdDNmZ1lBTF81Q0tubXY0NjAtQ2JXYXpENVF4OV9XZVpXYVM?oc=5",
+        "https://news.google.com/rss/articles/CBMilAFBVV95cUxPa3VnemxwbUd6T1JWc3RqcURhN3NUSU1uTVhfSmlvdXpaWHJuZzFBYlAwNklPcGUtckZWVXRVOHd1RHV0MGhNLTJjRXgzclk1SEZjYWNWRzczNE05RE5ta0phT284SmNQUURsUWhtOE9ZUWZ3ZERRVVRVQkhSUmU5amYzTWxfVHhhRzZPeEJWb2tNaS1L?oc=5",
+        "https://news.google.com/rss/articles/CBMiowFBVV95cUxQc0ZDRFBWeF8yU1U3ZGpaWG5nV2tpcHhhaE5ZS0VzLXpJcWxoN1BZVDFqazRrYloxT09PRWhqZnNKbjFRM2VqSXJfV0VZX2EwTkFCMk5LSi12dk5naTBKejJFcnJucGtqWnppRjU4UENSeW1NcllxUUFONjNKMkR0YkItR0RjRkhXUjVxSlRZZVB6OXdOTHZJMWd5UExDMl8xX0M00gGoAUFVX3lxTFBTck9HNzUwOGlOUHRScTh3M3VYTWFMcVpQbkI4SUlwSjNjNzlGdmxEd2VfNGFQOHc4eDVqZlFfdGNwZmZzMFRlNjhJTmhSbjVrY3BOcXFFLWVtcnN1eGFHZWVkak5sWHdHR1UtUFNZbEYyOHNDT19VLXduTnZla2VBb0dZUjlSMmNIVFQ4WXdxcDRIMkY1cmM1MHFkNlpCd0F6YWNBRThUeA?oc=5"
+      ],
+      "lastScan": "2026.04.11",
+      "scanning": false
+    },
+    {
+      "id": "rektcapital",
+      "bullPct": 20,
+      "summary": "Bitcoin risks 2018-style crash if 200-week EMA breaks, warns analyst - Bitg",
+      "headlines": [
+        "2026. 02. 23. — Bitcoin risks 2018-style crash if 200-week EMA breaks, warns analyst -",
+        "2026. 02. 26. — Bitcoin price outlook: analyst warns it’s ‘premature’ to say bear mark"
+      ],
+      "sourceUrls": [
+        "https://news.google.com/rss/articles/CBMiXkFVX3lxTE51Y1BDN2lIaTI3RlljRVVuZWY3dl9mZ3Y0NTVJX2xVTlNWVm5lV1NQclJuR3hoMUdwMTJFR1Bma1owZFFqSUVXLUlKS01IdVZRcnlwX0pxUXRYY1FmOXfSAWNBVV95cUxPRTZ0X0t6czN2RldmMlBwbUZqdlZ4ZXk0UE5XMndKZjd3RU1hd3VMOUM5Z0s1Tm5fTjlmU3ZSS1hHdy1jcnBhbFBHWUJNbldoMDlQZjhUem1obWlKY1hiR0pjaXM?oc=5",
+        "https://news.google.com/rss/articles/CBMiqgFBVV95cUxPcWd5NjhZLXp5UG5OT05pS1RudXRXdExaeDhKc3VPZ2N6SWMwVENDeHBUeUlxalZOcU4wOWY2OEppQW1XVkE3Rl84bDRqX1lLM3NEQXlac1k3X05RN0M2d1EycWw5ckh2Q0NYQ21FR3RncWt5RWZud2VZQkt3LVBoeDZvS2JLT3p2bVNqcmpzLXZPbm5RNm4yUlJQOGIxVi1zdExHbUlTeEx6dw?oc=5"
+      ],
+      "lastScan": "2026.04.11",
+      "scanning": false
     }
   ],
-  "avgBull": 47,
-  "updatedAt": "2026-04-11T11:20:19.912Z",
-  "updatedAtKST": "2026. 4. 11. PM 8:20:19",
+  "avgBull": 44,
+  "updatedAt": "2026-04-11T11:28:03.198Z",
+  "updatedAtKST": "2026. 4. 11. PM 8:28:03",
   "method": "web-search"
 }

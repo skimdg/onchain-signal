@@ -25,6 +25,12 @@ const ANALYSTS = [
   { id:'cryptoviz',    name:'CryptoVizArt',     handle:'CryptovizArt',    specialty:'알트코인 · 네트워크 지표' },
   { id:'skew',         name:'Skew',              handle:'52kskew',         specialty:'파생상품 · OI 심층 분석' },
   { id:'carpenoctom',  name:'CarpeNoctom',       handle:'CarpeNoctom',     specialty:'포지션 트레이딩 · 거시 전략' },
+  // ── 단기 전문 ──────────────────────────────────────────────
+  { id:'route2fi',     name:'Route 2 Fi',        handle:'Route2FI',        specialty:'단기 가격 예측 · TA 사이클' },
+  { id:'alexkruger',   name:'Alex Kruger',       handle:'krugermacro',     specialty:'거시 경제 · 단기 트레이딩' },
+  { id:'crypnuevo',    name:'CrypNuevo',          handle:'CrypNuevo',       specialty:'기술적 분석 · 단기 차트' },
+  { id:'ecoinometrics',name:'ecoinometrics',     handle:'ecoinometrics',   specialty:'계량 경제 · 단기 사이클' },
+  { id:'rektcapital',  name:'Rekt Capital',      handle:'rektcapital',     specialty:'차트 패턴 · 지지/저항 분석' },
 ];
 
 // ── 감성 구문 (문맥 포함 — 단일 단어 의존 탈피) ──────────────
