@@ -104,15 +104,15 @@
     {
       "id": "skew",
       "bullPct": 20,
-      "summary": "Bitcoin Shows Little Conviction as Signals Skew Negative - Bitcoin.com News",
+      "summary": "Bitcoin options signal extreme fear as downside protection premium hits new",
       "headlines": [
-        "2026. 04. 06. — Bitcoin Shows Little Conviction as Signals Skew Negative - Bitcoin.com",
         "2026. 03. 21. — Bitcoin options signal extreme fear as downside protection premium hit",
+        "2026. 04. 05. — Bitcoin Shows Little Conviction as Signals Skew Negative - Bitcoin.com",
         "2026. 03. 27. — Analyst warns Bitcoin traders are buying ‘crash insurance’ - thestreet"
       ],
       "sourceUrls": [
-        "https://news.google.com/rss/articles/CBMiigFBVV95cUxNVDNOV3ZPcmVzenNBVGJzUTliQzdSVDcwWnRNb3FHQldZYWZjRi11VXY4d2JLdVhXMFJMbFdUdGtGeDRxWkNPOEEtYzVxTWk4QWJEcGpoTmY2NnVDOXRfLUItZ0hZanhxbzh0cWoxeFA1OGEwcUUxSnRLU2FBTU91NXhhbHBTVV9wUHc?oc=5",
         "https://news.google.com/rss/articles/CBMi3gFBVV95cUxPQ2l0blF6dndMWnB6cHdfdDZHdmk4dEp6bVJrS2FIOVdjUmRVaDBFdGw2d19oZllxaWpmS25wWlBnU2o0SWdmWlV0aXp6T29JY0NlTUl4R2dsOUgxcU9heXUwdmtBY1JERFhfd05sTU1QNnJON2UtXzJXU0Z1bkEtbkhjaHBIWTNROHhTRnlTMk9GdW1Lb2RXRGN4OGtrcHdBRTRGTGFTazNtSG1QYmx5a3lNeklqQ3BTbXk2Wm5qLUgyZHlIam44d2dBRktXRDZCMkZ5MDQyMkk3YVEtRnc?oc=5",
+        "https://news.google.com/rss/articles/CBMiigFBVV95cUxNVDNOV3ZPcmVzenNBVGJzUTliQzdSVDcwWnRNb3FHQldZYWZjRi11VXY4d2JLdVhXMFJMbFdUdGtGeDRxWkNPOEEtYzVxTWk4QWJEcGpoTmY2NnVDOXRfLUItZ0hZanhxbzh0cWoxeFA1OGEwcUUxSnRLU2FBTU91NXhhbHBTVV9wUHc?oc=5",
         "https://news.google.com/rss/articles/CBMingFBVV95cUxQYWJnMnlTZFN0bl81WXhkNHZsRU1JOU9qU2NoR3pLc1J1eUZBcF9XZThOV3ZZSnRrX3NOYlZpNkpxYm9OOUd4czJ5UmMwZk1VQzhla1lpWDctMWNOMzlfUGtZWHVzQndmXzB0LUI1RFZFLUJaSXVsU2x2azVWclY4U3hzeU1VTUVjb2RDdUt0VVlHUWxrTm5RaENzRlZXZw?oc=5"
       ],
       "lastScan": "2026.04.11",
@@ -163,7 +163,7 @@
       "bullPct": 22,
       "summary": "Bitcoin Bear Market Bottom or Another Leg Down? 5 Signals That Will Decide ",
       "headlines": [
-        "2026. 02. 22. — Bitcoin Bear Market Bottom or Another Leg Down? 5 Signals That Will De",
+        "2026. 02. 21. — Bitcoin Bear Market Bottom or Another Leg Down? 5 Signals That Will De",
         "2026. 02. 22. — Ecoinometrics Warns Bitcoin at Risk if Equities Roll Over - Live Bitco",
         "2026. 02. 21. — Bitcoin Bear Market Bottom or Another Leg Down? 5 Signals That Will De"
       ],
@@ -191,8 +191,8 @@
       "scanning": false
     }
   ],
-  "avgBull": 44,
-  "updatedAt": "2026-04-11T11:28:03.198Z",
-  "updatedAtKST": "2026. 4. 11. PM 8:28:03",
+  "avgBull": 43,
+  "updatedAt": "2026-04-11T22:41:47.801Z",
+  "updatedAtKST": "2026. 4. 12. AM 7:41:47",
   "method": "web-search"
 }
