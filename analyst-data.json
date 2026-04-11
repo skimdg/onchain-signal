@@ -1,17 +1,128 @@
 {
   "analysts": [
-    { "id": "capriole",     "bullPct": 45, "summary": "가치 구간 진입, 딥밸류 미도달. 기관 순매수 재개",            "lastScan": "2026.04.11", "scanning": false },
-    { "id": "checkmate",    "bullPct": 30, "summary": "공급 절반 손실권. 시간+가격 고통 공존, LTH 버팀",            "lastScan": "2026.04.11", "scanning": false },
-    { "id": "kiyoungju",    "bullPct": 25, "summary": "명백한 약세장. $55k 실현가 하락 후 회복 가능",              "lastScan": "2026.04.11", "scanning": false },
-    { "id": "willclemente", "bullPct": 40, "summary": "기관 주도 구조 변화. 온체인 지표 바닥권 탐색 중",           "lastScan": "2026.04.11", "scanning": false },
-    { "id": "bencowen",     "bullPct": 20, "summary": "200주 SMA $60-70k 목표. 다음 하락 임박 경고",              "lastScan": "2026.04.11", "scanning": false },
-    { "id": "maartunn",     "bullPct": 28, "summary": "OG 고래 숏 유지. 관세 충격 후 약세 신호 다수",              "lastScan": "2026.04.11", "scanning": false },
-    { "id": "axeladler",    "bullPct": 32, "summary": "방어 국면. 자본 순유출·스테이블 축적 없음",                 "lastScan": "2026.04.11", "scanning": false },
-    { "id": "cryptoviz",    "bullPct": 38, "summary": "실현 손실 $3억/일. 과도한 이익실현 소화 중",               "lastScan": "2026.04.11", "scanning": false },
-    { "id": "skew",         "bullPct": 30, "summary": "코인베이스 프리미엄 음수. 현물 수요 지속 약세",              "lastScan": "2026.04.11", "scanning": false },
-    { "id": "carpenoctom",  "bullPct": 42, "summary": "매크로 변동성 지속. ETF·기관 수요가 구조적 하단 지지",      "lastScan": "2026.04.11", "scanning": false }
+    {
+      "id": "capriole",
+      "bullPct": 38,
+      "summary": "Capriole's Edwards Warns Bitcoin Could Fall Below $50K by 2028 - Bitbo",
+      "headlines": [
+        "2025. 12. 17. — Capriole's Edwards Warns Bitcoin Could Fall Below $50K by 2028 - Bitbo",
+        "2025. 12. 22. — Charles Edwards Warns Bitcoin Price Could Drop Below $50,000 Without Quantum Security Upgrade — Here’s Why - CCN.com",
+        "2026. 3. 30. — Bitcoin's Biggest Quantum Critic Breaks Down 'Failure' of Michael Saylor's Bitcoin Strategy - TradingView"
+      ],
+      "lastScan": "2026.04.11",
+      "scanning": false
+    },
+    {
+      "id": "checkmate",
+      "bullPct": 38,
+      "summary": "Bitcoin Price (BTC) Analysis: $95K Needs to Hold - CoinDesk",
+      "headlines": [
+        "2025. 11. 5. — Bitcoin Price (BTC) Analysis: $95K Needs to Hold - CoinDesk",
+        "2025. 12. 9. — Strategy (MSTR) Turned $1,000 Into $637 in 2025: 4D Chess or Checkmate? - Yahoo Finance",
+        "2026. 2. 12. — Bitcoin risk-reward has shifted after recent selloff: on-chain analyst - crypto.news"
+      ],
+      "lastScan": "2026.04.11",
+      "scanning": false
+    },
+    {
+      "id": "kiyoungju",
+      "bullPct": 85,
+      "summary": "Ki Young Ju Says Bitcoin May Need to Hit $55K Before True Recovery Beg",
+      "headlines": [
+        "2026. 2. 18. — Ki Young Ju Says Bitcoin May Need to Hit $55K Before True Recovery Begins - BeInCrypto",
+        "2026. 2. 10. — Bitcoin Not “Pumpable” Right Now, Says CryptoQuant Founder: Here’s Why - TradingView",
+        "2026. 1. 8. — Capital Inflows into Bitcoin Have Dried Up, Says CryptoQuant CEO - Yahoo Finance"
+      ],
+      "lastScan": "2026.04.11",
+      "scanning": false
+    },
+    {
+      "id": "willclemente",
+      "bullPct": 85,
+      "summary": "Bitcoin’s 100 BTC club edges toward 20K wallets in a ‘bullish sign’ - ",
+      "headlines": [
+        "2026. 2. 26. — Bitcoin’s 100 BTC club edges toward 20K wallets in a ‘bullish sign’ - TradingView",
+        "2026. 1. 26. — Bitcoin price news: BTC holds near year's low as precious metals continue garnering attention - CoinDesk",
+        "2025. 10. 31. — Everyone’s Depressed in Crypto — But Bitwise’s CEO Says That’s What Winning Looks Like - Yahoo Finance"
+      ],
+      "lastScan": "2026.04.11",
+      "scanning": false
+    },
+    {
+      "id": "bencowen",
+      "bullPct": 38,
+      "summary": "Ethereum unlikely to reach new highs in 2026: Ben Cowen - MSN",
+      "headlines": [
+        "2025. 12. 26. — Ethereum unlikely to reach new highs in 2026: Ben Cowen - MSN",
+        "2026. 4. 2. — Perspectivas Clave de la Primera Entrevista Blockchain 100 de Binance con Ben Cowen - Binance",
+        "2025. 12. 26. — Ben Cowen Cautions Ethereum May Struggle to Set New Highs - Coinfomania"
+      ],
+      "lastScan": "2026.04.11",
+      "scanning": false
+    },
+    {
+      "id": "maartunn",
+      "bullPct": 62,
+      "summary": "Bitcoin Surge To $74,000 Fueled By US Institutions, Coinbase Premium S",
+      "headlines": [
+        "2026. 3. 5. — Bitcoin Surge To $74,000 Fueled By US Institutions, Coinbase Premium Signals - TradingView",
+        "2025. 10. 29. — Long-Term Holders Are Selling 😬 — 325,600 BTC Just Hit the Market - Binance",
+        "2025. 11. 1. — Zcash Breakout Fueling Bitcoin's Liquidity Drain: Negative Correlation at Play? - TradingView"
+      ],
+      "lastScan": "2026.04.11",
+      "scanning": false
+    },
+    {
+      "id": "axeladler",
+      "bullPct": 60,
+      "summary": "Bitcoin holds $70K: Why ‘phantom leverage’ raises risk of a BTC revers",
+      "headlines": [
+        "2026. 4. 9. — Bitcoin holds $70K: Why ‘phantom leverage’ raises risk of a BTC reversal - Cryptonews.net",
+        "2026. 3. 26. — Bitcoin ETFs Buy 63,000 BTC In 30 Days As Retail Panic Selling Persists - TradingView",
+        "2026. 4. 7. — Bitcoin Tests Long-Term Holder Resilience Near Key Support Levels - MEXC Exchange"
+      ],
+      "lastScan": "2026.04.11",
+      "scanning": false
+    },
+    {
+      "id": "cryptoviz",
+      "bullPct": 38,
+      "summary": "XRP Falls Below $2 As $721 Million Profit-Take Hits Market - TradingVi",
+      "headlines": [
+        "2025. 12. 16. — XRP Falls Below $2 As $721 Million Profit-Take Hits Market - TradingView",
+        "2026. 2. 11. — Gold, Silver Fall Alongside Bitcoin, Ethereum, Dogecoin As 'Extreme Fear' Persists: Analyst Sees BTC's 'S - Benzinga",
+        "2025. 12. 9. — Leverage vanishes from Bitcoin perps as funding rates and open interest sink - crypto.news"
+      ],
+      "lastScan": "2026.04.11",
+      "scanning": false
+    },
+    {
+      "id": "skew",
+      "bullPct": 71,
+      "summary": "Bitcoin Options Traders Confidently Bet on Stunning $80K Price Target ",
+      "headlines": [
+        "2026. 4. 10. — Bitcoin Options Traders Confidently Bet on Stunning $80K Price Target - CryptoRank",
+        "2026. 4. 5. — Bitcoin Shows Little Conviction as Signals Skew Negative - Bitcoin.com News",
+        "2025. 11. 15. — 'Negative Skew': What It Is, Why It's Frustrating Bitcoin Bulls, and Why It Might Mean a Bottom is Near - CoinDesk"
+      ],
+      "lastScan": "2026.04.11",
+      "scanning": false
+    },
+    {
+      "id": "carpenoctom",
+      "bullPct": 38,
+      "summary": "Bitcoin Crash To $87,600 Looms If This Support Snaps, Warns Veteran An",
+      "headlines": [
+        "2025. 10. 30. — Bitcoin Crash To $87,600 Looms If This Support Snaps, Warns Veteran Analyst - TradingView",
+        "2025. 10. 3. — October Outlook: Bitcoin’s Seasonality, Macro Trends, Gold Correlation, and ETF Bonanza - Binance",
+        "2025. 12. 26. — ‘Ominous Sing’: Bitcoin Suddenly Plunges Lower - TradingView"
+      ],
+      "lastScan": "2026.04.11",
+      "scanning": false
+    }
   ],
-  "avgBull": 33,
-  "updatedAt": "2026-04-11T00:00:00.000Z",
-  "updatedAtKST": "2026. 4. 11. 오전 9:00:00"
+  "avgBull": 55,
+  "updatedAt": "2026-04-11T10:51:13.027Z",
+  "updatedAtKST": "2026. 4. 11. PM 7:51:13",
+  "method": "web-search"
 }
