@@ -1,14 +1,11 @@
 {
   "name": "onchain-signal-monitor",
   "version": "1.0.0",
-  "description": "24/7 onchain signal alert monitor with Telegram notifications",
+  "description": "24/7 onchain signal alert & analyst auto-update (no API key required)",
   "main": "monitor.js",
   "scripts": {
     "start": "node monitor.js",
     "update-analysts": "node update-analysts.js"
-  },
-  "dependencies": {
-    "@anthropic-ai/sdk": "^0.39.0"
   },
   "engines": {
     "node": ">=18"

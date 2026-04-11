@@ -2,15 +2,15 @@ name: Update Analyst Positions
 
 on:
   schedule:
-    - cron: '0 23 * * *'   # 매일 오전 8시 KST (UTC 23:00 전날)
+    - cron: '0 22 * * *'   # 매일 오전 7시 KST (UTC 22:00) — 9시 일일 리포트 전에 완료
   workflow_dispatch:         # 수동 실행 버튼
 
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     permissions:
-      contents: write        # analyst-data.json 커밋용
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
@@ -19,13 +19,8 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install dependencies
-        working-directory: monitor
-        run: npm install
-
-      - name: Run analyst update
-        env:
-          CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+      # 의존성 없음 — Node.js 내장 fetch만 사용 (API 키 불필요)
+      - name: Run analyst web search update
         run: node monitor/update-analysts.js
 
       - name: Commit updated analyst data
@@ -33,5 +28,5 @@ jobs:
           git config user.name "Onchain Signal Bot"
           git config user.email "action@github.com"
           git add analyst-data.json
-          git diff --staged --quiet || git commit -m "auto: 애널리스트 포지션 업데이트 $(TZ=Asia/Seoul date +'%Y.%m.%d %H:%M KST')"
+          git diff --staged --quiet || git commit -m "auto: 애널리스트 웹검색 업데이트 $(TZ=Asia/Seoul date +'%Y.%m.%d')"
           git push

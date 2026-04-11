@@ -15,9 +15,17 @@
 const fs   = require('fs');
 const path = require('path');
 
-const TG_TOKEN   = process.env.TG_TOKEN   || '';
-const TG_CHAT_ID = process.env.TG_CHAT_ID || '';
-const STATE_PATH = path.join(__dirname, 'state.json');
+const TG_TOKEN       = process.env.TG_TOKEN   || '';
+const TG_CHAT_ID     = process.env.TG_CHAT_ID || '';
+const STATE_PATH     = path.join(__dirname, 'state.json');
+const ANALYST_PATH   = path.join(__dirname, '..', 'analyst-data.json');
+
+// ── analyst-data.json 읽기 (update-analysts.js가 매일 업데이트) ──
+function loadAnalystData() {
+  try {
+    return JSON.parse(fs.readFileSync(ANALYST_PATH, 'utf8'));
+  } catch { return null; }
+}
 
 // ══════════════════════════════════════════════════════════════
 //  ★ 수동 지표 값 — Glassnode/CryptoQuant 확인 후 업데이트
@@ -192,11 +200,52 @@ async function main() {
 
   if (immediateAlerts.length === 0 && changes.length === 0) {
     console.log('✅ 변경 없음 — 정상 구간');
-    // 매일 오전 9시 KST 정기 리포트
-    const hour = parseInt(new Date().toLocaleString('ko-KR', { timeZone:'Asia/Seoul', hour:'numeric', hour12:false }));
-    if (hour === 9) {
-      await sendTelegram(`📊 <b>Onchain Signal 일일 리포트</b>\n${now}\n\n${summary}\n\n✅ 변경 조건 없음`);
+  }
+
+  // ── 매일 오전 9시 KST 정기 리포트 (조건과 무관하게 항상 전송) ──
+  const hour = parseInt(new Date().toLocaleString('ko-KR', { timeZone:'Asia/Seoul', hour:'numeric', hour12:false }));
+  if (hour === 9) {
+    const analystData = loadAnalystData();
+    let analystSection = '';
+
+    if (analystData?.analysts?.length) {
+      const sorted = [...analystData.analysts].sort((a, b) => a.bullPct - b.bullPct);
+      const bears  = sorted.filter(a => a.bullPct < 40);
+      const neuts  = sorted.filter(a => a.bullPct >= 40 && a.bullPct < 60);
+      const bulls  = sorted.filter(a => a.bullPct >= 60);
+
+      const lines = analystData.analysts.map(a => {
+        const icon = a.bullPct >= 60 ? '🟢' : a.bullPct >= 40 ? '🟡' : '🔴';
+        // 최신 헤드라인이 있으면 첫 번째 표시
+        const hl = a.headlines?.[0]
+          ? `\n    📰 ${a.headlines[0].substring(0, 70)}`
+          : `\n    💬 ${a.summary || '—'}`;
+        return `${icon} <b>${a.id === 'kiyoungju' ? 'Ki Young Ju' : a.headlines ? a.headlines[0]?.split('—')[0]?.trim() || a.id : a.id}</b> ${a.bullPct}%${hl}`;
+      });
+
+      // 이름 조회를 위한 맵
+      const nameMap = {
+        capriole:'Charles Edwards', checkmate:'Checkmate', kiyoungju:'Ki Young Ju',
+        willclemente:'Will Clemente', bencowen:'Ben Cowen', maartunn:'Maartunn',
+        axeladler:'Axel Adler Jr', cryptoviz:'CryptoVizArt', skew:'Skew', carpenoctom:'CarpeNoctom'
+      };
+      const analystLines = analystData.analysts.map(a => {
+        const icon = a.bullPct >= 60 ? '🟢' : a.bullPct >= 40 ? '🟡' : '🔴';
+        const hl = a.headlines?.[0]
+          ? `\n    📰 ${a.headlines[0].replace(/^\d{4}\.\s*\d+\.\s*\d+\.\s*—\s*/, '').substring(0, 65)}`
+          : `\n    💬 ${(a.summary || '—').substring(0, 65)}`;
+        return `${icon} <b>${nameMap[a.id] || a.id}</b>  ${a.bullPct}%  (${a.bullPct>=60?'강세':a.bullPct>=40?'중립':'약세'})${hl}`;
+      });
+
+      analystSection = `\n\n──── 👥 애널리스트 현황 (${analystData.updatedAtKST?.split(' ')[0] || '—'} 웹검색) ────\n`
+        + `강세 ${bulls.length}명 · 중립 ${neuts.length}명 · 약세 ${bears.length}명  (평균 ${analystData.avgBull}%)\n\n`
+        + analystLines.join('\n\n');
     }
+
+    const reportMsg = `📊 <b>Onchain Signal 일일 리포트</b>\n${now}\n\n${summary}${analystSection}\n\n`
+      + (immediateAlerts.length > 0 ? `⚠️ 활성 알림: ${immediateAlerts.length}건\n` + immediateAlerts.join('\n') : '✅ 알림 조건 없음');
+
+    await sendTelegram(reportMsg);
   }
 
   // ── 상태 저장 ──
