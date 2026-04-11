@@ -98,31 +98,37 @@
     },
     {
       "id": "skew",
-      "bullPct": 71,
-      "summary": "Bitcoin Options Traders Confidently Bet on Stunning $80K Price Target ",
+      "bullPct": 32,
+      "summary": "Bitcoin Shows Little Conviction as Signals Skew Negative - Bitcoin.com News",
       "headlines": [
-        "2026. 4. 10. — Bitcoin Options Traders Confidently Bet on Stunning $80K Price Target - CryptoRank",
-        "2026. 4. 5. — Bitcoin Shows Little Conviction as Signals Skew Negative - Bitcoin.com News",
-        "2025. 11. 15. — 'Negative Skew': What It Is, Why It's Frustrating Bitcoin Bulls, and Why It Might Mean a Bottom is Near - CoinDesk"
+        "04. 05. — Bitcoin Shows Little Conviction as Signals Skew Negative - Bitcoin.com",
+        "03. 21. — Bitcoin options signal extreme fear as downside protection premium hit",
+        "03. 27. — Analyst warns Bitcoin traders are buying ‘crash insurance’ - thestreet"
+      ],
+      "sourceUrls": [
+        "https://news.google.com/rss/articles/CBMiigFBVV95cUxNVDNOV3ZPcmVzenNBVGJzUTliQzdSVDcwWnRNb3FHQldZYWZjRi11VXY4d2JLdVhXMFJMbFdUdGtGeDRxWkNPOEEtYzVxTWk4QWJEcGpoTmY2NnVDOXRfLUItZ0hZanhxbzh0cWoxeFA1OGEwcUUxSnRLU2FBTU91NXhhbHBTVV9wUHc?oc=5",
+        "https://news.google.com/rss/articles/CBMi3gFBVV95cUxPQ2l0blF6dndMWnB6cHdfdDZHdmk4dEp6bVJrS2FIOVdjUmRVaDBFdGw2d19oZllxaWpmS25wWlBnU2o0SWdmWlV0aXp6T29JY0NlTUl4R2dsOUgxcU9heXUwdmtBY1JERFhfd05sTU1QNnJON2UtXzJXU0Z1bkEtbkhjaHBIWTNROHhTRnlTMk9GdW1Lb2RXRGN4OGtrcHdBRTRGTGFTazNtSG1QYmx5a3lNeklqQ3BTbXk2Wm5qLUgyZHlIam44d2dBRktXRDZCMkZ5MDQyMkk3YVEtRnc?oc=5",
+        "https://news.google.com/rss/articles/CBMingFBVV95cUxQYWJnMnlTZFN0bl81WXhkNHZsRU1JOU9qU2NoR3pLc1J1eUZBcF9XZThOV3ZZSnRrX3NOYlZpNkpxYm9OOUd4czJ5UmMwZk1VQzhla1lpWDctMWNOMzlfUGtZWHVzQndmXzB0LUI1RFZFLUJaSXVsU2x2azVWclY4U3hzeU1VTUVjb2RDdUt0VVlHUWxrTm5RaENzRlZXZw?oc=5"
       ],
       "lastScan": "2026.04.11",
       "scanning": false
     },
     {
       "id": "carpenoctom",
-      "bullPct": 38,
-      "summary": "Bitcoin Crash To $87,600 Looms If This Support Snaps, Warns Veteran An",
+      "bullPct": 80,
+      "summary": "Hyperliquid Breakout Alert: Bullish Trend Pushes Price Toward $50–$115 - Tr",
       "headlines": [
-        "2025. 10. 30. — Bitcoin Crash To $87,600 Looms If This Support Snaps, Warns Veteran Analyst - TradingView",
-        "2025. 10. 3. — October Outlook: Bitcoin’s Seasonality, Macro Trends, Gold Correlation, and ETF Bonanza - Binance",
-        "2025. 12. 26. — ‘Ominous Sing’: Bitcoin Suddenly Plunges Lower - TradingView"
+        "03. 18. — Hyperliquid Breakout Alert: Bullish Trend Pushes Price Toward $50–$115"
+      ],
+      "sourceUrls": [
+        "https://news.google.com/rss/articles/CBMigAFBVV95cUxOQ3FmOVgwV1VSZ015anNfNElyWl9Md1prMWRGdW9nVG05MWRQbDVrNlFFNjNSVmtpNktsRkJyYlFPX2RtMk5icC1qZEFWb3k1LW5rVnpLVlhmc2tyYXhkdXc3X2t5WUlvMW1HXzlXWkVNN0RjZDVtbGs2R1o0T0Q2MA?oc=5"
       ],
       "lastScan": "2026.04.11",
       "scanning": false
     }
   ],
-  "avgBull": 55,
-  "updatedAt": "2026-04-11T10:51:13.027Z",
-  "updatedAtKST": "2026. 4. 11. PM 7:51:13",
+  "avgBull": 56,
+  "updatedAt": "2026-04-11T11:02:43.686Z",
+  "updatedAtKST": "2026. 4. 11. PM 8:02:43",
   "method": "web-search"
 }
