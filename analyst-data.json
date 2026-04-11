@@ -14,7 +14,7 @@
     },
     {
       "id": "checkmate",
-      "bullPct": 38,
+      "bullPct": 20,
       "summary": "Bitcoin Price (BTC) Analysis: $95K Needs to Hold - CoinDesk",
       "headlines": [
         "2025. 11. 5. — Bitcoin Price (BTC) Analysis: $95K Needs to Hold - CoinDesk",
@@ -26,19 +26,24 @@
     },
     {
       "id": "kiyoungju",
-      "bullPct": 85,
-      "summary": "Ki Young Ju Says Bitcoin May Need to Hit $55K Before True Recovery Beg",
+      "bullPct": 20,
+      "summary": "Ki Young Ju Says Bitcoin May Need to Hit $55K Before True Recovery Begins -",
       "headlines": [
-        "2026. 2. 18. — Ki Young Ju Says Bitcoin May Need to Hit $55K Before True Recovery Begins - BeInCrypto",
-        "2026. 2. 10. — Bitcoin Not “Pumpable” Right Now, Says CryptoQuant Founder: Here’s Why - TradingView",
-        "2026. 1. 8. — Capital Inflows into Bitcoin Have Dried Up, Says CryptoQuant CEO - Yahoo Finance"
+        "02. 18. — Ki Young Ju Says Bitcoin May Need to Hit $55K Before True Recovery Beg",
+        "02. 10. — Bitcoin Not “Pumpable” Right Now, Says CryptoQuant Founder: Here’s Why",
+        "02. 01. — CryptoQuant CEO Ki Young Ju expects bitcoin to continue trading sidewa"
+      ],
+      "sourceUrls": [
+        "https://news.google.com/rss/articles/CBMiW0FVX3lxTE9kZ0FXWFZxcnozUGtpd3hwTllUemJralRJaG1hR0RMUjF6Vnc0U0w0dFlUaUJwTXBlMEF6dFo1YnRhZW9xaFg4d1lHTGx6bGgwb3Z3Wl94UzNDVFE?oc=5",
+        "https://news.google.com/rss/articles/CBMiwgFBVV95cUxNQy1Za0JMTG1xYkZseTA5Y1BEREN5d0o4WG1qc3JpVzZwVVk2TFNaYWNwYlFXQ1BDd2k4R0JNRGtfaUlXcWlFSzI0UTk2TElvcUpkSjhPUGtIUUpPUGVMc3NWN0gwVGZfRjFlTEpnZkRacjFtTzllZkpiRVNYQ0syeEdRZ3BUTDQ2Nnh3RFl0REhHd0JxdVljeE96NjB1NkM1ZFRGckFLV0FKZWo5LWpsUS1kR0FsSGdnZTgtOGZkVGpVdw?oc=5",
+        "https://news.google.com/rss/articles/CBMiXkFVX3lxTE9YOWNiNVF5S0lkbHd1ajJIMVJMUWRaWElXZ1RJbE9Sa2w5V1N2dXZMaXlmZ3MwdlZYdjFRaGdkOVA5TjdMWjFQMXJmMkhFaUhPOTZFTF8zYzY4S08tQlHSAWNBVV95cUxQaGlydEpkRGJIcmRhVnVFRTdUanZxR29rNV9BYkpjbFBiRkFFNjhQWnlueHZVNWtrUkg5NWdHeEFEaVI5b0YtQzVVOHRTZjZGekxuT2hNeXdQelljZHU4SnN3UGs?oc=5"
       ],
       "lastScan": "2026.04.11",
       "scanning": false
     },
     {
       "id": "willclemente",
-      "bullPct": 85,
+      "bullPct": 80,
       "summary": "Bitcoin’s 100 BTC club edges toward 20K wallets in a ‘bullish sign’ - ",
       "headlines": [
         "2026. 2. 26. — Bitcoin’s 100 BTC club edges toward 20K wallets in a ‘bullish sign’ - TradingView",
@@ -62,7 +67,7 @@
     },
     {
       "id": "maartunn",
-      "bullPct": 62,
+      "bullPct": 80,
       "summary": "Bitcoin Surge To $74,000 Fueled By US Institutions, Coinbase Premium S",
       "headlines": [
         "2026. 3. 5. — Bitcoin Surge To $74,000 Fueled By US Institutions, Coinbase Premium Signals - TradingView",
@@ -74,7 +79,7 @@
     },
     {
       "id": "axeladler",
-      "bullPct": 60,
+      "bullPct": 58,
       "summary": "Bitcoin holds $70K: Why ‘phantom leverage’ raises risk of a BTC revers",
       "headlines": [
         "2026. 4. 9. — Bitcoin holds $70K: Why ‘phantom leverage’ raises risk of a BTC reversal - Cryptonews.net",
@@ -86,7 +91,7 @@
     },
     {
       "id": "cryptoviz",
-      "bullPct": 38,
+      "bullPct": 80,
       "summary": "XRP Falls Below $2 As $721 Million Profit-Take Hits Market - TradingVi",
       "headlines": [
         "2025. 12. 16. — XRP Falls Below $2 As $721 Million Profit-Take Hits Market - TradingView",
@@ -98,10 +103,10 @@
     },
     {
       "id": "skew",
-      "bullPct": 32,
+      "bullPct": 20,
       "summary": "Bitcoin Shows Little Conviction as Signals Skew Negative - Bitcoin.com News",
       "headlines": [
-        "04. 05. — Bitcoin Shows Little Conviction as Signals Skew Negative - Bitcoin.com",
+        "04. 06. — Bitcoin Shows Little Conviction as Signals Skew Negative - Bitcoin.com",
         "03. 21. — Bitcoin options signal extreme fear as downside protection premium hit",
         "03. 27. — Analyst warns Bitcoin traders are buying ‘crash insurance’ - thestreet"
       ],
@@ -127,8 +132,8 @@
       "scanning": false
     }
   ],
-  "avgBull": 56,
-  "updatedAt": "2026-04-11T11:02:43.686Z",
-  "updatedAtKST": "2026. 4. 11. PM 8:02:43",
+  "avgBull": 51,
+  "updatedAt": "2026-04-11T11:12:16.999Z",
+  "updatedAtKST": "2026. 4. 11. PM 8:12:16",
   "method": "web-search"
 }

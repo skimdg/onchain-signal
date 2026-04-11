@@ -90,7 +90,7 @@ async function fetchNews(analyst) {
   ];
 
   const allItems = [];
-  for (const q of queries.slice(0, 2)) {
+  for (const q of queries) {
     try {
       const url = `https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=en&gl=US&ceid=US:en`;
       const res = await fetch(url, {
@@ -119,8 +119,8 @@ function calcStance(items, analystFirstName) {
     const ageDays = ageMs / 86400000;
     if (ageDays > 90) return; // 3개월 이상 기사 제외
 
-    const weight = ageDays < 14 ? 3 : ageDays < 30 ? 2 : 1;
-    hasRecent = hasRecent || ageDays < 45;
+    const weight = ageDays < 14 ? 3 : ageDays < 30 ? 2 : ageDays < 60 ? 1 : 0.5;
+    hasRecent = hasRecent || ageDays < 90; // 90일 내 기사면 신호로 인정
 
     // 제목에 애널리스트 이름이 있으면 2배 가중 (직접 발언)
     const isDirectQuote = title.toLowerCase().includes(analystFirstName.toLowerCase());
@@ -128,14 +128,21 @@ function calcStance(items, analystFirstName) {
 
     const txt = (title + ' ' + desc).toLowerCase();
 
-    // 부정 처리: "not bullish", "no recovery" 등 → 점수 반전
-    const negated = /\b(not|no|never|unlikely|won't|cannot|can't|before|until)\b/.test(txt);
+    // 부정 처리: "not bullish", "won't recover" 등 → 강세 점수 반전
+    // before/until 은 강세 부정에만 사용 (bear 구문은 이미 부정적이므로 제외)
+    const negatedBull = /\b(not|no|never|unlikely|won't|cannot|can't|before|until)\b/.test(txt);
+    const negatedBear = /\b(not|no|never|unlikely|won't|cannot|can't)\b/.test(txt);
+
+    // 단어 경계: 짧은 단어(6자 이하)는 부분 매칭 오류 방지
+    const matchPhrase = (t, p) => p.length <= 6
+      ? new RegExp('\\b' + p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b').test(t)
+      : t.includes(p);
 
     BEAR_PHRASES.forEach(p => {
-      if (txt.includes(p)) negated ? (bull += weight * mult * 0.5) : (bear += weight * mult);
+      if (matchPhrase(txt, p)) negatedBear ? (bull += weight * mult * 0.5) : (bear += weight * mult);
     });
     BULL_PHRASES.forEach(p => {
-      if (txt.includes(p)) negated ? (bear += weight * mult * 0.5) : (bull += weight * mult);
+      if (matchPhrase(txt, p)) negatedBull ? (bear += weight * mult * 0.5) : (bull += weight * mult);
     });
   });
 
@@ -157,11 +164,26 @@ async function scanOne(analyst) {
   const bullPct   = calcStance(items, firstName);
 
   if (bullPct === null) {
-    console.log(`  ⚠️ 최신 신호 없음 → 이전 데이터 유지`);
     const prev = prevData[analyst.id];
-    return prev ? { ...prev, scanning: false } : {
-      id: analyst.id, bullPct: 50, summary: '(최근 뉴스 없음)', headlines: [], sourceUrls: [], lastScan: '—', scanning: false,
-    };
+    if (!prev) {
+      return { id: analyst.id, bullPct: 50, summary: '(최근 뉴스 없음)', headlines: [], sourceUrls: [], lastScan: '—', scanning: false };
+    }
+    // 저장된 헤드라인으로 재분석 — 이전 (잘못된) 점수 수정
+    const storedItems = (prev.headlines || []).map(h => {
+      const dateMatch = h.match(/(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})/);
+      const pubDate = dateMatch
+        ? new Date(`${dateMatch[1]}-${dateMatch[2].padStart(2,'0')}-${dateMatch[3].padStart(2,'0')}`).toUTCString()
+        : null;
+      const title = h.replace(/^\d.*?—\s*/, '').trim();
+      return { title, desc: '', pubDate };
+    });
+    const reScore = calcStance(storedItems, firstName);
+    if (reScore !== null) {
+      console.log(`  ♻️  저장 헤드라인 재분석 → ${reScore >= 60 ? '강세' : reScore >= 40 ? '중립' : '약세'} ${reScore}%`);
+      return { ...prev, bullPct: reScore, scanning: false };
+    }
+    console.log(`  ⚠️ 최신 신호 없음 → 이전 데이터 유지`);
+    return { ...prev, scanning: false };
   }
 
   const today = new Date().toLocaleDateString('ko-KR',
