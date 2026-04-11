@@ -837,7 +837,10 @@ function renderAnalysts(){
       </div>
       <div class="ac-ft">
         <span class="ac-ts">${a.lastScan?'스캔: '+a.lastScan:'미스캔'}</span>
-        <span class="rescan" onclick="scanOne('${a.id}')">재스캔</span>
+        <div style="display:flex;align-items:center;gap:4px">
+          ${(a.sourceUrls||[]).slice(0,3).map((u,i)=>`<a href="${u}" target="_blank" rel="noopener" title="출처 ${i+1}" style="font-size:13px;text-decoration:none;opacity:.7" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">🔗</a>`).join('')}
+          <span class="rescan" onclick="scanOne('${a.id}')">재스캔</span>
+        </div>
       </div>
     </div>`;
   }).join('');
