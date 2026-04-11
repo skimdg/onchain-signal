@@ -4,7 +4,11 @@
   "description": "24/7 onchain signal alert monitor with Telegram notifications",
   "main": "monitor.js",
   "scripts": {
-    "start": "node monitor.js"
+    "start": "node monitor.js",
+    "update-analysts": "node update-analysts.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0"
   },
   "engines": {
     "node": ">=18"

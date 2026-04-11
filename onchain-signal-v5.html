@@ -1043,9 +1043,36 @@ async function manualRefresh(){
 // ═══════════════════════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════════════════════
+// ── analyst-data.json 로드 (GitHub Actions 자동 업데이트 결과) ──
+async function loadAnalystData(){
+  try{
+    const res=await fetch('analyst-data.json?_='+Date.now());
+    if(!res.ok) return;
+    const data=await res.json();
+    if(!data.analysts||!Array.isArray(data.analysts)) return;
+    data.analysts.forEach(fetched=>{
+      const idx=ANALYSTS.findIndex(a=>a.id===fetched.id);
+      if(idx>=0) ANALYSTS[idx]={...ANALYSTS[idx],...fetched};
+    });
+    const note=document.getElementById('data-src-note');
+    if(note&&data.updatedAtKST){
+      const d=new Date(data.updatedAt);
+      const diff=Math.floor((Date.now()-d)/3600000);
+      const ago=diff<1?'방금':diff<24?diff+'시간 전':Math.floor(diff/24)+'일 전';
+      note.innerHTML=`🤖 AI 자동 업데이트<br>${data.updatedAtKST.split(' ')[0]} (${ago})`;
+      note.style.color='var(--bull)';
+    }
+    console.log('✅ 애널리스트 데이터 로드:', data.updatedAtKST);
+  }catch(e){
+    console.log('analyst-data.json 없음 — 기본 데이터 사용');
+  }
+}
+
 async function init(){
   loadState(); loadTgConfig();
   if(CLAUDE_KEY){ const ind=document.getElementById('ind-claude'); if(ind){ind.className='ind ind-ok';ind.innerHTML='<span class="ind-dot" style="background:var(--bull)"></span>AI 준비';} }
+  // analyst-data.json 로드 (GitHub Actions 자동 업데이트)
+  await loadAnalystData();
   // 초기 렌더 (live 없이)
   const {score:cy,bd}=calcCycle(), en=calcEntry(), co=calcCon();
   renderGauge(cy,en); renderBreakdown(bd); renderAlerts(checkAlerts());

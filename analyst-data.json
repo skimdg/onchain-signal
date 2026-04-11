@@ -1,0 +1,17 @@
+{
+  "analysts": [
+    { "id": "capriole",     "bullPct": 45, "summary": "가치 구간 진입, 딥밸류 미도달. 기관 순매수 재개",            "lastScan": "2026.04.11", "scanning": false },
+    { "id": "checkmate",    "bullPct": 30, "summary": "공급 절반 손실권. 시간+가격 고통 공존, LTH 버팀",            "lastScan": "2026.04.11", "scanning": false },
+    { "id": "kiyoungju",    "bullPct": 25, "summary": "명백한 약세장. $55k 실현가 하락 후 회복 가능",              "lastScan": "2026.04.11", "scanning": false },
+    { "id": "willclemente", "bullPct": 40, "summary": "기관 주도 구조 변화. 온체인 지표 바닥권 탐색 중",           "lastScan": "2026.04.11", "scanning": false },
+    { "id": "bencowen",     "bullPct": 20, "summary": "200주 SMA $60-70k 목표. 다음 하락 임박 경고",              "lastScan": "2026.04.11", "scanning": false },
+    { "id": "maartunn",     "bullPct": 28, "summary": "OG 고래 숏 유지. 관세 충격 후 약세 신호 다수",              "lastScan": "2026.04.11", "scanning": false },
+    { "id": "axeladler",    "bullPct": 32, "summary": "방어 국면. 자본 순유출·스테이블 축적 없음",                 "lastScan": "2026.04.11", "scanning": false },
+    { "id": "cryptoviz",    "bullPct": 38, "summary": "실현 손실 $3억/일. 과도한 이익실현 소화 중",               "lastScan": "2026.04.11", "scanning": false },
+    { "id": "skew",         "bullPct": 30, "summary": "코인베이스 프리미엄 음수. 현물 수요 지속 약세",              "lastScan": "2026.04.11", "scanning": false },
+    { "id": "carpenoctom",  "bullPct": 42, "summary": "매크로 변동성 지속. ETF·기관 수요가 구조적 하단 지지",      "lastScan": "2026.04.11", "scanning": false }
+  ],
+  "avgBull": 33,
+  "updatedAt": "2026-04-11T00:00:00.000Z",
+  "updatedAtKST": "2026. 4. 11. 오전 9:00:00"
+}
