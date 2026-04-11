@@ -70,7 +70,7 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 .con-ct{flex:1;text-align:center;background:var(--bg3);border:1px solid var(--brd2);border-radius:5px;padding:5px 2px}
 .con-cv{font-size:16px;font-weight:700;line-height:1}
 .con-cl{font-size:10px;color:var(--txt2);margin-top:2px;text-transform:uppercase;font-weight:600}
-.scan-mini{width:100%;padding:7px 8px;background:var(--acc);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;transition:opacity .2s;margin-top:auto}
+.scan-mini{width:100%;padding:11px 8px;background:var(--acc);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .2s;margin-top:auto}
 .scan-mini:hover{opacity:.85}
 .scan-mini:disabled{opacity:.35;cursor:not-allowed}
 .data-src{font-size:10px;color:var(--txt2);text-align:center;line-height:1.4;font-weight:500}
@@ -317,7 +317,7 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
       <div class="con-ct"><div class="con-cv" id="cnt-bear" style="color:var(--bear)">0</div><div class="con-cl">약세</div></div>
     </div>
     <div class="data-src" id="data-src-note">연구 기반 데이터 (2026.04)<br>AI 업데이트: Claude Key 필요</div>
-    <button class="scan-mini" style="background:var(--bg3);color:var(--txt);border:1px solid var(--border)" onclick="openMgr()">⚙ 애널리스트 관리</button>
+    <button class="scan-mini" style="background:#7c3aed" onclick="openMgr()">⚙ 애널리스트 관리</button>
     <button class="scan-mini" id="scan-btn" onclick="scanAll()">⚡ AI로 재분석</button>
   </div>
 
@@ -327,21 +327,21 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
     <div id="alert-list"><div class="no-al">데이터 로딩 중...</div></div>
     <!-- 텔레그램 알림 설정 -->
     <div style="border-top:1px solid var(--brd2);padding-top:10px;margin-top:auto">
-      <div style="font-size:13px;font-weight:700;color:var(--txt);margin-bottom:8px">📲 알림 전송 설정</div>
-      <div style="display:flex;flex-direction:column;gap:7px">
-        <div style="display:flex;align-items:center;gap:7px">
-          <span style="font-size:11px;font-weight:600;color:var(--txt2);width:72px;flex-shrink:0">Bot Token</span>
-          <input id="tg-token" type="password" placeholder="123456:ABC-..." style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--txt);outline:none;font-family:monospace;min-width:0">
+      <div style="font-size:15px;font-weight:700;color:var(--txt);margin-bottom:10px">📲 알림 전송 설정</div>
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;font-weight:700;color:var(--txt2);width:80px;flex-shrink:0">Bot Token</span>
+          <input id="tg-token" type="password" placeholder="123456:ABC-..." style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:7px 10px;font-size:13px;color:var(--txt);outline:none;font-family:monospace;min-width:0">
         </div>
-        <div style="display:flex;align-items:center;gap:7px">
-          <span style="font-size:11px;font-weight:600;color:var(--txt2);width:72px;flex-shrink:0">Chat ID</span>
-          <input id="tg-chatid" placeholder="본인 또는 그룹 ID" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--txt);outline:none;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;font-weight:700;color:var(--txt2);width:80px;flex-shrink:0">Chat ID</span>
+          <input id="tg-chatid" placeholder="본인 또는 그룹 ID" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:7px 10px;font-size:13px;color:var(--txt);outline:none;min-width:0">
         </div>
         <div style="display:flex;gap:6px">
           <button onclick="saveTgConfig()" class="scan-mini" style="flex:1;margin-top:0">💾 저장</button>
           <button onclick="testTelegram()" class="scan-mini" style="flex:1;margin-top:0;background:var(--bg3);color:var(--txt);border:1px solid var(--border)">📤 테스트</button>
         </div>
-        <div id="tg-status" style="font-size:11px;font-weight:500;color:var(--txt2);text-align:center;min-height:16px"></div>
+        <div id="tg-status" style="font-size:12px;font-weight:500;color:var(--txt2);text-align:center;min-height:16px"></div>
       </div>
     </div>
   </div>
