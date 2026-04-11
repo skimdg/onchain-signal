@@ -2,7 +2,7 @@ name: Onchain Signal Alert
 
 on:
   schedule:
-    - cron: '*/15 * * * *'   # 15분마다 실행 (GitHub 서버 시간 기준)
+    - cron: '*/15 * * * *'   # 15분마다 (GitHub 서버 기준)
   workflow_dispatch:          # 수동 실행 버튼
 
 jobs:
@@ -17,8 +17,24 @@ jobs:
         with:
           node-version: '20'
 
+      # 이전 실행의 state.json 복원 (구간 변경 감지용)
+      - name: Restore state cache
+        uses: actions/cache/restore@v4
+        with:
+          path: monitor/state.json
+          key: monitor-state-${{ github.run_id }}
+          restore-keys: |
+            monitor-state-
+
       - name: Run alert check
         env:
           TG_TOKEN:   ${{ secrets.TG_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
         run: node monitor/check-once.js
+
+      # 이번 실행 상태 저장 (다음 실행에서 비교용)
+      - name: Save state cache
+        uses: actions/cache/save@v4
+        with:
+          path: monitor/state.json
+          key: monitor-state-${{ github.run_id }}
