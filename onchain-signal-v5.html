@@ -318,8 +318,8 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
       <div class="con-ct"><div class="con-cv" id="cnt-bear" style="color:var(--bear)">0</div><div class="con-cl">약세</div></div>
     </div>
     <div class="data-src" id="data-src-note">연구 기반 데이터 (2026.04)<br>AI 업데이트: Claude Key 필요</div>
-    <button class="scan-mini" style="background:#7c3aed" onclick="openMgr()">⚙ 애널리스트 관리</button>
-    <button class="scan-mini" id="scan-btn" onclick="scanAll()">⚡ AI로 재분석</button>
+    <button class="scan-mini" style="background:#7c3aed" onclick="requireAdmin(openMgr)">⚙ 애널리스트 관리</button>
+    <button class="scan-mini" id="scan-btn" onclick="requireAdmin(scanAll)">⚡ AI로 재분석</button>
   </div>
 
   <!-- 자동 알림 시그널 (compact) -->
@@ -327,9 +327,9 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
     <div class="sec-ttl" style="margin-bottom:0">🚨 자동 알림 시그널</div>
     <div id="alert-list"><div class="no-al">데이터 로딩 중...</div></div>
     <!-- 텔레그램 알림 상태 (컴팩트) -->
-    <div style="border-top:1px solid var(--brd2);padding-top:8px;margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:6px">
-      <div id="tg-status" style="font-size:11px;color:var(--txt2);flex:1">알림 미설정</div>
-      <button onclick="openAdminModal()" class="scan-mini" style="margin-top:0;font-size:11px;background:var(--bg3);color:var(--txt);border:1px solid var(--border)">⚙ 관리</button>
+    <div style="border-top:1px solid var(--brd2);padding-top:8px;margin-top:auto;display:flex;align-items:center;gap:8px;flex-wrap:nowrap">
+      <div id="tg-status" style="font-size:11px;color:var(--txt2);white-space:nowrap;flex:1;overflow:hidden;text-overflow:ellipsis">알림 미설정</div>
+      <button onclick="openAdminModal()" style="flex-shrink:0;padding:5px 10px;background:var(--bg3);color:var(--txt);border:1px solid var(--border);border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap">⚙ 관리</button>
     </div>
   </div>
 
@@ -451,7 +451,6 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
       <!-- 하단 컨트롤 -->
       <div style="display:flex;gap:6px">
         <button onclick="tgChangePinFlow()" class="scan-mini" style="margin-top:0;font-size:11px;background:var(--bg3);color:var(--txt2);border:1px solid var(--border)">🔑 PIN 변경</button>
-        <button onclick="tgLock()" class="scan-mini" style="margin-top:0;font-size:11px;background:var(--bg3);color:var(--txt2);border:1px solid var(--border)">🔒 잠금</button>
         <button onclick="closeAdminModal()" class="scan-mini" style="flex:1;margin-top:0;font-size:12px">닫기</button>
       </div>
     </div>
@@ -783,6 +782,10 @@ function showToast(msg, duration=3000){
 
 async function scanOne(id){
   const a=ANALYSTS.find(x=>x.id===id); if(!a||a.scanning) return;
+  if(!_tgUnlocked){
+    showToast('🔒 관리자 권한이 필요합니다 — ⚙ 관리에서 PIN을 입력하세요');
+    return;
+  }
   if(!CLAUDE_KEY){
     showToast('🔑 Claude API Key가 필요합니다 — ⚙ 관리 버튼에서 입력하세요');
     return;
@@ -1097,13 +1100,17 @@ function _setAdminLockStatus(unlocked){
   }
 }
 
+function requireAdmin(fn){
+  if(_tgUnlocked){ fn(); return; }
+  showToast('🔒 관리자 권한이 필요합니다 — ⚙ 관리에서 PIN을 입력하세요');
+}
+
 function openAdminModal(){
   document.getElementById('admin-modal').classList.add('open');
-  if(sessionStorage.getItem('tg_unlocked')==='1'){ _tgUnlocked=true; tgShowSettingsPanel(); }
-  else { _setAdminLockStatus(false); tgShowPinPanel(); }
-  // API 키 상태 표시
-  const modal=document.getElementById('ind-api-modal');
-  if(modal && CLAUDE_KEY){ modal.textContent='✅ API 키 설정됨 (탭 세션)'; modal.style.color='var(--bull)'; }
+  // 항상 PIN 화면에서 시작 (매번 인증 요구)
+  _tgUnlocked=false;
+  _setAdminLockStatus(false);
+  tgShowPinPanel();
 }
 
 function closeAdminModal(){
@@ -1145,14 +1152,15 @@ async function tgConfirmPin(){
 
 function tgUnlock(){
   _tgUnlocked=true;
-  sessionStorage.setItem('tg_unlocked','1');
   _setAdminLockStatus(true);
   tgShowSettingsPanel();
+  // API 키 상태 표시
+  const apiModal=document.getElementById('ind-api-modal');
+  if(apiModal && CLAUDE_KEY){ apiModal.textContent='✅ API 키 설정됨 (탭 세션)'; apiModal.style.color='var(--bull)'; }
 }
 
 function tgLock(){
   _tgUnlocked=false;
-  sessionStorage.removeItem('tg_unlocked');
   _setAdminLockStatus(false);
   tgShowPinPanel();
   showToast('🔒 잠금됨');
