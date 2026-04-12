@@ -3,10 +3,15 @@
  * 15분마다 실행 → 이전 상태(state.json)와 비교해 변경 감지 → 텔레그램 알림
  *
  * 감지 조건:
- *   1. 사이클 위치 구간 변경 (바닥권 / 하락장 / 회복 / 상승 / 과열)
- *   2. 온체인 지표 구간 변경 (F&G, MVRV-Z, NUPL, SOPR, 펀딩비, Exchange Netflow, Puell)
- *   3. 애널리스트 스탠스 변경 (약세 / 중립 / 강세)
- *   4. 즉시 경보 조건 (F&G ≤15, F&G ≥85, BTC 24h ≤-10%, BTC 24h ≥+10%)
+ *   1. 애널리스트 스탠스 변경 (analyst-data.json 읽기, 15명)
+ *   2. 사이클 점수 구간 변경 (0~20 / 20~40 / 40~60 / 60~75 / 75+)
+ *      대시보드와 동일 공식: MVRV-Z(45%) + NUPL(35%) + F&G(20%)
+ *   3. 온체인 지표 구간 변경 (F&G 자동 / 나머지 MANUAL 하드코딩)
+ *   4. 즉시 경보 (F&G ≤15, F&G ≥85, BTC 24h ≤-10%, BTC 24h ≥+10%)
+ *   5. 매일 07:30 KST 일일 리포트 (analyst update 완료 30분 후)
+ *
+ * ⚠️  온체인 지표(MVRV-Z/NUPL/SOPR/Netflow/Funding/Puell)는 Glassnode API 없이
+ *     자동 수집 불가 → 대시보드에서 수동 업데이트 후 아래 MANUAL 값도 같이 수정 필요
  *
  * ENV: TG_TOKEN, TG_CHAT_ID (GitHub Secrets)
  * 상태 파일: monitor/state.json (GitHub Actions Cache로 지속)
@@ -15,65 +20,85 @@
 const fs   = require('fs');
 const path = require('path');
 
-const TG_TOKEN       = process.env.TG_TOKEN   || '';
-const TG_CHAT_ID     = process.env.TG_CHAT_ID || '';
-const STATE_PATH     = path.join(__dirname, 'state.json');
-const ANALYST_PATH   = path.join(__dirname, '..', 'analyst-data.json');
+const TG_TOKEN     = process.env.TG_TOKEN   || '';
+const TG_CHAT_ID   = process.env.TG_CHAT_ID || '';
+const STATE_PATH   = path.join(__dirname, 'state.json');
+const ANALYST_PATH = path.join(__dirname, '..', 'analyst-data.json');
 
-// ── analyst-data.json 읽기 (update-analysts.js가 매일 업데이트) ──
-function loadAnalystData() {
-  try {
-    return JSON.parse(fs.readFileSync(ANALYST_PATH, 'utf8'));
-  } catch { return null; }
+// ══════════════════════════════════════════════════════════════
+//  ★ 수동 지표 값 — 대시보드에서 값 바꿀 때 여기도 같이 수정
+//    (Glassnode/CryptoQuant 확인 후 업데이트)
+// ══════════════════════════════════════════════════════════════
+const MANUAL = {
+  mvrvZ:   0.43,   // MVRV Z-Score
+  nupl:    0.15,   // NUPL
+  sopr:    0.98,   // SOPR
+  netflow: -5000,  // Exchange Netflow (BTC/일)
+  funding: 0.008,  // Funding Rate (%)
+  puell:   0.62,   // Puell Multiple
+};
+
+// 애널리스트 이름 맵 (ID → 표시명)
+const NAME_MAP = {
+  capriole:     'Charles Edwards',
+  checkmate:    'Checkmate',
+  kiyoungju:    'Ki Young Ju',
+  willclemente: 'Will Clemente',
+  bencowen:     'Ben Cowen',
+  maartunn:     'Maartunn',
+  axeladler:    'Axel Adler Jr',
+  cryptoviz:    'CryptoVizArt',
+  skew:         'Skew',
+  carpenoctom:  'CarpeNoctom',
+  route2fi:     'Route 2 Fi',
+  alexkruger:   'Alex Kruger',
+  crypnuevo:    'CrypNuevo',
+  ecoinometrics:'ecoinometrics',
+  rektcapital:  'Rekt Capital',
+};
+
+// ══════════════════════════════════════════════════════════════
+//  사이클 점수 계산 — 대시보드 calcCycle()과 동일 공식
+//  MVRV-Z(45%) + NUPL(35%) + F&G(20%)
+// ══════════════════════════════════════════════════════════════
+function calcCycleScore(mvrvZ, nupl, fg) {
+  const z = mvrvZ, n = nupl;
+  const mv  = z<0?8:z<0.5?16:z<1?25:z<1.5?34:z<2?44:z<2.5?53:z<3?61:z<3.5?68:z<4.5?76:z<6?84:92;
+  const np  = n<0?8:n<0.1?18:n<0.25?28:n<0.4?42:n<0.5?55:n<0.65?68:n<0.75?78:88;
+  const fg2 = fg<15?8:fg<25?18:fg<35?28:fg<45?40:fg<55?52:fg<65?62:fg<75?71:fg<85?79:86;
+  return Math.round(mv * 0.45 + np * 0.35 + fg2 * 0.20);
+}
+
+// 사이클 점수 → 구간 레이블 (사용자 지정: 0~20/20~40/40~60/60~75/75+)
+function cycleZone(score) {
+  return score <= 20 ? '바닥권(0~20)'
+       : score <= 40 ? '하락장(20~40)'
+       : score <= 60 ? '회복(40~60)'
+       : score <= 75 ? '상승(60~75)'
+       :               '과열(75+)';
 }
 
 // ══════════════════════════════════════════════════════════════
-//  ★ 수동 지표 값 — Glassnode/CryptoQuant 확인 후 업데이트
-//  zone 변경 감지는 이 값이 바뀌면 다음 실행 시 자동 알림
+//  온체인 지표 구간 함수
 // ══════════════════════════════════════════════════════════════
-const MANUAL = {
-  mvrvZ:    0.43,
-  nupl:     0.15,
-  sopr:     0.98,
-  netflow:  -5000,
-  funding:  0.008,
-  puell:    0.62,
-};
-
-// ★ 애널리스트 현재 스탠스 — 대시보드 업데이트 시 같이 수정
-const ANALYST_STANCES = {
-  'Charles Edwards': { pct: 45, stance: '중립' },
-  'Checkmate':       { pct: 30, stance: '약세' },
-  'Ki Young Ju':     { pct: 25, stance: '약세' },
-  'Will Clemente':   { pct: 40, stance: '중립' },
-  'Ben Cowen':       { pct: 20, stance: '약세' },
-  'Maartunn':        { pct: 28, stance: '약세' },
-  'Axel Adler Jr':   { pct: 32, stance: '약세' },
-  'CryptoVizArt':    { pct: 38, stance: '약세' },
-  'Skew':            { pct: 30, stance: '약세' },
-  'CarpeNoctom':     { pct: 42, stance: '중립' },
-};
-
-// ══════════════════════════════════════════════════════════════
-//  ZONE 함수 — 각 지표의 현재 구간 반환
-// ══════════════════════════════════════════════════════════════
-function fgZone(v)       { return v<=15?'극도공포':v<=25?'공포':v<=55?'중립':v<=75?'탐욕':'극도탐욕'; }
-function mvrvZone(v)     { return v<0?'극저평가':v<2?'저평가':v<3.5?'적정':v<6?'고평가':'극과열'; }
-function nuplZone(v)     { return v<0?'항복':v<0.25?'희망':v<0.5?'낙관':v<0.75?'믿음':'행복'; }
-function soprZone(v)     { return v<0.97?'패닉':v<1.0?'손익분기':v<1.05?'건전이익실현':'이익실현과잉'; }
-function netflowZone(v)  { return v<-20000?'강한유출':v<0?'순유출':v<5000?'소폭유입':'강한유입'; }
-function fundingZone(v)  { return v<-0.01?'숏과다':v<=0.01?'중립':v<=0.03?'롱과다':'극과열'; }
-function puellZone(v)    { return v<0.5?'채굴자항복':v<0.8?'저평가':v<1.5?'적정':v<2.0?'과열주의':'극과열'; }
-function cycleLabel(fg)  { return fg<=15?'바닥권':fg<=30?'하락장':fg<=50?'중립/회복초기':fg<=65?'상승중기':'상승후기/과열'; }
+function fgZone(v)      { return v<=15?'극도공포':v<=25?'공포':v<=55?'중립':v<=75?'탐욕':'극도탐욕'; }
+function mvrvZone(v)    { return v<0?'극저평가':v<2?'저평가':v<3.5?'적정':v<6?'고평가':'극과열'; }
+function nuplZone(v)    { return v<0?'항복':v<0.25?'희망':v<0.5?'낙관':v<0.75?'믿음':'행복'; }
+function soprZone(v)    { return v<0.97?'패닉':v<1.0?'손익분기':v<1.05?'건전이익실현':'이익실현과잉'; }
+function netflowZone(v) { return v<-20000?'강한유출':v<0?'순유출':v<5000?'소폭유입':'강한유입'; }
+function fundingZone(v) { return v<-0.01?'숏과다':v<=0.01?'중립':v<=0.03?'롱과다':'극과열'; }
+function puellZone(v)   { return v<0.5?'채굴자항복':v<0.8?'저평가':v<1.5?'적정':v<2.0?'과열주의':'극과열'; }
 
 // ══════════════════════════════════════════════════════════════
 //  STATE 읽기/쓰기
 // ══════════════════════════════════════════════════════════════
-function readState() {
-  try { return JSON.parse(fs.readFileSync(STATE_PATH, 'utf8')); }
-  catch { return {}; }
+function readState()    { try { return JSON.parse(fs.readFileSync(STATE_PATH, 'utf8')); } catch { return {}; } }
+function writeState(s)  { fs.writeFileSync(STATE_PATH, JSON.stringify(s, null, 2)); }
+
+function loadAnalystData() {
+  try { return JSON.parse(fs.readFileSync(ANALYST_PATH, 'utf8')); }
+  catch { return null; }
 }
-function writeState(s) { fs.writeFileSync(STATE_PATH, JSON.stringify(s, null, 2)); }
 
 // ══════════════════════════════════════════════════════════════
 //  TELEGRAM
@@ -100,15 +125,18 @@ async function sendTelegram(text) {
 //  MAIN
 // ══════════════════════════════════════════════════════════════
 async function main() {
-  const now = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+  const now  = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+  const hour = parseInt(new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', hour: 'numeric', hour12: false }));
+  const mins = new Date().getMinutes(); // 분(0~59)은 시간대 무관
   console.log(`[${now}] 체크 시작`);
 
-  // ── 이전 상태 로드 ──
-  const prev = readState();
-  const changes = [];
+  // ── 상태 / analyst-data 로드 ──
+  const prev        = readState();
+  const analystData = loadAnalystData(); // GitHub Actions가 매일 07:00 KST 업데이트
+  const changes        = [];
   const immediateAlerts = [];
 
-  // ── 실시간 데이터 수집 ──
+  // ── 실시간 데이터 수집 (F&G, BTC) ──
   const [fgRes, btcRes] = await Promise.allSettled([
     get('https://api.alternative.me/fng/?limit=1&format=json'),
     get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true'),
@@ -125,8 +153,8 @@ async function main() {
   //  1. 즉시 경보 (임계값 초과)
   // ────────────────────────────────────────────────────────────
   if (fg !== null) {
-    if (fg <= 15) immediateAlerts.push(`🔴 <b>극도 공포</b> F&G ${fg} — 패닉 구간, 역발상 매수 타이밍`);
-    if (fg >= 85) immediateAlerts.push(`🔴 <b>극도 탐욕</b> F&G ${fg} — 고점 신호, 즉시 익절 고려`);
+    if (fg <= 15) immediateAlerts.push(`🔴 <b>극도 공포</b> F&amp;G ${fg} — 패닉 구간, 역발상 매수 타이밍`);
+    if (fg >= 85) immediateAlerts.push(`🔴 <b>극도 탐욕</b> F&amp;G ${fg} — 고점 신호, 즉시 익절 고려`);
   }
   if (btcChange !== null) {
     if (btcChange <= -10) immediateAlerts.push(`📉 <b>BTC 급락</b> 24h ${btcChange.toFixed(1)}%`);
@@ -134,26 +162,30 @@ async function main() {
   }
 
   // ────────────────────────────────────────────────────────────
-  //  2. 사이클 위치 구간 변경 감지
+  //  2. 사이클 점수 구간 변경 감지
+  //     대시보드와 동일 공식 사용 (MVRV-Z·NUPL·F&G 가중평균)
+  //     구간: 바닥권(0~20) / 하락장(20~40) / 회복(40~60) / 상승(60~75) / 과열(75+)
   // ────────────────────────────────────────────────────────────
-  if (fg !== null) {
-    const curCycle = cycleLabel(fg);
-    if (prev.cycle && prev.cycle !== curCycle) {
-      changes.push(`🔄 <b>사이클 위치 변경</b>\n  ${prev.cycle} → <b>${curCycle}</b>  (F&G ${fg})`);
-    }
+  const cycleScore = calcCycleScore(MANUAL.mvrvZ, MANUAL.nupl, fg ?? 50);
+  const curCycleZone = cycleZone(cycleScore);
+  console.log(`사이클 점수: ${cycleScore} → ${curCycleZone}`);
+  if (prev.cycleZone && prev.cycleZone !== curCycleZone) {
+    changes.push(`🔄 <b>사이클 구간 변경</b>\n  ${prev.cycleZone} → <b>${curCycleZone}</b>  (점수 ${cycleScore})`);
   }
 
   // ────────────────────────────────────────────────────────────
   //  3. 온체인 지표 구간 변경 감지
+  //     ⚠️ F&G만 자동 수집, 나머지는 MANUAL 하드코딩
+  //        → 대시보드 값 변경 시 위 MANUAL 상수도 함께 수정 필요
   // ────────────────────────────────────────────────────────────
   const metricChecks = [
-    { key: 'fg',       label: 'Fear & Greed',   cur: fg !== null ? fgZone(fg) : null },
-    { key: 'mvrv',     label: 'MVRV Z-Score',   cur: mvrvZone(MANUAL.mvrvZ) },
-    { key: 'nupl',     label: 'NUPL',            cur: nuplZone(MANUAL.nupl) },
-    { key: 'sopr',     label: 'SOPR',            cur: soprZone(MANUAL.sopr) },
-    { key: 'netflow',  label: 'Exchange Netflow',cur: netflowZone(MANUAL.netflow) },
-    { key: 'funding',  label: 'Funding Rate',    cur: fundingZone(MANUAL.funding) },
-    { key: 'puell',    label: 'Puell Multiple',  cur: puellZone(MANUAL.puell) },
+    { key: 'fg',      label: 'Fear & Greed',    cur: fg !== null ? fgZone(fg)           : null },
+    { key: 'mvrv',    label: 'MVRV Z-Score',    cur: mvrvZone(MANUAL.mvrvZ)                    },
+    { key: 'nupl',    label: 'NUPL',             cur: nuplZone(MANUAL.nupl)                     },
+    { key: 'sopr',    label: 'SOPR',             cur: soprZone(MANUAL.sopr)                     },
+    { key: 'netflow', label: 'Exchange Netflow', cur: netflowZone(MANUAL.netflow)               },
+    { key: 'funding', label: 'Funding Rate',     cur: fundingZone(MANUAL.funding)               },
+    { key: 'puell',   label: 'Puell Multiple',   cur: puellZone(MANUAL.puell)                   },
   ];
 
   for (const m of metricChecks) {
@@ -165,25 +197,30 @@ async function main() {
   }
 
   // ────────────────────────────────────────────────────────────
-  //  4. 애널리스트 스탠스 변경 감지
+  //  4. 애널리스트 스탠스 변경 감지 (analyst-data.json, 15명)
   // ────────────────────────────────────────────────────────────
-  for (const [name, cur] of Object.entries(ANALYST_STANCES)) {
-    const prevStance = prev.analysts?.[name];
-    if (prevStance && prevStance !== cur.stance) {
-      const dir = cur.stance === '강세' ? '📈' : cur.stance === '약세' ? '📉' : '➡️';
-      changes.push(`${dir} <b>애널리스트 포지션 변경</b> — ${name}\n  ${prevStance} → <b>${cur.stance}</b> (${cur.pct}%)`);
+  if (analystData?.analysts?.length) {
+    for (const a of analystData.analysts) {
+      const curStance  = a.bullPct >= 60 ? '강세' : a.bullPct >= 40 ? '중립' : '약세';
+      const prevA      = prev.analysts?.[a.id];
+      if (prevA && prevA.stance !== curStance) {
+        const dir  = curStance === '강세' ? '📈' : curStance === '약세' ? '📉' : '➡️';
+        const name = NAME_MAP[a.id] || a.id;
+        changes.push(`${dir} <b>애널리스트 포지션 변경</b> — ${name}\n  ${prevA.stance} (${prevA.bullPct}%) → <b>${curStance}</b> (${a.bullPct}%)`);
+      }
     }
   }
 
   // ────────────────────────────────────────────────────────────
   //  알림 전송
   // ────────────────────────────────────────────────────────────
-  const avgBull  = Math.round(Object.values(ANALYST_STANCES).reduce((s,a) => s+a.pct, 0) / Object.keys(ANALYST_STANCES).length);
+  const avgBull  = analystData?.avgBull
+    ?? Math.round((analystData?.analysts || []).reduce((s,a) => s+a.bullPct, 0) / (analystData?.analysts?.length || 1));
   const dashLink = `🔗 <a href="https://skimdg.github.io/onchain-signal/onchain-signal-v5.html">대시보드 열기</a>`;
   const summary  = [
     `💰 BTC <b>$${btcPrice?.toLocaleString() || '—'}</b>  ${btcChange != null ? (btcChange>=0?'+':'')+btcChange.toFixed(2)+'%' : '—'}`,
-    `😨 Fear&Greed <b>${fg ?? '—'}</b>  (${fgl})`,
-    `${fg !== null ? (fg<=15?'🔴':fg<=30?'🟠':fg<=50?'🟡':'🟢') : '⚪'} 사이클  <b>${fg !== null ? cycleLabel(fg) : '—'}</b>`,
+    `😨 Fear&amp;Greed <b>${fg ?? '—'}</b>  (${fgl})`,
+    `🔄 사이클 점수  <b>${cycleScore}</b>  <i>${curCycleZone}</i>`,
     `👥 애널 컨센서스  <b>${avgBull}% 강세</b>`,
     dashLink,
   ].join('\n');
@@ -202,57 +239,66 @@ async function main() {
     console.log('✅ 변경 없음 — 정상 구간');
   }
 
-  // ── 매일 오전 9시 KST 정기 리포트 (조건과 무관하게 항상 전송) ──
-  const hour = parseInt(new Date().toLocaleString('ko-KR', { timeZone:'Asia/Seoul', hour:'numeric', hour12:false }));
-  if (hour === 9) {
-    const analystData = loadAnalystData();
-    let analystSection = '';
+  // ────────────────────────────────────────────────────────────
+  //  5. 매일 07:30 KST 일일 리포트
+  //     update-analysts.yml이 07:00 KST 실행 → 30분 후 최신 데이터로 보고
+  //     alert.yml은 */15분 실행 → 07:28~07:44 슬롯에서 리포트 전송
+  // ────────────────────────────────────────────────────────────
+  if (hour === 7 && mins >= 28 && mins <= 44) {
+    const analysts = analystData?.analysts || [];
+    const bulls    = analysts.filter(a => a.bullPct >= 60);
+    const neuts    = analysts.filter(a => a.bullPct >= 40 && a.bullPct < 60);
+    const bears    = analysts.filter(a => a.bullPct < 40);
 
-    if (analystData?.analysts?.length) {
-      const sorted = [...analystData.analysts].sort((a, b) => a.bullPct - b.bullPct);
-      const bears  = sorted.filter(a => a.bullPct < 40);
-      const neuts  = sorted.filter(a => a.bullPct >= 40 && a.bullPct < 60);
-      const bulls  = sorted.filter(a => a.bullPct >= 60);
+    // 온체인 장기 / 단기 전문 분리
+    const onchainIds   = ['capriole','checkmate','kiyoungju','willclemente','bencowen','maartunn','axeladler','cryptoviz','skew','carpenoctom'];
+    const shorttermIds = ['route2fi','alexkruger','crypnuevo','ecoinometrics','rektcapital'];
 
-      const lines = analystData.analysts.map(a => {
+    const makeLines = ids => ids
+      .map(id => analysts.find(a => a.id === id))
+      .filter(Boolean)
+      .map(a => {
         const icon = a.bullPct >= 60 ? '🟢' : a.bullPct >= 40 ? '🟡' : '🔴';
-        // 최신 헤드라인이 있으면 첫 번째 표시
+        const stance = a.bullPct >= 60 ? '강세' : a.bullPct >= 40 ? '중립' : '약세';
+        const prevTxt = (a.prevBullPct != null && a.prevBullPct !== a.bullPct)
+          ? ` (이전 ${a.prevBullPct}%)` : '';
         const hl = a.headlines?.[0]
-          ? `\n    📰 ${a.headlines[0].substring(0, 70)}`
-          : `\n    💬 ${a.summary || '—'}`;
-        return `${icon} <b>${a.id === 'kiyoungju' ? 'Ki Young Ju' : a.headlines ? a.headlines[0]?.split('—')[0]?.trim() || a.id : a.id}</b> ${a.bullPct}%${hl}`;
-      });
-
-      // 이름 조회를 위한 맵
-      const nameMap = {
-        capriole:'Charles Edwards', checkmate:'Checkmate', kiyoungju:'Ki Young Ju',
-        willclemente:'Will Clemente', bencowen:'Ben Cowen', maartunn:'Maartunn',
-        axeladler:'Axel Adler Jr', cryptoviz:'CryptoVizArt', skew:'Skew', carpenoctom:'CarpeNoctom'
-      };
-      const analystLines = analystData.analysts.map(a => {
-        const icon = a.bullPct >= 60 ? '🟢' : a.bullPct >= 40 ? '🟡' : '🔴';
-        const hl = a.headlines?.[0]
-          ? `\n    📰 ${a.headlines[0].replace(/^\d{4}\.\s*\d+\.\s*\d+\.\s*—\s*/, '').substring(0, 65)}`
+          ? `\n    📰 ${a.headlines[0].replace(/^\d{4}\.\s*\d+\.\s*\d+\.\s*[—-]\s*/, '').substring(0, 65)}`
           : `\n    💬 ${(a.summary || '—').substring(0, 65)}`;
-        return `${icon} <b>${nameMap[a.id] || a.id}</b>  ${a.bullPct}%  (${a.bullPct>=60?'강세':a.bullPct>=40?'중립':'약세'})${hl}`;
-      });
+        return `${icon} <b>${NAME_MAP[a.id] || a.id}</b>  ${a.bullPct}% ${stance}${prevTxt}${hl}`;
+      }).join('\n\n');
 
-      analystSection = `\n\n──── 👥 애널리스트 현황 (${analystData.updatedAtKST?.split(' ')[0] || '—'} 웹검색) ────\n`
-        + `강세 ${bulls.length}명 · 중립 ${neuts.length}명 · 약세 ${bears.length}명  (평균 ${analystData.avgBull}%)\n\n`
-        + analystLines.join('\n\n');
-    }
+    const analystSection = analysts.length
+      ? `\n\n──── 👥 애널리스트 현황 ────\n강세 ${bulls.length}명 · 중립 ${neuts.length}명 · 약세 ${bears.length}명  (평균 ${analystData?.avgBull ?? '?'}%)\n`
+        + `업데이트: ${analystData?.updatedAtKST?.split(' ')[0] || '—'} 웹검색\n\n`
+        + `<b>📊 온체인 장기</b>\n${makeLines(onchainIds)}\n\n`
+        + `<b>⚡ 단기 전문</b>\n${makeLines(shorttermIds)}`
+      : '';
 
-    const reportMsg = `📊 <b>Onchain Signal 일일 리포트</b>\n${now}\n\n${summary}${analystSection}\n\n`
-      + (immediateAlerts.length > 0 ? `⚠️ 활성 알림: ${immediateAlerts.length}건\n` + immediateAlerts.join('\n') : '✅ 알림 조건 없음');
+    const metricSection = `\n\n──── 📈 온체인 지표 현황 ────\n`
+      + metricChecks.map(m => `• ${m.label}: <b>${m.cur}</b>`).join('\n');
+
+    const reportMsg = `📊 <b>Onchain Signal 일일 리포트</b>\n${now}\n\n${summary}${metricSection}${analystSection}\n\n`
+      + (immediateAlerts.length > 0
+          ? `⚠️ 활성 즉시알림: ${immediateAlerts.length}건\n` + immediateAlerts.join('\n')
+          : '✅ 즉시 알림 조건 없음');
 
     await sendTelegram(reportMsg);
+    console.log('📊 일일 리포트 전송 완료');
   }
 
   // ── 상태 저장 ──
   const newState = {
-    cycle: fg !== null ? cycleLabel(fg) : (prev.cycle || null),
+    cycleZone: curCycleZone,
+    cycleScore,
     zones: Object.fromEntries(metricChecks.filter(m => m.cur).map(m => [m.key, m.cur])),
-    analysts: Object.fromEntries(Object.entries(ANALYST_STANCES).map(([n, a]) => [n, a.stance])),
+    // 애널리스트: ID 기준, bullPct와 stance 모두 저장
+    analysts: Object.fromEntries(
+      (analystData?.analysts || []).map(a => [
+        a.id,
+        { bullPct: a.bullPct, stance: a.bullPct >= 60 ? '강세' : a.bullPct >= 40 ? '중립' : '약세' }
+      ])
+    ),
     btcPrice,
     fg,
     updatedAt: new Date().toISOString(),

@@ -1,0 +1,78 @@
+{
+  "cycleZone": "하락장(20~40)",
+  "cycleScore": 21,
+  "zones": {
+    "fg": "공포",
+    "mvrv": "저평가",
+    "nupl": "희망",
+    "sopr": "손익분기",
+    "netflow": "순유출",
+    "funding": "중립",
+    "puell": "저평가"
+  },
+  "analysts": {
+    "capriole": {
+      "bullPct": 38,
+      "stance": "약세"
+    },
+    "checkmate": {
+      "bullPct": 20,
+      "stance": "약세"
+    },
+    "kiyoungju": {
+      "bullPct": 20,
+      "stance": "약세"
+    },
+    "willclemente": {
+      "bullPct": 80,
+      "stance": "강세"
+    },
+    "bencowen": {
+      "bullPct": 38,
+      "stance": "약세"
+    },
+    "maartunn": {
+      "bullPct": 80,
+      "stance": "강세"
+    },
+    "axeladler": {
+      "bullPct": 58,
+      "stance": "중립"
+    },
+    "cryptoviz": {
+      "bullPct": 38,
+      "stance": "약세"
+    },
+    "skew": {
+      "bullPct": 20,
+      "stance": "약세"
+    },
+    "carpenoctom": {
+      "bullPct": 80,
+      "stance": "강세"
+    },
+    "route2fi": {
+      "bullPct": 30,
+      "stance": "약세"
+    },
+    "alexkruger": {
+      "bullPct": 65,
+      "stance": "강세"
+    },
+    "crypnuevo": {
+      "bullPct": 30,
+      "stance": "약세"
+    },
+    "ecoinometrics": {
+      "bullPct": 22,
+      "stance": "약세"
+    },
+    "rektcapital": {
+      "bullPct": 20,
+      "stance": "약세"
+    }
+  },
+  "btcPrice": 71659,
+  "fg": 16,
+  "updatedAt": "2026-04-12T05:28:12.467Z"
+}
