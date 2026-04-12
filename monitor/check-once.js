@@ -21,23 +21,44 @@
 const fs   = require('fs');
 const path = require('path');
 
-const TG_TOKEN     = process.env.TG_TOKEN   || '';
-const TG_CHAT_ID   = process.env.TG_CHAT_ID || '';
-const STATE_PATH   = path.join(__dirname, 'state.json');
-const ANALYST_PATH = path.join(__dirname, '..', 'analyst-data.json');
+const TG_TOKEN      = process.env.TG_TOKEN   || '';
+const TG_CHAT_ID    = process.env.TG_CHAT_ID || '';
+const STATE_PATH    = path.join(__dirname, 'state.json');
+const ANALYST_PATH  = path.join(__dirname, '..', 'analyst-data.json');
+const ONCHAIN_PATH  = path.join(__dirname, '..', 'onchain-data.json');
 
 // ══════════════════════════════════════════════════════════════
-//  ★ 수동 지표 값 — 대시보드에서 값 바꿀 때 여기도 같이 수정
-//    (Glassnode/CryptoQuant 확인 후 업데이트)
+//  온체인 지표 — update-onchain.js가 BGeometrics API로 자동 수집
+//  onchain-data.json 없을 때만 아래 폴백 값 사용
 // ══════════════════════════════════════════════════════════════
-const MANUAL = {
-  mvrvZ:   0.43,   // MVRV Z-Score
-  nupl:    0.15,   // NUPL
-  sopr:    0.98,   // SOPR
-  netflow: -5000,  // Exchange Netflow (BTC/일)
-  funding: 0.008,  // Funding Rate (%)
-  puell:   0.62,   // Puell Multiple
+const FALLBACK = {
+  mvrvZ:   0.43,
+  nupl:    0.15,
+  sopr:    0.98,
+  netflow: -5000,
+  funding: 0.008,
+  puell:   0.62,
 };
+
+function loadOnchainData() {
+  try {
+    const d = JSON.parse(fs.readFileSync(ONCHAIN_PATH, 'utf8'));
+    console.log(`📊 온체인 데이터 로드: ${d.updatedAtKST || d.updatedAt || '날짜 불명'}`);
+    return {
+      mvrvZ:   d.mvrvZ   ?? FALLBACK.mvrvZ,
+      nupl:    d.nupl    ?? FALLBACK.nupl,
+      sopr:    d.sopr    ?? FALLBACK.sopr,
+      netflow: d.netflow ?? FALLBACK.netflow,
+      funding: d.funding ?? FALLBACK.funding,
+      puell:   d.puell   ?? FALLBACK.puell,
+    };
+  } catch {
+    console.warn('⚠️  onchain-data.json 없음 → 폴백값 사용');
+    return { ...FALLBACK };
+  }
+}
+
+const MANUAL = loadOnchainData();
 
 // 애널리스트 이름 맵 (ID → 표시명)
 const NAME_MAP = {

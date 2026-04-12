@@ -1,0 +1,33 @@
+name: Update Onchain Metrics
+
+on:
+  schedule:
+    - cron: '0 22 * * *'   # 07:00 KST (UTC 22:00) — 애널리스트 업데이트와 동시 실행
+    - cron: '0 10 * * *'   # 19:00 KST (UTC 10:00) — 하루 2회 업데이트
+  workflow_dispatch:         # 수동 실행 버튼
+
+jobs:
+  update-onchain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # BGeometrics API 호출 — 6개 지표 × 2회/일 = 12회/일 (15회 한도 내)
+      - name: Fetch onchain metrics from BGeometrics
+        run: node monitor/update-onchain.js
+
+      - name: Commit updated onchain data
+        run: |
+          git config user.name "Onchain Signal Bot"
+          git config user.email "action@github.com"
+          git add onchain-data.json
+          git diff --staged --quiet || git commit -m "auto: 온체인 지표 업데이트 $(TZ=Asia/Seoul date +'%Y.%m.%d %H:%M') KST"
+          git push

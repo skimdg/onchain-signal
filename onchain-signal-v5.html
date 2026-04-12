@@ -499,9 +499,29 @@ let ANALYSTS = [
 ];
 
 // ═══════════════════════════════════════════════════════════════
-//  수동 온체인 데이터 (Glassnode / CryptoQuant 에서 업데이트)
+//  온체인 데이터 — BGeometrics API 자동 수집 (update-onchain.yml)
+//  onchain-data.json에서 로드, 실패 시 하드코딩 폴백 사용
 // ═══════════════════════════════════════════════════════════════
-const MANUAL = { mvrvZ:0.43, nupl:0.15, sopr:0.98, netflow:-5000, funding:0.008, puell:0.62 };
+let MANUAL = { mvrvZ:0.43, nupl:0.15, sopr:0.98, netflow:-5000, funding:0.008, puell:0.62 };
+let ONCHAIN_UPDATED = null; // 마지막 자동 업데이트 시각
+
+async function loadOnchainData() {
+  try {
+    const res = await fetch('onchain-data.json?_=' + Date.now(), { cache:'no-cache' });
+    if (!res.ok) return;
+    const d = await res.json();
+    if (d.mvrvZ   != null) MANUAL.mvrvZ   = d.mvrvZ;
+    if (d.nupl    != null) MANUAL.nupl    = d.nupl;
+    if (d.sopr    != null) MANUAL.sopr    = d.sopr;
+    if (d.netflow != null) MANUAL.netflow = d.netflow;
+    if (d.funding != null) MANUAL.funding = d.funding;
+    if (d.puell   != null) MANUAL.puell   = d.puell;
+    ONCHAIN_UPDATED = d.updatedAtKST || d.updatedAt || null;
+    console.log('📊 온체인 데이터 로드:', ONCHAIN_UPDATED);
+  } catch(e) {
+    console.warn('onchain-data.json 로드 실패, 폴백값 사용:', e.message);
+  }
+}
 
 // ── live ──
 const LIVE = { fearGreed:null, fearGreedLabel:null, stableMcap:null, defiTvl:null, btcPrice:null, btcChange:null, btcDom:null, lastUpdated:null };
@@ -1413,6 +1433,8 @@ async function init(){
     document.getElementById('tg-settings-panel').style.display='flex';
   }
   if(CLAUDE_KEY){ const ind=document.getElementById('ind-claude'); if(ind){ind.className='ind ind-ok';ind.innerHTML='<span class="ind-dot" style="background:var(--bull)"></span>AI 준비';} }
+  // onchain-data.json 로드 (BGeometrics API 자동 수집값)
+  await loadOnchainData();
   // analyst-data.json 로드 (GitHub Actions 자동 업데이트)
   await loadAnalystData();
   // 초기 렌더 (live 없이)
