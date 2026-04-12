@@ -2,18 +2,16 @@
   "analysts": [
     {
       "id": "capriole",
-      "bullPct": 80,
-      "summary": "Charles Edwards Says Bitcoin Is In A Value Zone, But Not Yet At Deep Value ",
+      "bullPct": 50,
+      "summary": "Charles Edwards Says Bitcoin Is In A Value Zone, But Not Yet At Deep Value (2026.03.13) — 딥밸류 아직 아님, 가치구간 진입 신중론",
       "headlines": [
         "2026. 03. 13. — Charles Edwards Says Bitcoin Is In A Value Zone, But Not Yet At Deep V"
       ],
       "sourceUrls": [
         "https://news.google.com/rss/articles/CBMiywFBVV95cUxNTUpPS3VxY2lUNHRqaW9ZMm9VcWJoaXJmTTNSY0toYlAwdnYtbGlaOEc3U2tfMmZsaWVaRFMyR2g0QWUzbzY1RE9XaktfUlE1SGtOM3ZrUWxyZVNOLXZhb1JtOTJMcTZnQUZ5ZHhtS0VNMS1BU2JFdVU4YURjcW9EeDIwcklwMWpoWWFibFJJeU9sR2IwNnZpcUdwaFNtWFE1NkFKZkxxbmJhLURiQmFTeFB5aTdmdGdjcnJma3RVQThmUUpHeERVRDVnWQ?oc=5"
       ],
-      "lastScan": "2026.04.12",
-      "scanning": false,
-      "prevBullPct": 38,
-      "prevSummary": "Capriole's Edwards Warns Bitcoin Could Fall Below $50K by 2028 - Bitbo"
+      "lastScan": "2026.04.13",
+      "scanning": false
     },
     {
       "id": "checkmate",
@@ -46,14 +44,14 @@
     },
     {
       "id": "willclemente",
-      "bullPct": 80,
-      "summary": "Bitcoin’s 100 BTC club edges toward 20K wallets in a ‘bullish sign’ - ",
+      "bullPct": 55,
+      "summary": "Bitcoin’s 100 BTC club edges toward 20K wallets (2026.02.26) — 온체인 지표 일부 긍정, 직접 발언 기사 미확인",
       "headlines": [
         "2026. 2. 26. — Bitcoin’s 100 BTC club edges toward 20K wallets in a ‘bullish sign’ - TradingView",
-        "2026. 1. 26. — Bitcoin price news: BTC holds near year's low as precious metals continue garnering attention - CoinDesk",
-        "2025. 10. 31. — Everyone’s Depressed in Crypto — But Bitwise’s CEO Says That’s What Winning Looks Like - Yahoo Finance"
+        "2026. 1. 26. — Bitcoin price news: BTC holds near year’s low as precious metals continue garnering attention - CoinDesk"
       ],
-      "lastScan": "2026.04.11",
+      "sourceUrls": [],
+      "lastScan": "2026.04.13",
       "scanning": false
     },
     {
@@ -70,20 +68,21 @@
     },
     {
       "id": "maartunn",
-      "bullPct": 80,
-      "summary": "Bitcoin Surge To $74,000 Fueled By US Institutions, Coinbase Premium S",
+      "bullPct": 42,
+      "summary": "LTH 325,600 BTC 매도 + Zcash 유동성 이탈 신호 (2025.10~11), Surge $74K 기사는 시황 보도 — 직접 발언 포지션 미확인",
       "headlines": [
         "2026. 3. 5. — Bitcoin Surge To $74,000 Fueled By US Institutions, Coinbase Premium Signals - TradingView",
         "2025. 10. 29. — Long-Term Holders Are Selling 😬 — 325,600 BTC Just Hit the Market - Binance",
         "2025. 11. 1. — Zcash Breakout Fueling Bitcoin's Liquidity Drain: Negative Correlation at Play? - TradingView"
       ],
-      "lastScan": "2026.04.11",
+      "sourceUrls": [],
+      "lastScan": "2026.04.13",
       "scanning": false
     },
     {
       "id": "axeladler",
-      "bullPct": 80,
-      "summary": "Bitcoin Deleveraging Finally Over? What The Derivatives Data Says - Trading",
+      "bullPct": 55,
+      "summary": "Bitcoin Deleveraging Finally Over? + Luna-Level Capitulation Signal (2026.01~02) — 저점 가능성 언급, 단 2개월 이상 전 기사",
       "headlines": [
         "2026. 01. 30. — Bitcoin Deleveraging Finally Over? What The Derivatives Data Says - Tr",
         "2026. 02. 12. — Bitcoin Flashes Luna-Level Capitulation Signal at $67K, Not $19K - Tra"
@@ -92,10 +91,8 @@
         "https://news.google.com/rss/articles/CBMivwFBVV95cUxNMzFjbTUtaThvYTJodzNOY3lEUFhRZm0tSHNzSHpEYW85dUp6UzN1OGloZkthOEVNZnFKRlRUR0R2eTEyXzRKYi1RSUNIQ1ZHX0ZyZjlFcHhmbkxobnd0Y1JzY2pZV0VkbFdseUM1WXNvREhfTHlEQk51WmVfelJLQXFLeklneFdCazFSdzkyNWUyV0dJQjZnWGtmb1QyeEdVTjFCVVYtS0g2QWpLYXBzY1lsaHdqWGNwQV81UzM3aw?oc=5",
         "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNWGNqSFZMd3l3U3hyc1pMZkx6dmtSXzFITlpxWDBjVi1XS05YbjYxRDJlWk9PYkVsd3JnVGtMU1RBUGZoZ0lMRV9JVW5NaEFvSGttMjhmOHBqai1VT0oxQWwza05uWk50VkZMc1hoeGlZelFDQVJ4Sm84VjltMktTcDh6RDhIdFZ3eHE5U2N1WXF3eGl3d0lUcFJ3WE83OW1ObEV0SENYNDY5UnUxa2ZoS0lsZ243MmxOZ1Rv?oc=5"
       ],
-      "lastScan": "2026.04.12",
-      "scanning": false,
-      "prevBullPct": 58,
-      "prevSummary": "Bitcoin holds $70K: Why ‘phantom leverage’ raises risk of a BTC revers"
+      "lastScan": "2026.04.13",
+      "scanning": false
     },
     {
       "id": "cryptoviz",
@@ -128,15 +125,11 @@
     },
     {
       "id": "carpenoctom",
-      "bullPct": 80,
-      "summary": "Hyperliquid Breakout Alert: Bullish Trend Pushes Price Toward $50–$115 - Tr",
-      "headlines": [
-        "2026. 03. 18. — Hyperliquid Breakout Alert: Bullish Trend Pushes Price Toward $50–$115"
-      ],
-      "sourceUrls": [
-        "https://news.google.com/rss/articles/CBMigAFBVV95cUxOQ3FmOVgwV1VSZ015anNfNElyWl9Md1prMWRGdW9nVG05MWRQbDVrNlFFNjNSVmtpNktsRkJyYlFPX2RtMk5icC1qZEFWb3k1LW5rVnpLVlhmc2tyYXhkdXc3X2t5WUlvMW1HXzlXWkVNN0RjZDVtbGs2R1o0T0Q2MA?oc=5"
-      ],
-      "lastScan": "2026.04.12",
+      "bullPct": 50,
+      "summary": "최근 BTC 직접 발언 기사 없음 — Hyperliquid 관련 기사는 BTC 포지션 근거 불가",
+      "headlines": [],
+      "sourceUrls": [],
+      "lastScan": "2026.04.13",
       "scanning": false
     },
     {
@@ -180,10 +173,8 @@
         "https://news.google.com/rss/articles/CBMiWEFVX3lxTE15Y3BpdTNCekRMU0lkM1RVNkZMWFZHdnJLOGduTGRPSzcwSDUxbXRpTmNXQlhSdDNmZ1lBTF81Q0tubXY0NjAtQ2JXYXpENVF4OV9XZVpXYVM?oc=5",
         "https://news.google.com/rss/articles/CBMixAFBVV95cUxOWU5qTUdEOEZyVHVFNEotTzAtdWtjOUdPekZJS2lPbExIVkZBcXFET2dNSDMtRHRZd2k5b0FFQUhxQ0lWVHgwUzY0Vm82dEpRS3lUb0xoUG5CcDRJMVp5UWpsM1NWeEJFNFcxOGtUSm5zN19uYXpLQjR6Mlg5b3VHdllwOFhzOERDeFNYOWlkMGNZVERmTzVWczY4bkJnMnZCYW82Y3VqbU9BaTFTdXlnaWVtdHIwRUJtR01SYVJ1dXJjZ2k5?oc=5"
       ],
-      "lastScan": "2026.04.12",
-      "scanning": false,
-      "prevBullPct": 22,
-      "prevSummary": "Bitcoin Bear Market Bottom or Another Leg Down? 5 Signals That Will Decide "
+      "lastScan": "2026.04.13",
+      "scanning": false
     },
     {
       "id": "rektcapital",
@@ -201,8 +192,8 @@
       "scanning": false
     }
   ],
-  "avgBull": 47,
-  "updatedAt": "2026-04-12T22:45:18.541Z",
-  "updatedAtKST": "2026. 4. 13. AM 7:45:18",
+  "avgBull": 37,
+  "updatedAt": "2026-04-13T00:00:00.000Z",
+  "updatedAtKST": "2026. 4. 13. AM 9:00:00",
   "method": "web-search"
 }

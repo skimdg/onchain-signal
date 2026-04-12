@@ -115,51 +115,56 @@ async function fetchNews(analyst) {
   return allItems;
 }
 
-// ── 스탠스 계산 (문맥 가중, 최신성 우선, 보수적 기본값) ────────
-function calcStance(items, analystFirstName) {
-  const now = Date.now();
-  let bull = 0, bear = 0, hasRecent = false;
+// ── 스탠스 계산 — 직접 발언(제목에 이름 포함) + BTC 언급 기사만 채점 ──
+// ★ 핵심 원칙:
+//   1. 제목에 애널리스트 이름 또는 핸들이 없으면 무시 (간접 기사 제외)
+//   2. 제목+본문에 bitcoin/btc 언급 없으면 무시 (XRP·ETH·HYPE 등 제외)
+//   3. 위 두 조건을 모두 만족하는 기사가 60일 내 없으면 null 반환 (이전값 유지)
+function calcStance(items, analystFirstName, analystHandle) {
+  const now    = Date.now();
+  const handle = analystHandle.replace('@', '').toLowerCase();
+  let bull = 0, bear = 0, directRecent = 0;
 
   items.forEach(({ title, desc, pubDate }) => {
-    const ageMs  = pubDate ? now - new Date(pubDate).getTime() : Infinity;
+    const ageMs   = pubDate ? now - new Date(pubDate).getTime() : Infinity;
     const ageDays = ageMs / 86400000;
-    if (ageDays > 90) return; // 3개월 이상 기사 제외
+    if (ageDays > 90) return;                               // 3개월 이상 제외
 
-    const weight = ageDays < 14 ? 3 : ageDays < 30 ? 2 : ageDays < 60 ? 1 : 0.5;
-    hasRecent = hasRecent || ageDays < 90; // 90일 내 기사면 신호로 인정
+    const titleLow = title.toLowerCase();
+    const fullTxt  = (title + ' ' + desc).toLowerCase();
 
-    // 제목에 애널리스트 이름이 있으면 2배 가중 (직접 발언)
-    const isDirectQuote = title.toLowerCase().includes(analystFirstName.toLowerCase());
-    const mult = isDirectQuote ? 2 : 1;
+    // ① 제목에 BTC/Bitcoin 언급 필수 (다른 코인 단독 기사 차단)
+    if (!/\b(bitcoin|btc)\b/.test(fullTxt)) return;
 
-    const txt = (title + ' ' + desc).toLowerCase();
+    // ② 제목에 애널리스트 이름 또는 핸들 필수 (직접 발언 기사만 인정)
+    const isDirect = titleLow.includes(analystFirstName.toLowerCase())
+                  || titleLow.includes(handle);
+    if (!isDirect) return;
 
-    // 부정 처리: "not bullish", "won't recover" 등 → 강세 점수 반전
-    // before/until 은 강세 부정에만 사용 (bear 구문은 이미 부정적이므로 제외)
-    const negatedBull = /\b(not|no|never|unlikely|won't|cannot|can't|before|until)\b/.test(txt);
-    const negatedBear = /\b(not|no|never|unlikely|won't|cannot|can't)\b/.test(txt);
+    if (ageDays < 60) directRecent++;                       // 60일 내 직접 발언 카운트
 
-    // 단어 경계: 짧은 단어(6자 이하)는 부분 매칭 오류 방지
+    const weight   = ageDays < 14 ? 3 : ageDays < 30 ? 2 : ageDays < 60 ? 1 : 0.5;
+    const negBull  = /\b(not|no|never|unlikely|won't|cannot|can't|before|until)\b/.test(fullTxt);
+    const negBear  = /\b(not|no|never|unlikely|won't|cannot|can't)\b/.test(fullTxt);
+
     const matchPhrase = (t, p) => p.length <= 6
       ? new RegExp('\\b' + p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b').test(t)
       : t.includes(p);
 
     BEAR_PHRASES.forEach(p => {
-      if (matchPhrase(txt, p)) negatedBear ? (bull += weight * mult * 0.5) : (bear += weight * mult);
+      if (matchPhrase(fullTxt, p)) negBear ? (bull += weight * 0.5) : (bear += weight);
     });
     BULL_PHRASES.forEach(p => {
-      if (matchPhrase(txt, p)) negatedBull ? (bear += weight * mult * 0.5) : (bull += weight * mult);
+      if (matchPhrase(fullTxt, p)) negBull ? (bear += weight * 0.5) : (bull += weight);
     });
   });
 
-  if (!hasRecent || (bull === 0 && bear === 0)) return null; // 신호 없음
+  // 60일 내 직접 발언 기사 없으면 신호 없음 → 이전값 유지
+  if (directRecent === 0 || (bull === 0 && bear === 0)) return null;
 
-  const total = bull + bear;
-  const raw   = (bull / total) * 100;
-
-  // 중립 방향 40% 회귀 — 극단값 방지
-  const score = Math.round(raw * 0.6 + 50 * 0.4);
-  return Math.max(10, Math.min(90, score)); // 10~90% 범위 제한
+  const raw   = (bull / (bull + bear)) * 100;
+  const score = Math.round(raw * 0.6 + 50 * 0.4);  // 중립 방향 40% 회귀
+  return Math.max(10, Math.min(90, score));
 }
 
 // ── 단일 애널리스트 처리 ───────────────────────────────────────
@@ -167,7 +172,7 @@ async function scanOne(analyst) {
   console.log(`\n🔍 ${analyst.name}`);
   const items    = await fetchNews(analyst);
   const firstName = analyst.name.split(' ')[0];
-  const bullPct   = calcStance(items, firstName);
+  const bullPct   = calcStance(items, firstName, analyst.handle);
 
   if (bullPct === null) {
     const prev = prevData[analyst.id];
@@ -196,9 +201,17 @@ async function scanOne(analyst) {
     { year: 'numeric', month: '2-digit', day: '2-digit' }
   ).replace(/\.\s*/g, '.').replace(/\.$/, '');
 
-  // 최신 기사 3개 추출 (출처 링크 포함)
+  // 최신 기사 3개 추출 — calcStance와 동일 조건 (직접 발언 + BTC 언급)
+  const handle2 = analyst.handle.replace('@', '').toLowerCase();
   const recentItems = items
-    .filter(it => it.pubDate && (Date.now() - new Date(it.pubDate).getTime()) < 90 * 86400000)
+    .filter(it => {
+      if (!it.pubDate) return false;
+      if ((Date.now() - new Date(it.pubDate).getTime()) > 90 * 86400000) return false;
+      const tl  = it.title.toLowerCase();
+      const txt = (it.title + ' ' + (it.desc || '')).toLowerCase();
+      if (!/\b(bitcoin|btc)\b/.test(txt)) return false;    // BTC 언급 필수
+      return tl.includes(firstName.toLowerCase()) || tl.includes(handle2); // 직접 발언 필수
+    })
     .slice(0, 3);
 
   const headlines  = recentItems.map(it => {
@@ -214,10 +227,13 @@ async function scanOne(analyst) {
     console.log(`     • ${it.pubDate ? new Date(it.pubDate).toLocaleDateString('ko-KR') : '?'}  ${it.title.substring(0, 70)}`)
   );
 
-  // 이전 값 저장 (변화가 있을 때만)
+  // 이전 값 저장 — 15% 이상 차이날 때만 포지션 변경으로 인정
+  //   (소폭 등락은 노이즈로 간주, 알림·대시보드 오보 방지)
+  const CHANGE_THRESHOLD = 15;
   const oldData = prevData[analyst.id];
-  const prevBullPct  = (oldData && oldData.bullPct !== bullPct)  ? oldData.bullPct  : (oldData?.prevBullPct  ?? null);
-  const prevSummary  = (oldData && oldData.bullPct !== bullPct)  ? oldData.summary  : (oldData?.prevSummary  ?? null);
+  const changed      = oldData && Math.abs(oldData.bullPct - bullPct) >= CHANGE_THRESHOLD;
+  const prevBullPct  = changed ? oldData.bullPct  : (oldData?.prevBullPct  ?? null);
+  const prevSummary  = changed ? oldData.summary  : (oldData?.prevSummary  ?? null);
 
   return { id: analyst.id, bullPct, summary, headlines, sourceUrls, lastScan: today, scanning: false,
            ...(prevBullPct !== null ? { prevBullPct } : {}),
