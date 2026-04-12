@@ -180,6 +180,7 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 .ac-ts{font-size:10px;font-weight:500;color:var(--txt2)}
 .rescan{font-size:10px;font-weight:600;padding:3px 8px;background:var(--bg2);color:var(--acc);border:1px solid rgba(37,99,235,.3);border-radius:3px;cursor:pointer}
 .rescan:hover{background:var(--accg)}
+#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1e293b;color:#f1f5f9;font-size:13px;padding:10px 18px;border-radius:8px;border:1px solid var(--border);box-shadow:0 4px 16px rgba(0,0,0,.4);pointer-events:none;opacity:0;transition:opacity .25s;z-index:9999;white-space:nowrap}
 
 /* footer */
 .footer{text-align:center;padding:14px;color:var(--txt3);font-size:10px;border-top:1px solid var(--border);margin-top:4px}
@@ -705,12 +706,18 @@ async function fetchLive(){
 // ═══════════════════════════════════════════════════════════════
 //  ANALYST AI SCAN
 // ═══════════════════════════════════════════════════════════════
+let _toastTimer=null;
+function showToast(msg, duration=3000){
+  const t=document.getElementById('toast'); if(!t) return;
+  t.textContent=msg; t.style.opacity='1';
+  clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(()=>{ t.style.opacity='0'; }, duration);
+}
+
 async function scanOne(id){
   const a=ANALYSTS.find(x=>x.id===id); if(!a||a.scanning) return;
   if(!CLAUDE_KEY){
-    const note=document.getElementById('data-src-note');
-    if(note) note.style.color='var(--bear)';
-    setTimeout(()=>{ if(note) note.style.color=''; }, 2000);
+    showToast('🔑 Claude API Key가 필요합니다 — 헤더에서 입력 후 저장하세요');
     return;
   }
   a.scanning=true; refreshCard(id);
@@ -1113,5 +1120,6 @@ async function init(){
 
 document.addEventListener('DOMContentLoaded', init);
 </script>
+<div id="toast"></div>
 </body>
 </html>
