@@ -237,9 +237,8 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
     <span id="btc-dom" class="dom">DOM —%</span>
   </div>
   <div class="hd-right">
-    <input class="api-inp" id="api-key-inp" type="password" placeholder="Claude API Key (선택)">
-    <button class="btn-xs" onclick="saveApiKey()">저장</button>
-    <div id="ind-claude" class="ind ind-dim"><span class="ind-dot" style="background:var(--txt3)"></span>AI</div>
+    <div id="ind-claude" class="ind ind-dim" onclick="openAdminModal()" style="cursor:pointer" title="관리자 설정"><span class="ind-dot" style="background:var(--txt3)"></span>AI</div>
+    <button class="btn-xs" onclick="openAdminModal()" style="font-size:11px">⚙ 관리</button>
     <span id="last-ts" style="font-size:10px;color:var(--txt2)">—</span>
     <span class="cd" id="countdown">5:00</span>
     <button class="btn-refresh" id="btn-rf" onclick="manualRefresh()">↻ 새로고침</button>
@@ -327,50 +326,10 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
   <div class="card" style="display:flex;flex-direction:column;gap:8px">
     <div class="sec-ttl" style="margin-bottom:0">🚨 자동 알림 시그널</div>
     <div id="alert-list"><div class="no-al">데이터 로딩 중...</div></div>
-    <!-- 텔레그램 알림 설정 (PIN 잠금) -->
-    <div style="border-top:1px solid var(--brd2);padding-top:10px;margin-top:auto">
-      <div style="font-size:15px;font-weight:700;color:var(--txt);margin-bottom:8px">📲 알림 전송 설정</div>
-
-      <!-- 항상 표시: 테스트 + 수신자 목록 토글 -->
-      <div style="display:flex;gap:5px;margin-bottom:6px">
-        <button onclick="testTelegram()" class="scan-mini" style="flex:1;margin-top:0;font-size:11px">📤 테스트</button>
-        <button id="tg-list-btn" onclick="tgToggleListPanel()" class="scan-mini" style="flex:1;margin-top:0;font-size:11px;background:var(--bg3);color:var(--txt);border:1px solid var(--border)">👥 수신자 목록 ▾</button>
-      </div>
-      <div id="tg-status" style="font-size:12px;font-weight:500;color:var(--txt2);text-align:center;min-height:14px;margin-bottom:4px"></div>
-
-      <!-- 수신자 목록 패널 (토글) -->
-      <div id="tg-list-panel" style="display:none;flex-direction:column;gap:6px;border:1px solid var(--border);border-radius:6px;padding:8px;background:var(--bg3)">
-
-        <!-- 잠금 상태: PIN 입력 -->
-        <div id="tg-pin-panel" style="display:flex;flex-direction:column;gap:6px">
-          <div id="tg-pin-msg" style="font-size:11px;color:var(--txt3);text-align:center"></div>
-          <input id="tg-pin-input" type="password" placeholder="PIN 입력" maxlength="20"
-            style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:6px 8px;font-size:13px;color:var(--txt);outline:none;width:100%;box-sizing:border-box"
-            onkeydown="if(event.key==='Enter') tgConfirmPin()">
-          <button onclick="tgConfirmPin()" class="scan-mini" style="margin-top:0;width:100%;font-size:11px">확인</button>
-        </div>
-
-        <!-- 잠금 해제 상태: 수신자 관리 -->
-        <div id="tg-settings-panel" style="display:none;flex-direction:column;gap:6px">
-          <div id="tg-recipient-list" style="display:flex;flex-direction:column;gap:4px"></div>
-          <!-- 수신자 추가/편집 폼 -->
-          <div id="tg-add-form" style="display:none;flex-direction:column;gap:5px;border-top:1px solid var(--border);padding-top:6px">
-            <input id="tg-f-name"   placeholder="수신자 이름 (예: 나, 친구)" style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:5px 8px;font-size:12px;color:var(--txt);outline:none">
-            <input id="tg-f-token"  type="password" placeholder="Bot Token (123456:ABC-...)" style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:5px 8px;font-size:12px;color:var(--txt);outline:none;font-family:monospace">
-            <input id="tg-f-chatid" placeholder="Chat ID" style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:5px 8px;font-size:12px;color:var(--txt);outline:none">
-            <div style="display:flex;gap:5px">
-              <button onclick="tgSaveRecipient()" class="scan-mini" style="flex:1;margin-top:0;font-size:11px">💾 저장</button>
-              <button onclick="tgCancelForm()" class="scan-mini" style="margin-top:0;font-size:11px;background:var(--bg2);color:var(--txt);border:1px solid var(--border)">취소</button>
-            </div>
-          </div>
-          <div style="display:flex;gap:5px;border-top:1px solid var(--border);padding-top:6px">
-            <button onclick="tgShowAddForm()" class="scan-mini" style="flex:1;margin-top:0;font-size:11px">＋ 추가</button>
-            <button onclick="tgChangePinFlow()" class="scan-mini" style="margin-top:0;font-size:10px;background:var(--bg2);color:var(--txt3);border:1px solid var(--border)">🔑</button>
-            <button onclick="tgLock()" class="scan-mini" style="margin-top:0;font-size:10px;background:var(--bg2);color:var(--txt3);border:1px solid var(--border)">🔒</button>
-          </div>
-        </div>
-
-      </div>
+    <!-- 텔레그램 알림 상태 (컴팩트) -->
+    <div style="border-top:1px solid var(--brd2);padding-top:8px;margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:6px">
+      <div id="tg-status" style="font-size:11px;color:var(--txt2);flex:1">알림 미설정</div>
+      <button onclick="openAdminModal()" class="scan-mini" style="margin-top:0;font-size:11px;background:var(--bg3);color:var(--txt);border:1px solid var(--border)">⚙ 관리</button>
     </div>
   </div>
 
@@ -413,6 +372,83 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
       <div class="mgr-actions">
         <button class="btn-modal-close" onclick="closeMgr()">닫기</button>
         <button class="btn-add-analyst" onclick="addAnalyst()">추가</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     ADMIN MODAL
+════════════════════════════════════════ -->
+<div class="modal-bg" id="admin-modal" onclick="if(event.target===this)closeAdminModal()">
+  <div class="modal" style="width:min(500px,92vw)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <span style="font-size:16px;font-weight:700;color:var(--txt)">⚙ 관리자 설정</span>
+      <button onclick="closeAdminModal()" style="background:none;border:none;color:var(--txt2);font-size:20px;cursor:pointer;line-height:1;padding:0 4px">✕</button>
+    </div>
+
+    <!-- PIN 잠금 패널 -->
+    <div id="tg-pin-panel" style="display:flex;flex-direction:column;gap:10px;max-width:300px;margin:16px auto 20px">
+      <div style="font-size:13px;color:var(--txt2);text-align:center;margin-bottom:4px">🔒 이 페이지는 PIN으로 보호됩니다</div>
+      <div id="tg-pin-msg" style="font-size:12px;color:var(--txt3);text-align:center;min-height:16px"></div>
+      <input id="tg-pin-input" type="password" placeholder="PIN 입력" maxlength="20"
+        style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:9px 12px;font-size:14px;color:var(--txt);outline:none;width:100%;box-sizing:border-box;text-align:center;letter-spacing:4px"
+        onkeydown="if(event.key==='Enter') tgConfirmPin()">
+      <button onclick="tgConfirmPin()" class="scan-mini" style="margin-top:0;width:100%;font-size:13px;padding:8px">확인</button>
+    </div>
+
+    <!-- 잠금 해제 후 컨텐츠 -->
+    <div id="tg-settings-panel" style="display:none;flex-direction:column;gap:16px">
+
+      <!-- Claude API Key 섹션 -->
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--txt);margin-bottom:6px">🤖 Claude API Key</div>
+        <div style="font-size:11px;color:var(--txt3);margin-bottom:8px">AI 재분석 기능에 사용됩니다. 브라우저 탭 내에서만 유지됩니다.</div>
+        <div style="display:flex;gap:6px">
+          <input id="admin-api-key-inp" type="password" placeholder="sk-ant-api03-..."
+            style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:12px;color:var(--txt);outline:none;font-family:monospace"
+            onkeydown="if(event.key==='Enter')saveApiKey()">
+          <button onclick="saveApiKey()" class="scan-mini" style="margin-top:0;font-size:12px;padding:0 12px">저장</button>
+        </div>
+        <div id="ind-api-modal" style="font-size:11px;color:var(--txt3);margin-top:5px;min-height:14px"></div>
+      </div>
+
+      <div style="border-top:1px solid var(--border)"></div>
+
+      <!-- 텔레그램 수신자 섹션 -->
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--txt);margin-bottom:8px">📲 텔레그램 수신자</div>
+        <div id="tg-recipient-list" style="display:flex;flex-direction:column;gap:5px;margin-bottom:8px"></div>
+
+        <!-- 수신자 추가/편집 폼 -->
+        <div id="tg-add-form" style="display:none;flex-direction:column;gap:6px;border:1px solid var(--border);border-radius:6px;padding:10px;background:var(--bg3);margin-bottom:8px">
+          <div style="font-size:11px;font-weight:600;color:var(--txt2);margin-bottom:2px">수신자 정보 입력</div>
+          <input id="tg-f-name" placeholder="수신자 이름 (예: 나, 친구)"
+            style="background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:6px 9px;font-size:12px;color:var(--txt);outline:none;width:100%;box-sizing:border-box">
+          <input id="tg-f-token" type="password" placeholder="Bot Token (예: 123456:ABC-DEF...)"
+            style="background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:6px 9px;font-size:12px;color:var(--txt);outline:none;width:100%;box-sizing:border-box;font-family:monospace">
+          <input id="tg-f-chatid" placeholder="Chat ID (예: 123456789)"
+            style="background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:6px 9px;font-size:12px;color:var(--txt);outline:none;width:100%;box-sizing:border-box">
+          <div style="display:flex;gap:6px">
+            <button onclick="tgSaveRecipient()" class="scan-mini" style="flex:1;margin-top:0;font-size:12px">💾 저장</button>
+            <button onclick="tgCancelForm()" class="scan-mini" style="margin-top:0;font-size:12px;background:var(--bg3);color:var(--txt2);border:1px solid var(--border)">취소</button>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:6px">
+          <button onclick="tgShowAddForm()" class="scan-mini" style="flex:1;margin-top:0;font-size:12px">＋ 수신자 추가</button>
+          <button onclick="testTelegram()" class="scan-mini" style="flex:1;margin-top:0;font-size:12px">📤 테스트 전송</button>
+        </div>
+        <div id="admin-tg-status" style="font-size:11px;color:var(--txt2);text-align:center;margin-top:7px;min-height:14px"></div>
+      </div>
+
+      <div style="border-top:1px solid var(--border)"></div>
+
+      <!-- 하단 컨트롤 -->
+      <div style="display:flex;gap:6px">
+        <button onclick="tgChangePinFlow()" class="scan-mini" style="margin-top:0;font-size:11px;background:var(--bg3);color:var(--txt2);border:1px solid var(--border)">🔑 PIN 변경</button>
+        <button onclick="tgLock()" class="scan-mini" style="margin-top:0;font-size:11px;background:var(--bg3);color:var(--txt2);border:1px solid var(--border)">🔒 잠금</button>
+        <button onclick="closeAdminModal()" class="scan-mini" style="flex:1;margin-top:0;font-size:12px">닫기</button>
       </div>
     </div>
   </div>
@@ -744,7 +780,7 @@ function showToast(msg, duration=3000){
 async function scanOne(id){
   const a=ANALYSTS.find(x=>x.id===id); if(!a||a.scanning) return;
   if(!CLAUDE_KEY){
-    showToast('🔑 Claude API Key가 필요합니다 — 헤더에서 입력 후 저장하세요');
+    showToast('🔑 Claude API Key가 필요합니다 — ⚙ 관리 버튼에서 입력하세요');
     return;
   }
   a.scanning=true; refreshCard(id);
@@ -766,7 +802,7 @@ JSON만 응답(마크다운 없이): {"position":"bull"|"bear"|"neutral","bullPc
 async function scanAll(){
   if(!CLAUDE_KEY){
     const note=document.getElementById('data-src-note');
-    if(note){ note.textContent='헤더에서 Claude API Key를 저장하면\nAI 실시간 재분석이 가능합니다.'; note.style.color='var(--bear)'; }
+    if(note){ note.textContent='⚙ 관리 버튼에서 Claude API Key를 저장하면\nAI 실시간 재분석이 가능합니다.'; note.style.color='var(--bear)'; }
     return;
   }
   const btn=document.getElementById('scan-btn'); btn.disabled=true; btn.textContent='스캔 중...';
@@ -986,12 +1022,14 @@ function updateAnalyst(idx,val){
   ANALYSTS[idx].bullPct=parseInt(val); refreshCard(ANALYSTS[idx].id); saveState(); updateConUI(); recalc();
 }
 function saveApiKey(){
-  const k=document.getElementById('api-key-inp').value.trim(); if(!k) return;
+  const k=document.getElementById('admin-api-key-inp').value.trim(); if(!k) return;
   CLAUDE_KEY=k; sessionStorage.setItem('claude_key',k);
-  document.getElementById('api-key-inp').value='';
+  document.getElementById('admin-api-key-inp').value='';
   const ind=document.getElementById('ind-claude');
   if(ind){ ind.className='ind ind-ok'; ind.innerHTML='<span class="ind-dot" style="background:var(--bull)"></span>AI 준비'; }
-  alert('Claude API 키 저장 완료. AI 전체 스캔을 사용할 수 있습니다.');
+  const modal=document.getElementById('ind-api-modal');
+  if(modal){ modal.textContent='✅ API 키 저장됨 (탭 세션 유지)'; modal.style.color='var(--bull)'; }
+  showToast('🤖 Claude API 키 저장 완료. AI 재분석을 사용할 수 있습니다.');
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1021,6 +1059,7 @@ function loadTgConfig(){
     }
   }catch(e){}
   try{ const s=localStorage.getItem('oc_tg_v2'); if(s) TG_RECIPIENTS=JSON.parse(s); }catch(e){}
+  updateTgBadge();
 }
 
 function saveTgRecipients(){
@@ -1028,23 +1067,38 @@ function saveTgRecipients(){
 }
 
 function setTgStatus(msg,color='var(--txt2)'){
-  const e=document.getElementById('tg-status'); if(e){e.textContent=msg;e.style.color=color;}
+  const e=document.getElementById('admin-tg-status'); if(e){e.textContent=msg;e.style.color=color;}
 }
 
-// ── PIN 잠금/해제 ─────────────────────────────────────────────
-let _tgListOpen = false;
-
-function tgToggleListPanel(){
-  _tgListOpen = !_tgListOpen;
-  const panel = document.getElementById('tg-list-panel');
-  const btn   = document.getElementById('tg-list-btn');
-  panel.style.display = _tgListOpen ? 'flex' : 'none';
-  btn.textContent = _tgListOpen ? '👥 수신자 목록 ▴' : '👥 수신자 목록 ▾';
-  if(_tgListOpen && !_tgUnlocked) tgShowPinPanel();
-  if(_tgListOpen && _tgUnlocked)  renderTgRecipients();
+function updateTgBadge(){
+  const active=TG_RECIPIENTS.filter(r=>r.enabled&&r.token&&r.chatId);
+  const e=document.getElementById('tg-status');
+  if(!e) return;
+  if(!TG_RECIPIENTS.length){ e.textContent='알림 미설정'; e.style.color='var(--txt3)'; }
+  else if(!active.length){ e.textContent='수신자 비활성화'; e.style.color='var(--neu)'; }
+  else { e.textContent=`📲 ${active.length}명 수신 중`; e.style.color='var(--bull)'; }
 }
 
-function tgToggleLock(){ _tgUnlocked ? tgLock() : tgShowPinPanel(); }
+// ── 관리자 모달 ────────────────────────────────────────────────
+function openAdminModal(){
+  document.getElementById('admin-modal').classList.add('open');
+  if(sessionStorage.getItem('tg_unlocked')==='1'){ _tgUnlocked=true; tgShowSettingsPanel(); }
+  else tgShowPinPanel();
+  // API 키 상태 표시
+  const modal=document.getElementById('ind-api-modal');
+  if(modal && CLAUDE_KEY){ modal.textContent='✅ API 키 설정됨 (탭 세션)'; modal.style.color='var(--bull)'; }
+}
+
+function closeAdminModal(){
+  document.getElementById('admin-modal').classList.remove('open');
+  tgCancelForm();
+}
+
+function tgShowSettingsPanel(){
+  document.getElementById('tg-pin-panel').style.display='none';
+  document.getElementById('tg-settings-panel').style.display='flex';
+  renderTgRecipients();
+}
 
 function tgShowPinPanel(){
   document.getElementById('tg-pin-panel').style.display='flex';
@@ -1075,19 +1129,13 @@ async function tgConfirmPin(){
 function tgUnlock(){
   _tgUnlocked=true;
   sessionStorage.setItem('tg_unlocked','1');
-  document.getElementById('tg-pin-panel').style.display='none';
-  document.getElementById('tg-settings-panel').style.display='flex';
-  renderTgRecipients();
+  tgShowSettingsPanel();
 }
 
 function tgLock(){
   _tgUnlocked=false;
-  _tgListOpen=false;
   sessionStorage.removeItem('tg_unlocked');
-  document.getElementById('tg-list-panel').style.display='none';
-  document.getElementById('tg-list-btn').textContent='👥 수신자 목록 ▾';
-  document.getElementById('tg-pin-panel').style.display='flex';
-  document.getElementById('tg-settings-panel').style.display='none';
+  tgShowPinPanel();
   showToast('🔒 잠금됨');
 }
 
@@ -1152,7 +1200,7 @@ function tgSaveRecipient(){
   } else {
     TG_RECIPIENTS.push({id:'r'+Date.now(),name,token,chatId,enabled:true});
   }
-  saveTgRecipients(); tgCancelForm(); renderTgRecipients();
+  saveTgRecipients(); tgCancelForm(); renderTgRecipients(); updateTgBadge();
   setTgStatus('✅ 저장됨');
 }
 
@@ -1161,12 +1209,12 @@ function tgEditRecipient(id){ tgShowAddForm(id); }
 function tgDeleteRecipient(id){
   if(!confirm('이 수신자를 삭제할까요?')) return;
   TG_RECIPIENTS=TG_RECIPIENTS.filter(r=>r.id!==id);
-  saveTgRecipients(); renderTgRecipients();
+  saveTgRecipients(); renderTgRecipients(); updateTgBadge();
 }
 
 function tgToggleRecipient(id,enabled){
   const r=TG_RECIPIENTS.find(x=>x.id===id); if(r) r.enabled=enabled;
-  saveTgRecipients();
+  saveTgRecipients(); updateTgBadge();
 }
 
 async function _sendToOne(token,chatId,text){
