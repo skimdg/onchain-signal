@@ -160,22 +160,23 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 .ac-nm{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ac-hdl{font-size:12px;font-weight:600;color:#1d9bf0;margin-top:1px}
 .ac-role{font-size:11px;font-weight:500;color:var(--txt2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ac-mid{padding:6px 9px;border-bottom:1px solid var(--brd2)}
-.pt{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:4px;border:1px solid;margin-bottom:5px}
+.ac-bar-wrap{padding:7px 9px 6px;border-bottom:1px solid var(--brd2)}
+.ac-bar-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.pt{display:inline-block;font-size:14px;font-weight:800;padding:5px 14px;border-radius:5px;border:1px solid;letter-spacing:.02em}
 .pt-bull{background:var(--bullg);color:var(--bull);border-color:rgba(10,158,116,.25)}
 .pt-bear{background:var(--bearg);color:var(--bear);border-color:rgba(224,53,53,.25)}
 .pt-neu{background:var(--neug);color:var(--neu);border-color:rgba(217,119,6,.25)}
-.br{display:flex;align-items:center;gap:4px;margin-bottom:3px}
-.br-l{font-size:7px;color:var(--txt3);width:18px;flex-shrink:0;text-transform:uppercase}
-.br-t{flex:1;height:3px;background:var(--bg3);border-radius:2px;overflow:hidden}
-.br-f{height:100%;border-radius:2px;transition:width 1s}
-.br-p{font-size:11px;font-weight:700;min-width:28px;text-align:right}
+.ac-pct-num{font-size:22px;font-weight:800;line-height:1}
+.ac-bar-track{position:relative;height:10px;background:var(--bg3);border-radius:5px;margin-bottom:2px}
+.ac-bar-fill{position:absolute;left:0;top:0;height:100%;border-radius:5px;transition:width .6s}
+.ac-bar-dot{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;border:2.5px solid var(--bg2);transform:translateX(-50%) translateY(-50%);transition:left .6s;z-index:2;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.ac-bar-prev-tick{position:absolute;top:-3px;bottom:-3px;width:2px;border-radius:1px;opacity:.4;transform:translateX(-50%);transition:left .6s;z-index:1}
+.ac-change-row{font-size:10px;color:var(--txt3);text-align:right;margin:3px 0 2px;min-height:14px}
 .ac-sum{padding:7px 10px;font-size:12px;font-weight:500;color:var(--txt);line-height:1.5;min-height:40px;border-bottom:1px solid var(--brd2)}
 .ac-sum.dim{color:var(--txt3);font-style:italic}
-.ac-sl{padding:5px 9px 8px}
-.a-slider{width:100%;-webkit-appearance:none;height:3px;border-radius:2px;background:var(--border);outline:none;cursor:pointer;margin:5px 0 3px}
-.a-slider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--acc);cursor:pointer;border:2px solid var(--bg2);box-shadow:0 1px 3px rgba(0,0,0,.2)}
-.a-pct{font-size:17px;font-weight:700;text-align:center}
+.a-slider{width:100%;-webkit-appearance:none;height:2px;border-radius:2px;background:var(--border);outline:none;cursor:pointer;display:block;margin:4px 0 0;opacity:.55}
+.a-slider::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;border-radius:50%;background:var(--txt3);cursor:pointer;border:1.5px solid var(--bg2)}
+.ac-prev-sum{font-size:10px;color:var(--txt3);padding:3px 9px 4px;opacity:.55;font-style:italic;border-top:1px dashed var(--brd2);line-height:1.4}
 .ac-ft{display:flex;align-items:center;justify-content:space-between;padding:4px 9px;background:var(--bg3)}
 .ac-ts{font-size:10px;font-weight:500;color:var(--txt2)}
 .rescan{font-size:10px;font-weight:600;padding:3px 8px;background:var(--bg2);color:var(--acc);border:1px solid rgba(37,99,235,.3);border-radius:3px;cursor:pointer}
@@ -835,21 +836,29 @@ function renderAnalysts(){
   const cards=ANALYSTS.map((a,i)=>{
     const p=a.bullPct, ptC=p>=60?'pt-bull':p>=40?'pt-neu':'pt-bear', ptT=p>=60?'강세':p>=40?'중립':'약세';
     const fc=p>=60?'var(--bull)':p>=40?'var(--neu)':'var(--bear)';
+    const prev=(a.prevBullPct!==undefined&&a.prevBullPct!==null)?a.prevBullPct:null;
+    const pfc=prev!==null?(prev>=60?'var(--bull)':prev>=40?'var(--neu)':'var(--bear)'):'';
     return `<div class="ac" id="ac-${a.id}">
       <div class="ac-hd">
         <div class="ac-nm">${a.name}</div>
         <div class="ac-hdl">${a.handle}</div>
         <div class="ac-role">${a.rank} · ${a.specialty}</div>
       </div>
-      <div class="ac-mid">
-        <span class="pt ${ptC}" id="pt-${a.id}">${ptT}</span>
-        <div class="br"><span class="br-l">강세</span><div class="br-t"><div class="br-f" id="brf-${a.id}" style="width:${p}%;background:${fc}"></div></div><span class="br-p" id="brp-${a.id}" style="color:${fc}">${p}%</span></div>
+      <div class="ac-bar-wrap">
+        <div class="ac-bar-hd">
+          <span class="pt ${ptC}" id="pt-${a.id}">${ptT}</span>
+          <span class="ac-pct-num" id="apct-${a.id}" style="color:${fc}">${p}%</span>
+        </div>
+        <div class="ac-bar-track">
+          <div class="ac-bar-fill" id="brf-${a.id}" style="width:${p}%;background:${fc}"></div>
+          <div class="ac-bar-dot" id="bdot-${a.id}" style="left:${p}%;background:${fc}"></div>
+          ${prev!==null?`<div class="ac-bar-prev-tick" id="prevtick-${a.id}" style="left:${prev}%;background:${pfc}" title="이전 포지션: ${prev}%"></div>`:''}
+        </div>
+        <div class="ac-change-row" id="chgrow-${a.id}">${prev!==null&&prev!==p?`<span style="color:${pfc};opacity:.6">이전 ${prev}%</span> → <span style="color:${fc};font-weight:700">${p}%</span>`:''}</div>
+        <input type="range" class="a-slider" min="0" max="100" value="${p}" id="sl-${a.id}" oninput="updateAnalyst(${i},this.value)">
       </div>
       <div class="ac-sum${a.summary?'':' dim'}" id="sum-${a.id}">${a.summary||(a.scanning?'분석 중...':'슬라이더로 조정 가능')}</div>
-      <div class="ac-sl">
-        <input type="range" class="a-slider" min="0" max="100" value="${p}" id="sl-${a.id}" oninput="updateAnalyst(${i},this.value)">
-        <div class="a-pct" id="apct-${a.id}" style="color:${fc}">${p}%</div>
-      </div>
+      ${a.prevSummary&&a.prevSummary!==a.summary?`<div class="ac-prev-sum" id="prevsm-${a.id}">이전: ${a.prevSummary}</div>`:''}
       <div class="ac-ft">
         <span class="ac-ts" title="${(a.headlines||[])[0]||''}">${(()=>{
           const h=(a.headlines||[])[0]||'';
@@ -882,13 +891,17 @@ function refreshCard(id){
   const a=ANALYSTS.find(x=>x.id===id); if(!a) return;
   const p=a.bullPct, ptC=p>=60?'pt-bull':p>=40?'pt-neu':'pt-bear', ptT=p>=60?'강세':p>=40?'중립':'약세';
   const fc=p>=60?'var(--bull)':p>=40?'var(--neu)':'var(--bear)';
+  const prev=(a.prevBullPct!==undefined&&a.prevBullPct!==null)?a.prevBullPct:null;
+  const pfc=prev!==null?(prev>=60?'var(--bull)':prev>=40?'var(--neu)':'var(--bear)'):'';
   const set=(sel,fn)=>{ const e=document.getElementById(sel); if(e) fn(e); };
-  set(`pt-${id}`,  e=>{ e.className=`pt ${ptC}`; e.textContent=ptT; });
-  set(`brf-${id}`, e=>{ e.style.width=p+'%'; e.style.background=fc; });
-  set(`brp-${id}`, e=>{ e.textContent=p+'%'; e.style.color=fc; });
-  set(`sum-${id}`, e=>{ e.textContent=a.scanning?'분석 중...':(a.summary||'슬라이더로 조정 가능'); e.className='ac-sum'+(a.summary&&!a.scanning?'':' dim'); });
-  set(`sl-${id}`,  e=>{ e.value=p; });
-  set(`apct-${id}`,e=>{ e.textContent=p+'%'; e.style.color=fc; });
+  set(`pt-${id}`,    e=>{ e.className=`pt ${ptC}`; e.textContent=ptT; });
+  set(`brf-${id}`,   e=>{ e.style.width=p+'%'; e.style.background=fc; });
+  set(`bdot-${id}`,  e=>{ e.style.left=p+'%'; e.style.background=fc; });
+  set(`apct-${id}`,  e=>{ e.textContent=p+'%'; e.style.color=fc; });
+  set(`sl-${id}`,    e=>{ e.value=p; });
+  set(`sum-${id}`,   e=>{ e.textContent=a.scanning?'분석 중...':(a.summary||'슬라이더로 조정 가능'); e.className='ac-sum'+(a.summary&&!a.scanning?'':' dim'); });
+  set(`chgrow-${id}`,e=>{ e.innerHTML=prev!==null&&prev!==p?`<span style="color:${pfc};opacity:.6">이전 ${prev}%</span> → <span style="color:${fc};font-weight:700">${p}%</span>`:''; });
+  if(prev!==null) set(`prevtick-${id}`,e=>{ e.style.left=prev+'%'; e.style.background=pfc; });
 }
 
 function updateConUI(){

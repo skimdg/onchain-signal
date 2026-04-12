@@ -214,7 +214,14 @@ async function scanOne(analyst) {
     console.log(`     • ${it.pubDate ? new Date(it.pubDate).toLocaleDateString('ko-KR') : '?'}  ${it.title.substring(0, 70)}`)
   );
 
-  return { id: analyst.id, bullPct, summary, headlines, sourceUrls, lastScan: today, scanning: false };
+  // 이전 값 저장 (변화가 있을 때만)
+  const oldData = prevData[analyst.id];
+  const prevBullPct  = (oldData && oldData.bullPct !== bullPct)  ? oldData.bullPct  : (oldData?.prevBullPct  ?? null);
+  const prevSummary  = (oldData && oldData.bullPct !== bullPct)  ? oldData.summary  : (oldData?.prevSummary  ?? null);
+
+  return { id: analyst.id, bullPct, summary, headlines, sourceUrls, lastScan: today, scanning: false,
+           ...(prevBullPct !== null ? { prevBullPct } : {}),
+           ...(prevSummary ? { prevSummary } : {}) };
 }
 
 async function main() {
