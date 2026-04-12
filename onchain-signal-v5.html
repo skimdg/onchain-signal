@@ -382,9 +382,13 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 ════════════════════════════════════════ -->
 <div class="modal-bg" id="admin-modal" onclick="if(event.target===this)closeAdminModal()">
   <div class="modal" style="width:min(500px,92vw)">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
       <span style="font-size:16px;font-weight:700;color:var(--txt)">⚙ 관리자 설정</span>
       <button onclick="closeAdminModal()" style="background:none;border:none;color:var(--txt2);font-size:20px;cursor:pointer;line-height:1;padding:0 4px">✕</button>
+    </div>
+    <div id="admin-lock-status" style="font-size:11px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:4px;color:var(--txt3)">
+      <span id="admin-lock-dot" style="width:7px;height:7px;border-radius:50%;background:var(--txt3);display:inline-block"></span>
+      <span id="admin-lock-label">잠금 상태</span>
     </div>
 
     <!-- PIN 잠금 패널 -->
@@ -1080,10 +1084,23 @@ function updateTgBadge(){
 }
 
 // ── 관리자 모달 ────────────────────────────────────────────────
+function _setAdminLockStatus(unlocked){
+  const dot=document.getElementById('admin-lock-dot');
+  const lbl=document.getElementById('admin-lock-label');
+  if(!dot||!lbl) return;
+  if(unlocked){
+    dot.style.background='var(--bull)'; lbl.style.color='var(--bull)';
+    lbl.textContent='잠금 해제 상태';
+  } else {
+    dot.style.background='var(--bear)'; lbl.style.color='var(--txt3)';
+    lbl.textContent='잠금 상태';
+  }
+}
+
 function openAdminModal(){
   document.getElementById('admin-modal').classList.add('open');
   if(sessionStorage.getItem('tg_unlocked')==='1'){ _tgUnlocked=true; tgShowSettingsPanel(); }
-  else tgShowPinPanel();
+  else { _setAdminLockStatus(false); tgShowPinPanel(); }
   // API 키 상태 표시
   const modal=document.getElementById('ind-api-modal');
   if(modal && CLAUDE_KEY){ modal.textContent='✅ API 키 설정됨 (탭 세션)'; modal.style.color='var(--bull)'; }
@@ -1129,12 +1146,14 @@ async function tgConfirmPin(){
 function tgUnlock(){
   _tgUnlocked=true;
   sessionStorage.setItem('tg_unlocked','1');
+  _setAdminLockStatus(true);
   tgShowSettingsPanel();
 }
 
 function tgLock(){
   _tgUnlocked=false;
   sessionStorage.removeItem('tg_unlocked');
+  _setAdminLockStatus(false);
   tgShowPinPanel();
   showToast('🔒 잠금됨');
 }
@@ -1153,17 +1172,25 @@ function renderTgRecipients(){
   const list=document.getElementById('tg-recipient-list');
   if(!list) return;
   if(!TG_RECIPIENTS.length){
-    list.innerHTML=`<div style="font-size:11px;color:var(--txt3);text-align:center;padding:6px 0">수신자가 없습니다. 아래 버튼으로 추가하세요.</div>`;
+    list.innerHTML=`<div style="font-size:12px;color:var(--txt3);padding:10px 0;border:1px dashed var(--border);border-radius:6px;text-align:center">
+      수신자가 없습니다.<br>
+      <span style="font-size:11px">아래 <b>＋ 수신자 추가</b> 버튼을 눌러 Bot Token과 Chat ID를 등록하세요.</span>
+    </div>`;
     return;
   }
-  list.innerHTML=TG_RECIPIENTS.map(r=>`
-    <div style="display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:6px 8px">
+  list.innerHTML=TG_RECIPIENTS.map(r=>{
+    const tokenOk=r.token && r.token.includes(':') && r.token.split(':')[1].length>20;
+    const warn=tokenOk?'':'⚠️ ';
+    const hint=tokenOk?'':`<span style="font-size:9px;color:var(--bear)"> (토큰 확인 필요)</span>`;
+    return `
+    <div style="display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid ${tokenOk?'var(--border)':'var(--bear)'};border-radius:5px;padding:6px 8px">
       <input type="checkbox" ${r.enabled?'checked':''} onchange="tgToggleRecipient('${r.id}',this.checked)" style="cursor:pointer;accent-color:var(--acc)">
-      <span style="flex:1;font-size:12px;font-weight:600;color:var(--txt)">${r.name}</span>
+      <span style="flex:1;font-size:12px;font-weight:600;color:var(--txt)">${warn}${r.name}${hint}</span>
       <span style="font-size:10px;color:var(--txt3)">${r.chatId||'—'}</span>
-      <button onclick="tgEditRecipient('${r.id}')" style="font-size:10px;background:none;border:none;color:var(--acc);cursor:pointer;padding:0 2px">수정</button>
+      <button onclick="tgEditRecipient('${r.id}')" style="font-size:10px;background:none;border:none;color:var(--acc);cursor:pointer;padding:0 4px">수정</button>
       <button onclick="tgDeleteRecipient('${r.id}')" style="font-size:10px;background:none;border:none;color:var(--bear);cursor:pointer;padding:0 2px">삭제</button>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 // ── 수신자 추가/편집/삭제 ─────────────────────────────────────
