@@ -8,7 +8,8 @@
  *      대시보드와 동일 공식: MVRV-Z(45%) + NUPL(35%) + F&G(20%)
  *   3. 온체인 지표 구간 변경 (F&G 자동 / 나머지 MANUAL 하드코딩)
  *   4. 즉시 경보 (F&G ≤15, F&G ≥85, BTC 24h ≤-10%, BTC 24h ≥+10%)
- *   5. 매일 07:30 KST 일일 리포트 (analyst update 완료 30분 후)
+ *   5. 매일 07:15 KST 이후 첫 번째 실행에서 일일 리포트 1회 전송
+ *      (state.json의 lastReportDate로 중복 방지, GitHub Actions 지연에 강건함)
  *
  * ⚠️  온체인 지표(MVRV-Z/NUPL/SOPR/Netflow/Funding/Puell)는 Glassnode API 없이
  *     자동 수집 불가 → 대시보드에서 수동 업데이트 후 아래 MANUAL 값도 같이 수정 필요
@@ -125,9 +126,12 @@ async function sendTelegram(text) {
 //  MAIN
 // ══════════════════════════════════════════════════════════════
 async function main() {
-  const now  = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
-  const hour = parseInt(new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', hour: 'numeric', hour12: false }));
-  const mins = new Date().getMinutes(); // 분(0~59)은 시간대 무관
+  const nowDate   = new Date();
+  const now       = nowDate.toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+  const hour      = parseInt(nowDate.toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', hour: 'numeric', hour12: false }));
+  const mins      = nowDate.getMinutes(); // 분(0~59)은 시간대 무관
+  // 오늘 날짜 (KST 기준 YYYY.M.D. 형식) — 일일 리포트 중복 방지용
+  const todayKST  = nowDate.toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul' });
   console.log(`[${now}] 체크 시작`);
 
   // ── 상태 / analyst-data 로드 ──
@@ -241,10 +245,12 @@ async function main() {
 
   // ────────────────────────────────────────────────────────────
   //  5. 매일 07:30 KST 일일 리포트
-  //     update-analysts.yml이 07:00 KST 실행 → 30분 후 최신 데이터로 보고
-  //     alert.yml은 */15분 실행 → 07:28~07:44 슬롯에서 리포트 전송
+  //     update-analysts.yml이 07:00 KST 실행 → 완료 후 최신 데이터로 보고
+  //     alert.yml은 */15분 실행 → 07:15 이후 첫 번째 실행 시 전송
+  //     ★ 분 범위 체크 대신 lastReportDate 비교 사용 (GitHub Actions 지연 대응)
   // ────────────────────────────────────────────────────────────
-  if (hour === 7 && mins >= 28 && mins <= 44) {
+  const shouldReport = hour === 7 && mins >= 15 && prev.lastReportDate !== todayKST;
+  if (shouldReport) {
     const analysts = analystData?.analysts || [];
     const bulls    = analysts.filter(a => a.bullPct >= 60);
     const neuts    = analysts.filter(a => a.bullPct >= 40 && a.bullPct < 60);
@@ -301,6 +307,8 @@ async function main() {
     ),
     btcPrice,
     fg,
+    // 일일 리포트 전송 날짜 저장 (오늘 전송했으면 오늘 날짜, 아니면 이전 값 유지)
+    lastReportDate: shouldReport ? todayKST : (prev.lastReportDate || null),
     updatedAt: new Date().toISOString(),
   };
   writeState(newState);
