@@ -327,23 +327,45 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
   <div class="card" style="display:flex;flex-direction:column;gap:8px">
     <div class="sec-ttl" style="margin-bottom:0">🚨 자동 알림 시그널</div>
     <div id="alert-list"><div class="no-al">데이터 로딩 중...</div></div>
-    <!-- 텔레그램 알림 설정 -->
+    <!-- 텔레그램 알림 설정 (PIN 잠금) -->
     <div style="border-top:1px solid var(--brd2);padding-top:10px;margin-top:auto">
-      <div style="font-size:15px;font-weight:700;color:var(--txt);margin-bottom:10px">📲 알림 전송 설정</div>
-      <div style="display:flex;flex-direction:column;gap:9px">
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:13px;font-weight:700;color:var(--txt2);width:80px;flex-shrink:0">Bot Token</span>
-          <input id="tg-token" type="password" placeholder="123456:ABC-..." style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:7px 10px;font-size:13px;color:var(--txt);outline:none;font-family:monospace;min-width:0">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:15px;font-weight:700;color:var(--txt)">📲 알림 전송 설정</span>
+        <button id="tg-lock-btn" onclick="tgToggleLock()" class="scan-mini" style="margin-top:0;font-size:11px;padding:4px 10px;background:var(--bg3);color:var(--txt3);border:1px solid var(--border)">🔒 잠금 해제</button>
+      </div>
+
+      <!-- 잠금 상태: PIN 입력 패널 -->
+      <div id="tg-pin-panel" style="display:flex;flex-direction:column;gap:7px">
+        <input id="tg-pin-input" type="password" placeholder="PIN 입력 (첫 설정 시 새 PIN 등록)" maxlength="20"
+          style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:7px 10px;font-size:13px;color:var(--txt);outline:none;width:100%;box-sizing:border-box"
+          onkeydown="if(event.key==='Enter') tgConfirmPin()">
+        <button onclick="tgConfirmPin()" class="scan-mini" style="margin-top:0;width:100%">확인</button>
+        <div id="tg-pin-msg" style="font-size:11px;color:var(--txt3);text-align:center;min-height:14px"></div>
+      </div>
+
+      <!-- 잠금 해제 상태: 수신자 관리 -->
+      <div id="tg-settings-panel" style="display:none;flex-direction:column;gap:8px">
+        <!-- 수신자 목록 -->
+        <div id="tg-recipient-list" style="display:flex;flex-direction:column;gap:5px"></div>
+        <!-- 수신자 추가/편집 폼 -->
+        <div id="tg-add-form" style="display:none;flex-direction:column;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px">
+          <input id="tg-f-name"  placeholder="수신자 이름 (예: 나, 친구)" style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:6px 8px;font-size:12px;color:var(--txt);outline:none">
+          <input id="tg-f-token" type="password" placeholder="Bot Token (123456:ABC-...)" style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:6px 8px;font-size:12px;color:var(--txt);outline:none;font-family:monospace">
+          <input id="tg-f-chatid" placeholder="Chat ID" style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:6px 8px;font-size:12px;color:var(--txt);outline:none">
+          <div style="display:flex;gap:5px">
+            <button onclick="tgSaveRecipient()" class="scan-mini" style="flex:1;margin-top:0;font-size:11px">💾 저장</button>
+            <button onclick="tgCancelForm()" class="scan-mini" style="margin-top:0;font-size:11px;background:var(--bg3);color:var(--txt);border:1px solid var(--border)">취소</button>
+          </div>
         </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:13px;font-weight:700;color:var(--txt2);width:80px;flex-shrink:0">Chat ID</span>
-          <input id="tg-chatid" placeholder="본인 또는 그룹 ID" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:7px 10px;font-size:13px;color:var(--txt);outline:none;min-width:0">
+        <div style="display:flex;gap:5px">
+          <button onclick="tgShowAddForm()" class="scan-mini" style="flex:1;margin-top:0;font-size:11px">＋ 수신자 추가</button>
+          <button onclick="testTelegram()" class="scan-mini" style="flex:1;margin-top:0;font-size:11px;background:var(--bg3);color:var(--txt);border:1px solid var(--border)">📤 테스트</button>
         </div>
-        <div style="display:flex;gap:6px">
-          <button onclick="saveTgConfig()" class="scan-mini" style="flex:1;margin-top:0">💾 저장</button>
-          <button onclick="testTelegram()" class="scan-mini" style="flex:1;margin-top:0;background:var(--bg3);color:var(--txt);border:1px solid var(--border)">📤 테스트</button>
+        <div style="display:flex;gap:5px">
+          <button onclick="tgChangePinFlow()" class="scan-mini" style="flex:1;margin-top:0;font-size:10px;background:var(--bg3);color:var(--txt3);border:1px solid var(--border)">🔑 PIN 변경</button>
+          <button onclick="tgLock()" class="scan-mini" style="flex:1;margin-top:0;font-size:10px;background:var(--bg3);color:var(--txt3);border:1px solid var(--border)">🔒 잠금</button>
         </div>
-        <div id="tg-status" style="font-size:12px;font-weight:500;color:var(--txt2);text-align:center;min-height:16px"></div>
+        <div id="tg-status" style="font-size:12px;font-weight:500;color:var(--txt2);text-align:center;min-height:14px"></div>
       </div>
     </div>
   </div>
@@ -973,39 +995,188 @@ function saveApiKey(){
 // ═══════════════════════════════════════════════════════════════
 //  TELEGRAM NOTIFICATION
 // ═══════════════════════════════════════════════════════════════
-let TG = { token:'', chatId:'' };
+// ── Telegram 수신자 관리 (PIN 잠금 + 다중 수신자) ────────────
+let TG_RECIPIENTS = [];   // [{id, name, token, chatId, enabled}]
+let _tgUnlocked   = false;
+let _tgEditId     = null; // 편집 중인 수신자 ID
 let _lastAlertKeys = new Set();
 
-function loadTgConfig(){
-  try{ const s=localStorage.getItem('oc_tg'); if(s){ const d=JSON.parse(s); TG.token=d.token||''; TG.chatId=d.chatId||''; } }catch(e){}
-  if(TG.token){ document.getElementById('tg-token').value=TG.token; }
-  if(TG.chatId){ document.getElementById('tg-chatid').value=TG.chatId; }
+async function _sha256(str){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
-function saveTgConfig(){
-  TG.token=document.getElementById('tg-token').value.trim();
-  TG.chatId=document.getElementById('tg-chatid').value.trim();
-  try{ localStorage.setItem('oc_tg',JSON.stringify(TG)); }catch(e){}
-  setTgStatus(TG.token?'✅ 저장됨':'❌ 토큰 없음');
-}
-function setTgStatus(msg,color='var(--txt2)'){ const e=document.getElementById('tg-status'); if(e){e.textContent=msg;e.style.color=color;} }
 
-async function sendTelegram(text){
-  if(!TG.token||!TG.chatId) return false;
+function loadTgConfig(){
+  // 구버전 마이그레이션 (oc_tg → oc_tg_v2)
   try{
-    const res=await fetch(`https://api.telegram.org/bot${TG.token}/sendMessage`,{
+    const old=localStorage.getItem('oc_tg');
+    if(old && !localStorage.getItem('oc_tg_v2')){
+      const d=JSON.parse(old);
+      if(d.token){ TG_RECIPIENTS=[{id:'default',name:'기본',token:d.token,chatId:d.chatId||'',enabled:true}];
+        localStorage.setItem('oc_tg_v2',JSON.stringify(TG_RECIPIENTS)); }
+    }
+  }catch(e){}
+  try{ const s=localStorage.getItem('oc_tg_v2'); if(s) TG_RECIPIENTS=JSON.parse(s); }catch(e){}
+}
+
+function saveTgRecipients(){
+  try{ localStorage.setItem('oc_tg_v2',JSON.stringify(TG_RECIPIENTS)); }catch(e){}
+}
+
+function setTgStatus(msg,color='var(--txt2)'){
+  const e=document.getElementById('tg-status'); if(e){e.textContent=msg;e.style.color=color;}
+}
+
+// ── PIN 잠금/해제 ─────────────────────────────────────────────
+function tgToggleLock(){ _tgUnlocked ? tgLock() : tgShowPinPanel(); }
+
+function tgShowPinPanel(){
+  document.getElementById('tg-pin-panel').style.display='flex';
+  document.getElementById('tg-settings-panel').style.display='none';
+  document.getElementById('tg-pin-input').value='';
+  const hasPin=!!localStorage.getItem('oc_tg_pin');
+  document.getElementById('tg-pin-msg').textContent=hasPin?'PIN을 입력하세요':'처음 사용: 사용할 PIN을 입력 후 확인';
+}
+
+async function tgConfirmPin(){
+  const pin=document.getElementById('tg-pin-input').value.trim();
+  if(!pin){ document.getElementById('tg-pin-msg').textContent='PIN을 입력하세요'; return; }
+  const hash=await _sha256(pin);
+  const stored=localStorage.getItem('oc_tg_pin');
+  if(!stored){
+    // 첫 설정 — PIN 등록
+    localStorage.setItem('oc_tg_pin',hash);
+    tgUnlock();
+    showToast('🔑 PIN이 등록되었습니다');
+  } else if(hash===stored){
+    tgUnlock();
+  } else {
+    document.getElementById('tg-pin-msg').textContent='❌ PIN이 맞지 않습니다';
+    document.getElementById('tg-pin-input').value='';
+  }
+}
+
+function tgUnlock(){
+  _tgUnlocked=true;
+  sessionStorage.setItem('tg_unlocked','1');
+  document.getElementById('tg-pin-panel').style.display='none';
+  document.getElementById('tg-settings-panel').style.display='flex';
+  document.getElementById('tg-lock-btn').textContent='🔓 잠금됨';
+  document.getElementById('tg-lock-btn').style.color='var(--bull)';
+  renderTgRecipients();
+}
+
+function tgLock(){
+  _tgUnlocked=false;
+  sessionStorage.removeItem('tg_unlocked');
+  document.getElementById('tg-pin-panel').style.display='flex';
+  document.getElementById('tg-settings-panel').style.display='none';
+  document.getElementById('tg-lock-btn').textContent='🔒 잠금 해제';
+  document.getElementById('tg-lock-btn').style.color='var(--txt3)';
+}
+
+async function tgChangePinFlow(){
+  const newPin=prompt('새 PIN을 입력하세요:');
+  if(!newPin) return;
+  const confirm=prompt('PIN을 다시 입력하세요:');
+  if(newPin!==confirm){ showToast('❌ PIN이 일치하지 않습니다'); return; }
+  localStorage.setItem('oc_tg_pin',await _sha256(newPin));
+  showToast('🔑 PIN이 변경되었습니다');
+}
+
+// ── 수신자 렌더 ───────────────────────────────────────────────
+function renderTgRecipients(){
+  const list=document.getElementById('tg-recipient-list');
+  if(!list) return;
+  if(!TG_RECIPIENTS.length){
+    list.innerHTML=`<div style="font-size:11px;color:var(--txt3);text-align:center;padding:6px 0">수신자가 없습니다. 아래 버튼으로 추가하세요.</div>`;
+    return;
+  }
+  list.innerHTML=TG_RECIPIENTS.map(r=>`
+    <div style="display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:6px 8px">
+      <input type="checkbox" ${r.enabled?'checked':''} onchange="tgToggleRecipient('${r.id}',this.checked)" style="cursor:pointer;accent-color:var(--acc)">
+      <span style="flex:1;font-size:12px;font-weight:600;color:var(--txt)">${r.name}</span>
+      <span style="font-size:10px;color:var(--txt3)">${r.chatId||'—'}</span>
+      <button onclick="tgEditRecipient('${r.id}')" style="font-size:10px;background:none;border:none;color:var(--acc);cursor:pointer;padding:0 2px">수정</button>
+      <button onclick="tgDeleteRecipient('${r.id}')" style="font-size:10px;background:none;border:none;color:var(--bear);cursor:pointer;padding:0 2px">삭제</button>
+    </div>`).join('');
+}
+
+// ── 수신자 추가/편집/삭제 ─────────────────────────────────────
+function tgShowAddForm(id=null){
+  _tgEditId=id;
+  const form=document.getElementById('tg-add-form');
+  form.style.display='flex';
+  if(id){
+    const r=TG_RECIPIENTS.find(x=>x.id===id);
+    if(r){ document.getElementById('tg-f-name').value=r.name;
+           document.getElementById('tg-f-token').value=r.token;
+           document.getElementById('tg-f-chatid').value=r.chatId; }
+  } else {
+    document.getElementById('tg-f-name').value='';
+    document.getElementById('tg-f-token').value='';
+    document.getElementById('tg-f-chatid').value='';
+  }
+  document.getElementById('tg-f-name').focus();
+}
+
+function tgCancelForm(){
+  _tgEditId=null;
+  document.getElementById('tg-add-form').style.display='none';
+}
+
+function tgSaveRecipient(){
+  const name =document.getElementById('tg-f-name').value.trim();
+  const token=document.getElementById('tg-f-token').value.trim();
+  const chatId=document.getElementById('tg-f-chatid').value.trim();
+  if(!name||!token||!chatId){ showToast('이름, Token, Chat ID를 모두 입력하세요'); return; }
+  if(_tgEditId){
+    const r=TG_RECIPIENTS.find(x=>x.id===_tgEditId);
+    if(r){ r.name=name; r.token=token; r.chatId=chatId; }
+  } else {
+    TG_RECIPIENTS.push({id:'r'+Date.now(),name,token,chatId,enabled:true});
+  }
+  saveTgRecipients(); tgCancelForm(); renderTgRecipients();
+  setTgStatus('✅ 저장됨');
+}
+
+function tgEditRecipient(id){ tgShowAddForm(id); }
+
+function tgDeleteRecipient(id){
+  if(!confirm('이 수신자를 삭제할까요?')) return;
+  TG_RECIPIENTS=TG_RECIPIENTS.filter(r=>r.id!==id);
+  saveTgRecipients(); renderTgRecipients();
+}
+
+function tgToggleRecipient(id,enabled){
+  const r=TG_RECIPIENTS.find(x=>x.id===id); if(r) r.enabled=enabled;
+  saveTgRecipients();
+}
+
+async function _sendToOne(token,chatId,text){
+  try{
+    const res=await fetch(`https://api.telegram.org/bot${token}/sendMessage`,{
       method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({chat_id:TG.chatId, text, parse_mode:'HTML'})
+      body:JSON.stringify({chat_id:chatId, text, parse_mode:'HTML'})
     });
     return res.ok;
   }catch(e){ return false; }
 }
 
+// 활성화된 모든 수신자에게 전송 (sendTelegram = 공개 인터페이스)
+async function sendTelegram(text){
+  const active=TG_RECIPIENTS.filter(r=>r.enabled&&r.token&&r.chatId);
+  if(!active.length) return false;
+  const results=await Promise.all(active.map(r=>_sendToOne(r.token,r.chatId,text)));
+  return results.some(Boolean);
+}
+
 async function testTelegram(){
-  saveTgConfig();
-  if(!TG.token||!TG.chatId){ setTgStatus('❌ Token과 Chat ID를 먼저 입력하세요','var(--bear)'); return; }
-  setTgStatus('전송 중...','var(--txt3)');
+  const active=TG_RECIPIENTS.filter(r=>r.enabled&&r.token&&r.chatId);
+  if(!active.length){ setTgStatus('❌ 활성화된 수신자가 없습니다','var(--bear)'); return; }
+  setTgStatus(`전송 중... (${active.length}명)`,'var(--txt3)');
   const ok=await sendTelegram(`🔔 <b>Onchain Signal v5 테스트</b>\n연결이 정상적으로 설정되었습니다.\n현재 BTC: $${LIVE.btcPrice?.toLocaleString()||'—'}`);
-  setTgStatus(ok?'✅ 전송 성공!':'❌ 전송 실패 — Token/ID 확인','var(--'+(ok?'bull':'bear')+')');
+  setTgStatus(ok?`✅ ${active.length}명 전송 성공!`:'❌ 전송 실패 — Token/ID 확인','var(--'+(ok?'bull':'bear')+')');
 }
 
 async function checkAndNotify(){
@@ -1118,6 +1289,8 @@ async function loadAnalystData(){
 
 async function init(){
   loadState(); loadTgConfig();
+  // 이전 세션에서 잠금 해제했으면 자동 복원
+  if(sessionStorage.getItem('tg_unlocked')==='1') tgUnlock();
   if(CLAUDE_KEY){ const ind=document.getElementById('ind-claude'); if(ind){ind.className='ind ind-ok';ind.innerHTML='<span class="ind-dot" style="background:var(--bull)"></span>AI 준비';} }
   // analyst-data.json 로드 (GitHub Actions 자동 업데이트)
   await loadAnalystData();
