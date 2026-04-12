@@ -1100,9 +1100,13 @@ function _setAdminLockStatus(unlocked){
   }
 }
 
+let _pendingAdminAction = null;
+
 function requireAdmin(fn){
   if(_tgUnlocked){ fn(); return; }
-  showToast('🔒 관리자 권한이 필요합니다 — ⚙ 관리에서 PIN을 입력하세요');
+  // PIN 인증 후 자동 실행할 액션 저장
+  _pendingAdminAction = fn;
+  openAdminModal();
 }
 
 function openAdminModal(){
@@ -1116,6 +1120,7 @@ function openAdminModal(){
 function closeAdminModal(){
   document.getElementById('admin-modal').classList.remove('open');
   tgCancelForm();
+  _pendingAdminAction=null;
 }
 
 function tgShowSettingsPanel(){
@@ -1153,6 +1158,11 @@ async function tgConfirmPin(){
 function tgUnlock(){
   _tgUnlocked=true;
   _setAdminLockStatus(true);
+  // 대기 중인 관리자 액션이 있으면 모달 닫고 실행
+  if(_pendingAdminAction){
+    const fn=_pendingAdminAction; _pendingAdminAction=null;
+    closeAdminModal(); fn(); return;
+  }
   tgShowSettingsPanel();
   // API 키 상태 표시
   const apiModal=document.getElementById('ind-api-modal');
