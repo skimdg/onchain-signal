@@ -51,79 +51,79 @@ const METRICS = [
   {
     key:            'netflow',
     label:          'Exchange Netflow (BTC)',
-    urlCandidates:  ['/v1/exchange_netflow', '/v1/netflow', '/v1/exchanges-netflow'],
-    fieldCandidates:['netflow', 'exchange_netflow', 'value'],
+    urlCandidates:  ['/v1/exchange-netflow', '/v1/exchange_netflow', '/v1/netflow'],
+    fieldCandidates:['exchange_netflow', 'netflow', 'value'],
     decimals:       0,
   },
   {
     key:            'puell',
     label:          'Puell Multiple',
-    urlCandidates:  ['/v1/puell_multiple', '/v1/puell-multiple', '/v1/puell'],
+    urlCandidates:  ['/v1/puell-multiple', '/v1/puell_multiple', '/v1/puell'],
     fieldCandidates:['puell_multiple', 'puell', 'value'],
     decimals:       3,
   },
   {
     key:            'funding',
     label:          'Funding Rate (%)',
-    urlCandidates:  ['/v1/funding_rate', '/v1/funding-rate', '/v1/funding'],
+    urlCandidates:  ['/v1/funding-rate', '/v1/funding_rate', '/v1/funding'],
     fieldCandidates:['funding_rate', 'funding', 'value'],
     decimals:       5,
   },
   {
     key:            'utxo1m',
     label:          'UTXO 1w~1m (실현시가총액 비율 %)',
-    urlCandidates:  ['/v1/hodl_waves_realized_cap', '/v1/hodlwaves_realized_cap'],
-    fieldCandidates:['w1_1m', '1w_1m', 'band_1w_1m', 'value'],
+    urlCandidates:  ['/v1/hodl-waves-realized-cap', '/v1/realized-cap-hodl-waves', '/v1/hodl_waves_realized_cap'],
+    fieldCandidates:['w1_1m', '1w_1m', 'band_1w_1m', 'pct_1w_1m', 'value'],
     decimals:       2,
   },
   {
     key:            'utxo7yr',
     label:          'UTXO 7yr+ (공급량 비율 %)',
-    urlCandidates:  ['/v1/hodl_waves_supply', '/v1/hodlwaves_supply'],
-    fieldCandidates:['y7_10', 'y7plus', 'over7y', 'band_7y_10y', 'value'],
+    urlCandidates:  ['/v1/hodl-waves', '/v1/hodl-waves-supply', '/v1/hodl_waves_supply'],
+    fieldCandidates:['y7_10', 'y7plus', 'over7y', 'band_7y_plus', 'pct_7y_10y', 'y7_10y', 'value'],
     decimals:       2,
   },
   // ── 홀더 행동 · 사이클 국면 ─────────────────────────────────
   {
     key:            'nrpl',
-    label:          'NRPL (순실현손익, USD)',
-    urlCandidates:  ['/v1/nrpl', '/v1/net_realized_pnl', '/v1/net-realized-pnl'],
+    label:          'NRPL (순실현손익, BTC)',
+    urlCandidates:  ['/v1/nrpl', '/v1/net-realized-pnl', '/v1/net_realized_pnl'],
     fieldCandidates:['nrpl', 'net_realized_pnl', 'value'],
     decimals:       0,
   },
   {
     key:            'exchReserve',
     label:          'Exchange Reserves (BTC)',
-    urlCandidates:  ['/v1/exchange_reserve', '/v1/exchange_reserves', '/v1/exchange-reserve'],
-    fieldCandidates:['reserve', 'exchange_reserve', 'total_reserve', 'value'],
+    urlCandidates:  ['/v1/exchange-reserve', '/v1/exchange_reserve', '/v1/exchange-reserves'],
+    fieldCandidates:['exchange_reserve', 'reserve', 'total_reserve', 'value'],
     decimals:       0,
   },
   {
     key:            'hodlWave1y2y',
     label:          'HODL Waves 1yr-2yr (공급량 %)',
-    urlCandidates:  ['/v1/hodl_waves_supply', '/v1/hodlwaves_supply'],
-    fieldCandidates:['y1_2', 'band_1y_2y', '1y_2y', 'y1y2', 'value'],
+    urlCandidates:  ['/v1/hodl-waves', '/v1/hodl-waves-supply', '/v1/hodl_waves_supply'],
+    fieldCandidates:['y1_2', '1y_2y', 'band_1y_2y', 'pct_1y_2y', 'y1y2', 'value'],
     decimals:       2,
   },
   {
     key:            'lthSopr',
     label:          'LTH SOPR (장기보유자)',
-    urlCandidates:  ['/v1/lth_sopr', '/v1/lth-sopr', '/v1/sopr_lth'],
-    fieldCandidates:['lth_sopr', 'sopr_lth', 'value'],
+    urlCandidates:  ['/v1/lth-sopr', '/v1/lth_sopr', '/v1/sopr-lth'],
+    fieldCandidates:['lth_sopr', 'sopr_lth', 'lth', 'value'],
     decimals:       4,
   },
   {
     key:            'sthSopr',
     label:          'STH SOPR (단기보유자)',
-    urlCandidates:  ['/v1/sth_sopr', '/v1/sth-sopr', '/v1/sopr_sth'],
-    fieldCandidates:['sth_sopr', 'sopr_sth', 'value'],
+    urlCandidates:  ['/v1/sth-sopr', '/v1/sth_sopr', '/v1/sopr-sth'],
+    fieldCandidates:['sth_sopr', 'sopr_sth', 'sth', 'value'],
     decimals:       4,
   },
   {
     key:            'reserveRisk',
     label:          'Reserve Risk',
-    urlCandidates:  ['/v1/reserve_risk', '/v1/reserve-risk'],
-    fieldCandidates:['reserve_risk', 'value'],
+    urlCandidates:  ['/v1/reserve-risk', '/v1/reserve_risk', '/v1/reserve-risk-adjusted'],
+    fieldCandidates:['reserve_risk', 'risk', 'value'],
     decimals:       6,
   },
 ];
@@ -137,24 +137,33 @@ function fmtDate(d) {
 function extractLatest(data, fieldCandidates) {
   if (!Array.isArray(data) || data.length === 0) return null;
 
-  // 날짜 필드 기준으로 내림차순 정렬
-  const DATE_KEYS = ['t', 'date', 'day', 'timestamp', 'time'];
+  // 날짜/메타 필드 (숫자 자동탐색 제외 대상)
+  const DATE_KEYS = new Set(['t', 'date', 'day', 'timestamp', 'time', 'd', 'unixTs', 'id']);
+
+  // 날짜 필드 기준으로 내림차순 정렬 ('d' 우선)
   const sorted = [...data].sort((a, b) => {
-    const da = DATE_KEYS.map(k => a[k]).find(v => v != null) ?? '';
-    const db = DATE_KEYS.map(k => b[k]).find(v => v != null) ?? '';
+    const da = [...DATE_KEYS].map(k => a[k]).find(v => v != null) ?? '';
+    const db = [...DATE_KEYS].map(k => b[k]).find(v => v != null) ?? '';
     return String(db).localeCompare(String(da));
   });
 
   const latest = sorted[0];
   console.log(`   최신 레코드:`, JSON.stringify(latest));
 
-  // 후보 필드명으로 값 탐색
+  // 후보 필드명으로 값 탐색 — 숫자형 또는 숫자 문자열 모두 허용
   for (const f of fieldCandidates) {
-    if (latest[f] != null && typeof latest[f] === 'number') return latest[f];
+    const raw = latest[f];
+    if (raw != null) {
+      const n = parseFloat(raw);
+      if (!isNaN(n)) return n;
+    }
   }
   // 후보 실패 시 첫 번째 숫자형 필드 자동 탐색 (날짜·ID 제외)
   for (const [k, v] of Object.entries(latest)) {
-    if (typeof v === 'number' && !DATE_KEYS.includes(k) && k !== 'id') return v;
+    if (!DATE_KEYS.has(k)) {
+      const n = parseFloat(v);
+      if (!isNaN(n) && isFinite(n)) return n;
+    }
   }
   return null;
 }
