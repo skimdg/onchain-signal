@@ -66,6 +66,20 @@ const METRICS = [
     fieldCandidates:['funding_rate', 'funding', 'value'],
     decimals:       5,
   },
+  {
+    key:            'utxo1m',
+    label:          'UTXO 1w~1m (실현시가총액 비율 %)',
+    urlCandidates:  ['/v1/hodl_waves_realized_cap', '/v1/hodlwaves_realized_cap'],
+    fieldCandidates:['w1_1m', '1w_1m', 'band_1w_1m', 'value'],
+    decimals:       2,
+  },
+  {
+    key:            'utxo7yr',
+    label:          'UTXO 7yr+ (공급량 비율 %)',
+    urlCandidates:  ['/v1/hodl_waves_supply', '/v1/hodlwaves_supply'],
+    fieldCandidates:['y7_10', 'y7plus', 'over7y', 'band_7y_10y', 'value'],
+    decimals:       2,
+  },
 ];
 
 // ── 날짜 헬퍼 ─────────────────────────────────────────────────

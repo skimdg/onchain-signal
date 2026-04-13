@@ -116,7 +116,7 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 /* ── SECTION 2: onchain metrics ── */
 .s2{margin-bottom:12px}
 .m-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.mc{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:15px;box-shadow:var(--sh);transition:border-color .2s}
+.mc{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:12px;box-shadow:var(--sh);transition:border-color .2s}
 .mc:hover{border-color:var(--acc)}
 .mc-hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px}
 .mc-nm{font-size:12px;color:var(--txt2);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
@@ -502,7 +502,7 @@ let ANALYSTS = [
 //  온체인 데이터 — BGeometrics API 자동 수집 (update-onchain.yml)
 //  onchain-data.json에서 로드, 실패 시 하드코딩 폴백 사용
 // ═══════════════════════════════════════════════════════════════
-let MANUAL = { mvrvZ:0.43, nupl:0.15, sopr:0.98, netflow:-5000, funding:0.008, puell:0.62 };
+let MANUAL = { mvrvZ:0.43, nupl:0.15, sopr:0.98, netflow:-5000, funding:0.008, puell:0.62, utxo1m:null, utxo7yr:null };
 let ONCHAIN_UPDATED = null; // 마지막 자동 업데이트 시각
 
 async function loadOnchainData() {
@@ -516,6 +516,8 @@ async function loadOnchainData() {
     if (d.netflow != null) MANUAL.netflow = d.netflow;
     if (d.funding != null) MANUAL.funding = d.funding;
     if (d.puell   != null) MANUAL.puell   = d.puell;
+    if (d.utxo1m  != null) MANUAL.utxo1m  = d.utxo1m;
+    if (d.utxo7yr != null) MANUAL.utxo7yr = d.utxo7yr;
     ONCHAIN_UPDATED = d.updatedAtKST || d.updatedAt || null;
     console.log('📊 온체인 데이터 로드:', ONCHAIN_UPDATED);
   } catch(e) {
@@ -524,7 +526,7 @@ async function loadOnchainData() {
 }
 
 // ── live ──
-const LIVE = { fearGreed:null, fearGreedLabel:null, stableMcap:null, defiTvl:null, btcPrice:null, btcChange:null, btcDom:null, lastUpdated:null };
+const LIVE = { fearGreed:null, fearGreedLabel:null, stableMcap:null, defiTvl:null, btcPrice:null, btcChange:null, btcDom:null, coinbasePremium:null, lastUpdated:null };
 
 // ── api key ──
 let CLAUDE_KEY = sessionStorage.getItem('claude_key') || '';
@@ -644,6 +646,22 @@ function metricSt(id,v){
       if(v>100)return{cls:'b-bull',lbl:'건강',itp:`$${v}B — DeFi 생태계 건강`};
       if(v>60) return{cls:'b-neu', lbl:'보통',itp:`$${v}B — DeFi 정상`};
       return         {cls:'b-bear',lbl:'위축',itp:`$${v}B — DeFi 자금 이탈 주의`};
+    case'coinbasepremium':
+      if(v>0.2)  return{cls:'b-bull',lbl:'프리미엄',itp:`코인베이스 프리미엄 +${v}% — 미국 기관 매수 강세`};
+      if(v>0.05) return{cls:'b-bull',lbl:'소폭양수',itp:`코인베이스 프리미엄 +${v}% — 미국 수요 우세`};
+      if(v>=-0.05)return{cls:'b-neu',lbl:'중립',   itp:`코인베이스 프리미엄 ${v}% — 수급 균형`};
+      if(v>=-0.2)return{cls:'b-neu', lbl:'소폭음수',itp:`코인베이스 프리미엄 ${v}% — 아시아 수요 우세`};
+      return          {cls:'b-bear',lbl:'디스카운트',itp:`코인베이스 프리미엄 ${v}% — 미국 기관 매도 우세`};
+    case'utxo1m':
+      if(v>15)  return{cls:'b-bear',lbl:'과열',   itp:`단기 보유자 비율 ${v}% — 신규 매수 과잉, 조정 위험`};
+      if(v>8)   return{cls:'b-neu', lbl:'보통',   itp:`단기 보유자 비율 ${v}% — 정상 범위`};
+      if(v>4)   return{cls:'b-bull',lbl:'건전',   itp:`단기 보유자 비율 ${v}% — HODLing 우세, 건전한 상승`};
+      return          {cls:'b-bull',lbl:'강HODL', itp:`단기 보유자 비율 ${v}% — 강한 장기 보유 신호`};
+    case'utxo7yr':
+      if(v>3)   return{cls:'b-bear',lbl:'고래이동',itp:`7년+ UTXO ${v}% 이동 — 초장기 고래 매도 가능성 경고`};
+      if(v>1.5) return{cls:'b-neu', lbl:'주의',   itp:`7년+ UTXO ${v}% 이동 — 고래 움직임 모니터링 필요`};
+      if(v>0.5) return{cls:'b-neu', lbl:'소량',   itp:`7년+ UTXO ${v}% 이동 — 소량 고래 활동`};
+      return          {cls:'b-bull',lbl:'동면',   itp:`7년+ UTXO ${v}% — 초장기 보유자 동면 중, 매도 압력 없음`};
     default: return{cls:'b-neu',lbl:'—',itp:'—'};
   }
 }
@@ -675,7 +693,16 @@ const ZONES = {
              segs:[{max:0.5,color:'#e03535',lbl:'채굴자항복'},{max:0.8,color:'#f97316',lbl:'저평가'},{max:1.5,color:'#22c55e',lbl:'적정'},{max:2.0,color:'#eab308',lbl:'과열주의'},{max:3,color:'#dc2626',lbl:'극과열'}] },
   tvl:     { desc:'DeFi 예치 총 자산. 생태계 건전성 및 시장 신뢰도 지표',
              min:0, max:120,
-             segs:[{max:40, color:'#e03535',lbl:'위축'},{max:80, color:'#eab308',lbl:'보통'},{max:120,color:'#22c55e',lbl:'건강'}] }
+             segs:[{max:40, color:'#e03535',lbl:'위축'},{max:80, color:'#eab308',lbl:'보통'},{max:120,color:'#22c55e',lbl:'건강'}] },
+  coinbasepremium:{ desc:'코인베이스 BTC 가격 - 바이낸스 BTC 가격(%). 양수 = 미국 기관 매수 우세, 음수 = 아시아/셀 프레셔',
+             min:-0.5, max:0.5,
+             segs:[{max:-0.2,color:'#e03535',lbl:'디스카운트'},{max:-0.05,color:'#f97316',lbl:'소폭음수'},{max:0.05,color:'#eab308',lbl:'중립'},{max:0.2,color:'#84cc16',lbl:'소폭양수'},{max:0.5,color:'#22c55e',lbl:'프리미엄'}] },
+  utxo1m:  { desc:'1주~1개월 사이 이동된 BTC 비율(실현시가총액 기준). 높으면 단기 투기 과열, 낮으면 HODLing 강세',
+             min:0, max:20,
+             segs:[{max:4,color:'#22c55e',lbl:'강HODL'},{max:8,color:'#84cc16',lbl:'건전'},{max:15,color:'#eab308',lbl:'보통'},{max:20,color:'#e03535',lbl:'과열'}] },
+  utxo7yr: { desc:'7년 이상 미이동 BTC 비율(공급량 기준). 급등 시 초장기 고래 매도 신호 — 역사적 고점 경고',
+             min:0, max:5,
+             segs:[{max:0.5,color:'#22c55e',lbl:'동면'},{max:1.5,color:'#84cc16',lbl:'소량'},{max:3,color:'#eab308',lbl:'주의'},{max:5,color:'#e03535',lbl:'고래이동'}] }
 };
 
 function makeZoneBar(id, val){
@@ -792,7 +819,14 @@ async function fetchLive(){
     fetchWithRetry('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true')
       .then(r=>r.json()).then(d=>{ const b=d.bitcoin; if(b){LIVE.btcPrice=b.usd;LIVE.btcChange=b.usd_24h_change;} }).catch(()=>{}),
     fetchWithRetry('https://api.coingecko.com/api/v3/global')
-      .then(r=>r.json()).then(d=>{ LIVE.btcDom=d.data?.market_cap_percentage?.btc; }).catch(()=>{})
+      .then(r=>r.json()).then(d=>{ LIVE.btcDom=d.data?.market_cap_percentage?.btc; }).catch(()=>{}),
+    Promise.all([
+      fetchWithRetry('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT').then(r=>r.json()),
+      fetchWithRetry('https://api.coinbase.com/v2/prices/BTC-USD/spot').then(r=>r.json())
+    ]).then(([bin,cb])=>{
+      const binP=parseFloat(bin.price), cbP=parseFloat(cb.data?.amount);
+      if(binP>0&&cbP>0) LIVE.coinbasePremium=parseFloat(((cbP-binP)/binP*100).toFixed(4));
+    }).catch(()=>{})
   ]);
   LIVE.lastUpdated=new Date();
 }
@@ -884,8 +918,8 @@ function renderAlerts(als){
 }
 
 function renderMetrics(){
-  const {fearGreed:fg,fearGreedLabel:fgl,defiTvl:tvl}=LIVE;
-  const {mvrvZ,nupl,sopr,netflow,funding,puell}=MANUAL;
+  const {fearGreed:fg,fearGreedLabel:fgl,defiTvl:tvl,coinbasePremium:cp}=LIVE;
+  const {mvrvZ,nupl,sopr,netflow,funding,puell,utxo1m,utxo7yr}=MANUAL;
   const metrics=[
     {id:'fg',    nm:'Fear & Greed Index',     val:fg,          auto:true,  disp:fg!=null?`${fg}`:      '—',  sub:fgl||''},
     {id:'mvrv',  nm:'MVRV Z-Score',           val:mvrvZ,                   disp:`${mvrvZ}`,                  field:'mvrvZ',   step:'0.01'},
@@ -893,28 +927,38 @@ function renderMetrics(){
     {id:'sopr',  nm:'SOPR',                   val:sopr,                    disp:`${sopr}`,                   field:'sopr',    step:'0.001'},
     {id:'netflow',nm:'Exchange Netflow (7d)', val:netflow,                 disp:`${netflow>=0?'+':''}${fmt(netflow)} BTC`, field:'netflow', step:'100'},
     {id:'funding',nm:'Funding Rate',          val:funding,                 disp:`${funding>=0?'+':''}${funding}%`, field:'funding', step:'0.001'},
-    {id:'puell', nm:'Puell Multiple',           val:MANUAL.puell,                             disp:`${MANUAL.puell}`,               field:'puell',   step:'0.01'},
-    {id:'tvl',   nm:'DeFi TVL',               val:tvl!=null?Math.round(tvl):null, auto:true, disp:tvl!=null?`$${tvl.toFixed(1)}B`:'—'}
+    {id:'puell', nm:'Puell Multiple',         val:MANUAL.puell,            disp:`${MANUAL.puell}`,               field:'puell',   step:'0.01'},
+    {id:'tvl',   nm:'DeFi TVL',               val:tvl!=null?Math.round(tvl):null, auto:true, disp:tvl!=null?`$${tvl.toFixed(1)}B`:'—'},
+    {id:'coinbasepremium', nm:'Coinbase Premium', val:cp, auto:true, disp:cp!=null?`${cp>=0?'+':''}${cp}%`:'—', sub:cp!=null?(cp>0.05?'기관매수↑':cp<-0.05?'매도압력↑':'중립'):''},
+    {id:'utxo1m', nm:'UTXO 1w~1m (실현시가)',  val:utxo1m,                 disp:utxo1m!=null?`${utxo1m}%`:'—',  field:'utxo1m',  step:'0.1'},
+    {id:'utxo7yr',nm:'UTXO 7yr+ (공급량)',     val:utxo7yr,                disp:utxo7yr!=null?`${utxo7yr}%`:'—', field:'utxo7yr', step:'0.01'},
   ];
-  document.getElementById('m-grid').innerHTML=metrics.map(m=>{
-    const st2=metricSt(m.id,m.val);
-    const valCol=st2.cls==='b-bull'?'var(--bull)':st2.cls==='b-bear'?'var(--bear)':'var(--neu)';
-    const desc=ZONES[m.id]?.desc||'';
-    const zbar=m.val!=null?makeZoneBar(m.id,m.val):'';
-    return `<div class="mc" id="mc-${m.id}">
-      <div class="mc-hd"><span class="mc-nm">${m.nm}</span>
-        <div style="display:flex;gap:4px;align-items:center">
-          ${m.auto?'<span class="badge b-auto">AUTO</span>':''}
-          <span class="badge ${st2.cls}" id="badge-${m.id}">${st2.lbl}</span>
-        </div>
-      </div>
-      <div class="mc-dsc">${desc}</div>
-      <div class="mc-val" style="color:${valCol}">${m.disp}${m.sub?`<span style="font-size:12px;color:var(--txt2);margin-left:6px">${m.sub}</span>`:''}</div>
-      <div class="mc-itp" id="itp-${m.id}">${st2.itp}</div>
-      ${zbar}
-      ${m.field?`<div class="mc-inp"><label>수동 입력</label><input type="number" id="inp-${m.field}" value="${m.val}" step="${m.step}" onchange="updateManual('${m.field}',this.value)"></div>`:''}
-    </div>`;
+  // 섹션 구분자 (기존 8개 + 신규 3개 사이)
+  const DIVIDER_IDX = 8;
+  document.getElementById('m-grid').innerHTML=metrics.map((m,i)=>{
+    const divider = i===DIVIDER_IDX ? `<div style="grid-column:1/-1;margin:4px 0 2px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px"><span style="font-size:10px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap">수급 심층 지표</span><span style="font-size:10px;color:var(--txt3)">Coinbase Premium · UTXO Age Band</span></div>` : '';
+    return divider + renderMetricCard(m);
   }).join('');
+}
+
+function renderMetricCard(m){
+  const st2=metricSt(m.id,m.val);
+  const valCol=st2.cls==='b-bull'?'var(--bull)':st2.cls==='b-bear'?'var(--bear)':'var(--neu)';
+  const desc=ZONES[m.id]?.desc||'';
+  const zbar=m.val!=null?makeZoneBar(m.id,m.val):'';
+  return `<div class="mc" id="mc-${m.id}">
+    <div class="mc-hd"><span class="mc-nm">${m.nm}</span>
+      <div style="display:flex;gap:4px;align-items:center">
+        ${m.auto?'<span class="badge b-auto">AUTO</span>':''}
+        <span class="badge ${st2.cls}" id="badge-${m.id}">${st2.lbl}</span>
+      </div>
+    </div>
+    <div class="mc-dsc">${desc}</div>
+    <div class="mc-val" style="color:${valCol}">${m.disp}${m.sub?`<span style="font-size:12px;color:var(--txt2);margin-left:6px">${m.sub}</span>`:''}</div>
+    <div class="mc-itp" id="itp-${m.id}">${st2.itp}</div>
+    ${zbar}
+    ${m.field?`<div class="mc-inp"><label>수동 입력</label><input type="number" id="inp-${m.field}" value="${m.val??''}" step="${m.step}" onchange="updateManual('${m.field}',this.value)"></div>`:''}
+  </div>`;
 }
 
 function renderStrategy(cy,co){
@@ -1020,13 +1064,16 @@ function recalc(){
   const {score:cy,bd}=calcCycle(), en=calcEntry(), co=calcCon();
   renderGauge(cy,en); renderBreakdown(bd); renderAlerts(checkAlerts()); renderStrategy(cy,co); updateConUI();
   // update metric badges only
-  ['fg','mvrv','nupl','sopr','netflow','funding','puell','tvl'].forEach(id=>{
+  ['fg','mvrv','nupl','sopr','netflow','funding','puell','tvl','coinbasepremium','utxo1m','utxo7yr'].forEach(id=>{
     let v; switch(id){
       case'fg':v=LIVE.fearGreed;break; case'mvrv':v=MANUAL.mvrvZ;break;
       case'nupl':v=MANUAL.nupl;break; case'sopr':v=MANUAL.sopr;break;
       case'netflow':v=MANUAL.netflow;break; case'funding':v=MANUAL.funding;break;
       case'puell':v=MANUAL.puell;break;
       case'tvl':v=LIVE.defiTvl!=null?Math.round(LIVE.defiTvl):null;break;
+      case'coinbasepremium':v=LIVE.coinbasePremium;break;
+      case'utxo1m':v=MANUAL.utxo1m;break;
+      case'utxo7yr':v=MANUAL.utxo7yr;break;
     }
     const st=metricSt(id,v);
     const b=document.getElementById(`badge-${id}`); if(b){b.className=`badge ${st.cls}`;b.textContent=st.lbl;}
@@ -1047,7 +1094,7 @@ function renderAll(){
 function updateManual(field,val){
   MANUAL[field]=parseFloat(val); saveState(); recalc();
   // zone bar 갱신
-  const idMap={mvrvZ:'mvrv',nupl:'nupl',sopr:'sopr',netflow:'netflow',funding:'funding'};
+  const idMap={mvrvZ:'mvrv',nupl:'nupl',sopr:'sopr',netflow:'netflow',funding:'funding',puell:'puell',utxo1m:'utxo1m',utxo7yr:'utxo7yr'};
   const mid=idMap[field]; if(!mid) return;
   const mc=document.getElementById(`mc-${mid}`); if(!mc) return;
   const zw=mc.querySelector('.zbar-wrap');
