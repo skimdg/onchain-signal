@@ -926,17 +926,17 @@ function renderMetrics(){
     {id:'nupl',  nm:'NUPL',                   val:nupl,                    disp:`${nupl}`,                   field:'nupl',    step:'0.01'},
     {id:'sopr',  nm:'SOPR',                   val:sopr,                    disp:`${sopr}`,                   field:'sopr',    step:'0.001'},
     {id:'netflow',nm:'Exchange Netflow (7d)', val:netflow,                 disp:`${netflow>=0?'+':''}${fmt(netflow)} BTC`, field:'netflow', step:'100'},
-    {id:'funding',nm:'Funding Rate',          val:funding,                 disp:`${funding>=0?'+':''}${funding}%`, field:'funding', step:'0.001'},
-    {id:'puell', nm:'Puell Multiple',         val:MANUAL.puell,            disp:`${MANUAL.puell}`,               field:'puell',   step:'0.01'},
-    {id:'tvl',   nm:'DeFi TVL',               val:tvl!=null?Math.round(tvl):null, auto:true, disp:tvl!=null?`$${tvl.toFixed(1)}B`:'—'},
     {id:'coinbasepremium', nm:'Coinbase Premium', val:cp, auto:true, disp:cp!=null?`${cp>=0?'+':''}${cp}%`:'—', sub:cp!=null?(cp>0.05?'기관매수↑':cp<-0.05?'매도압력↑':'중립'):''},
     {id:'utxo1m', nm:'UTXO 1w~1m (실현시가)',  val:utxo1m,                 disp:utxo1m!=null?`${utxo1m}%`:'—',  field:'utxo1m',  step:'0.1'},
     {id:'utxo7yr',nm:'UTXO 7yr+ (공급량)',     val:utxo7yr,                disp:utxo7yr!=null?`${utxo7yr}%`:'—', field:'utxo7yr', step:'0.01'},
+    {id:'funding',nm:'Funding Rate',          val:funding,                 disp:`${funding>=0?'+':''}${funding}%`, field:'funding', step:'0.001'},
+    {id:'puell', nm:'Puell Multiple',         val:MANUAL.puell,            disp:`${MANUAL.puell}`,               field:'puell',   step:'0.01'},
+    {id:'tvl',   nm:'DeFi TVL',               val:tvl!=null?Math.round(tvl):null, auto:true, disp:tvl!=null?`$${tvl.toFixed(1)}B`:'—'},
   ];
-  // 섹션 구분자 (기존 8개 + 신규 3개 사이)
+  // 섹션 구분자 (상위 8개 온체인 핵심 / 하위 3개 파생·생태계)
   const DIVIDER_IDX = 8;
   document.getElementById('m-grid').innerHTML=metrics.map((m,i)=>{
-    const divider = i===DIVIDER_IDX ? `<div style="grid-column:1/-1;margin:4px 0 2px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px"><span style="font-size:10px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap">수급 심층 지표</span><span style="font-size:10px;color:var(--txt3)">Coinbase Premium · UTXO Age Band</span></div>` : '';
+    const divider = i===DIVIDER_IDX ? `<div style="grid-column:1/-1;margin:4px 0 2px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px"><span style="font-size:10px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap">파생 · 생태계 지표</span><span style="font-size:10px;color:var(--txt3)">Funding Rate · Puell Multiple · DeFi TVL</span></div>` : '';
     return divider + renderMetricCard(m);
   }).join('');
 }
