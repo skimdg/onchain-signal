@@ -173,7 +173,7 @@ async function fetchMetric(metric) {
   // 최근 5일 범위 (데이터 지연 대비)
   const endDay   = new Date();
   const startDay = new Date(endDay.getTime() - 5 * 86400000);
-  const params   = `?startday=${fmtDate(startDay)}&endday=${fmtDate(endDay)}&size=5&sort=t,desc`;
+  const params   = `?startday=${fmtDate(startDay)}&endday=${fmtDate(endDay)}&size=5`;
 
   for (const ep of metric.urlCandidates) {
     const url = `https://bitcoin-data.com${ep}${params}`;
