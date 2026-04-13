@@ -115,7 +115,12 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 
 /* ── SECTION 2: onchain metrics ── */
 .s2{margin-bottom:12px}
-.m-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.m-grid{display:flex;flex-direction:column;gap:10px}
+.m-section{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px}
+.m-section-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px;padding-bottom:7px;border-bottom:1px solid var(--brd2)}
+.m-section-ttl{font-size:10px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.m-section-sub{font-size:10px;color:var(--txt3)}
+.m-section-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .mc{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:12px;box-shadow:var(--sh);transition:border-color .2s}
 .mc:hover{border-color:var(--acc)}
 .mc-hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px}
@@ -217,10 +222,10 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 .btn-modal-close:hover{border-color:var(--acc);color:var(--acc)}
 
 /* responsive */
-@media(max-width:1400px){.m-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:1400px){.m-section-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:1100px){.s1{grid-template-columns:1fr 1fr 1fr}}
-@media(max-width:900px){.s1{grid-template-columns:1fr 1fr}.m-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:600px){.s1{grid-template-columns:1fr}.m-grid{grid-template-columns:1fr}.hd{flex-direction:column;align-items:flex-start}}
+@media(max-width:900px){.s1{grid-template-columns:1fr 1fr}.m-section-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.s1{grid-template-columns:1fr}.m-section-grid{grid-template-columns:1fr}.hd{flex-direction:column;align-items:flex-start}}
 </style>
 </head>
 <body>
@@ -975,36 +980,44 @@ function renderMetrics(){
   const {fearGreed:fg,fearGreedLabel:fgl,defiTvl:tvl,coinbasePremium:cp}=LIVE;
   const {mvrvZ,nupl,sopr,netflow,funding,puell,utxo1m,utxo7yr,
          nrpl,exchReserve,hodlWave1y2y,lthSopr,sthSopr,reserveRisk}=MANUAL;
-  const metrics=[
-    // ── 섹션 1: 사이클 심리 · 수급 핵심 ──
-    {id:'fg',    nm:'Fear & Greed Index',     val:fg,          auto:true,  disp:fg!=null?`${fg}`:'—',         sub:fgl||''},
-    {id:'mvrv',  nm:'MVRV Z-Score',           val:mvrvZ,                   disp:`${mvrvZ}`,                   field:'mvrvZ',    step:'0.01'},
-    {id:'nupl',  nm:'NUPL',                   val:nupl,                    disp:`${nupl}`,                    field:'nupl',     step:'0.01'},
-    {id:'sopr',  nm:'SOPR',                   val:sopr,                    disp:`${sopr}`,                    field:'sopr',     step:'0.001'},
-    {id:'netflow',nm:'Exchange Netflow (7d)', val:netflow,                 disp:`${netflow>=0?'+':''}${fmt(netflow)} BTC`, field:'netflow', step:'100'},
-    {id:'coinbasepremium',nm:'Coinbase Premium',val:cp, auto:true,         disp:cp!=null?`${cp>=0?'+':''}${cp}%`:'—', sub:cp!=null?(cp>0.05?'기관매수↑':cp<-0.05?'매도압력↑':'중립'):''},
-    {id:'utxo1m', nm:'UTXO 1w~1m (실현시가)', val:utxo1m,                  disp:utxo1m!=null?`${utxo1m}%`:'—',  field:'utxo1m',  step:'0.1'},
-    {id:'utxo7yr',nm:'UTXO 7yr+ (공급량)',    val:utxo7yr,                 disp:utxo7yr!=null?`${utxo7yr}%`:'—', field:'utxo7yr', step:'0.01'},
-    // ── 섹션 2: 홀더 행동 · 사이클 국면 ──
-    {id:'nrpl',       nm:'NRPL',                  val:nrpl,        disp:fmtNRPL(nrpl),      field:'nrpl',       step:'1000000'},
-    {id:'exchreserve',nm:'Exchange Reserves',      val:exchReserve, disp:fmtReserve(exchReserve), field:'exchReserve', step:'10000'},
-    {id:'hodlwave',   nm:'HODL Waves 1yr-2yr',    val:hodlWave1y2y,disp:hodlWave1y2y!=null?`${hodlWave1y2y}%`:'—', field:'hodlWave1y2y', step:'0.1'},
-    {id:'lthsopr',    nm:'LTH / STH SOPR',         val:lthSopr,     disp:lthSopr!=null?`${lthSopr}`:'—', sub:sthSopr!=null?`STH ${sthSopr}`:'', field:'lthSopr', step:'0.001'},
-    {id:'reserverisk',nm:'Reserve Risk',           val:reserveRisk, disp:reserveRisk!=null?`${reserveRisk}`:'—', field:'reserveRisk', step:'0.0001'},
-    // ── 섹션 3: 파생 · 생태계 ──
-    {id:'funding',nm:'Funding Rate',          val:funding,                 disp:`${funding>=0?'+':''}${funding}%`, field:'funding', step:'0.001'},
-    {id:'puell', nm:'Puell Multiple',         val:puell,                   disp:`${puell}`,                   field:'puell',    step:'0.01'},
-    {id:'tvl',   nm:'DeFi TVL',               val:tvl!=null?Math.round(tvl):null, auto:true, disp:tvl!=null?`$${tvl.toFixed(1)}B`:'—'},
+  const SECTIONS = [
+    {
+      title: '사이클 심리 · 수급 핵심',
+      sub: 'Fear&Greed · MVRV Z · NUPL · SOPR · Exchange Netflow · Coinbase Premium · UTXO',
+      metrics: [
+        {id:'fg',          nm:'Fear & Greed Index',  val:fg,       auto:true, disp:fg!=null?`${fg}`:'—', sub:fgl||''},
+        {id:'mvrv',        nm:'MVRV Z-Score',        val:mvrvZ,               disp:`${mvrvZ}`,           field:'mvrvZ',    step:'0.01'},
+        {id:'nupl',        nm:'NUPL',                val:nupl,                disp:`${nupl}`,            field:'nupl',     step:'0.01'},
+        {id:'sopr',        nm:'SOPR',                val:sopr,                disp:`${sopr}`,            field:'sopr',     step:'0.001'},
+        {id:'netflow',     nm:'Exchange Netflow (7d)',val:netflow,             disp:`${netflow>=0?'+':''}${fmt(netflow)} BTC`, field:'netflow', step:'100'},
+        {id:'coinbasepremium',nm:'Coinbase Premium', val:cp,       auto:true, disp:cp!=null?`${cp>=0?'+':''}${cp}%`:'—', sub:cp!=null?(cp>0.05?'기관매수↑':cp<-0.05?'매도압력↑':'중립'):''},
+        {id:'utxo1m',      nm:'UTXO 1w~1m (실현시가)',val:utxo1m,             disp:utxo1m!=null?`${utxo1m}%`:'—',  field:'utxo1m',  step:'0.1'},
+        {id:'utxo7yr',     nm:'UTXO 7yr+ (공급량)',  val:utxo7yr,             disp:utxo7yr!=null?`${utxo7yr}%`:'—', field:'utxo7yr', step:'0.01'},
+      ]
+    },
+    {
+      title: '홀더 행동 · 파생 지표',
+      sub: 'NRPL · Exchange Reserves · HODL Waves · LTH/STH SOPR · Reserve Risk · Funding · Puell · DeFi TVL',
+      metrics: [
+        {id:'nrpl',        nm:'NRPL',                val:nrpl,                disp:fmtNRPL(nrpl),        field:'nrpl',       step:'1000000'},
+        {id:'exchreserve', nm:'Exchange Reserves',   val:exchReserve,         disp:fmtReserve(exchReserve), field:'exchReserve', step:'10000'},
+        {id:'hodlwave',    nm:'HODL Waves 1yr-2yr',  val:hodlWave1y2y,        disp:hodlWave1y2y!=null?`${hodlWave1y2y}%`:'—', field:'hodlWave1y2y', step:'0.1'},
+        {id:'lthsopr',     nm:'LTH / STH SOPR',      val:lthSopr,             disp:lthSopr!=null?`${lthSopr}`:'—', sub:sthSopr!=null?`STH ${sthSopr}`:'', field:'lthSopr', step:'0.001'},
+        {id:'reserverisk', nm:'Reserve Risk',        val:reserveRisk,         disp:reserveRisk!=null?`${reserveRisk}`:'—', field:'reserveRisk', step:'0.0001'},
+        {id:'funding',     nm:'Funding Rate',        val:funding,             disp:`${funding>=0?'+':''}${funding}%`, field:'funding', step:'0.001'},
+        {id:'puell',       nm:'Puell Multiple',      val:puell,               disp:`${puell}`,           field:'puell',    step:'0.01'},
+        {id:'tvl',         nm:'DeFi TVL',            val:tvl!=null?Math.round(tvl):null, auto:true, disp:tvl!=null?`$${tvl.toFixed(1)}B`:'—'},
+      ]
+    }
   ];
-  const DIVIDERS = {
-    8:  { title:'홀더 행동 · 사이클 국면', sub:'NRPL · Exchange Reserves · HODL Waves · LTH/STH SOPR · Reserve Risk' },
-    13: { title:'파생 · 생태계 지표',     sub:'Funding Rate · Puell Multiple · DeFi TVL' }
-  };
-  document.getElementById('m-grid').innerHTML=metrics.map((m,i)=>{
-    const dv = DIVIDERS[i];
-    const divider = dv ? `<div style="grid-column:1/-1;margin:4px 0 2px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px"><span style="font-size:10px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap">${dv.title}</span><span style="font-size:10px;color:var(--txt3)">${dv.sub}</span></div>` : '';
-    return divider + renderMetricCard(m);
-  }).join('');
+  document.getElementById('m-grid').innerHTML = SECTIONS.map(sec => `
+    <div class="m-section">
+      <div class="m-section-hd">
+        <span class="m-section-ttl">${sec.title}</span>
+        <span class="m-section-sub">${sec.sub}</span>
+      </div>
+      <div class="m-section-grid">${sec.metrics.map(m=>renderMetricCard(m)).join('')}</div>
+    </div>`).join('');
 }
 
 function renderMetricCard(m){
