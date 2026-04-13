@@ -502,7 +502,9 @@ let ANALYSTS = [
 //  온체인 데이터 — BGeometrics API 자동 수집 (update-onchain.yml)
 //  onchain-data.json에서 로드, 실패 시 하드코딩 폴백 사용
 // ═══════════════════════════════════════════════════════════════
-let MANUAL = { mvrvZ:0.43, nupl:0.15, sopr:0.98, netflow:-5000, funding:0.008, puell:0.62, utxo1m:null, utxo7yr:null };
+let MANUAL = { mvrvZ:0.43, nupl:0.15, sopr:0.98, netflow:-5000, funding:0.008, puell:0.62,
+               utxo1m:null, utxo7yr:null,
+               nrpl:null, exchReserve:null, hodlWave1y2y:null, lthSopr:null, sthSopr:null, reserveRisk:null };
 let ONCHAIN_UPDATED = null; // 마지막 자동 업데이트 시각
 
 async function loadOnchainData() {
@@ -516,8 +518,14 @@ async function loadOnchainData() {
     if (d.netflow != null) MANUAL.netflow = d.netflow;
     if (d.funding != null) MANUAL.funding = d.funding;
     if (d.puell   != null) MANUAL.puell   = d.puell;
-    if (d.utxo1m  != null) MANUAL.utxo1m  = d.utxo1m;
-    if (d.utxo7yr != null) MANUAL.utxo7yr = d.utxo7yr;
+    if (d.utxo1m      != null) MANUAL.utxo1m      = d.utxo1m;
+    if (d.utxo7yr     != null) MANUAL.utxo7yr     = d.utxo7yr;
+    if (d.nrpl        != null) MANUAL.nrpl        = d.nrpl;
+    if (d.exchReserve != null) MANUAL.exchReserve = d.exchReserve;
+    if (d.hodlWave1y2y!= null) MANUAL.hodlWave1y2y= d.hodlWave1y2y;
+    if (d.lthSopr     != null) MANUAL.lthSopr     = d.lthSopr;
+    if (d.sthSopr     != null) MANUAL.sthSopr     = d.sthSopr;
+    if (d.reserveRisk != null) MANUAL.reserveRisk = d.reserveRisk;
     ONCHAIN_UPDATED = d.updatedAtKST || d.updatedAt || null;
     console.log('📊 온체인 데이터 로드:', ONCHAIN_UPDATED);
   } catch(e) {
@@ -538,6 +546,8 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 function fmt(n){ return (n==null||isNaN(n))?'—':n.toLocaleString('en-US',{maximumFractionDigits:0}); }
 function fmtP(n){ if(!n)return'—'; if(n>=1000)return'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); return'$'+n.toFixed(4); }
 function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+function fmtNRPL(v){ if(v==null||isNaN(v)) return'—'; const a=Math.abs(v),s=v>=0?'+':'-'; return a>=1e9?`${s}$${(a/1e9).toFixed(2)}B`:a>=1e6?`${s}$${(a/1e6).toFixed(0)}M`:a>=1e3?`${s}$${(a/1e3).toFixed(0)}K`:`${s}$${a.toFixed(0)}`; }
+function fmtReserve(v){ if(v==null||isNaN(v)) return'—'; return v>=1e6?`${(v/1e6).toFixed(3)}M BTC`:v>=1e3?`${(v/1e3).toFixed(0)}K BTC`:`${v.toFixed(0)} BTC`; }
 
 // ═══════════════════════════════════════════════════════════════
 //  SCORE 1: 사이클 위치 (낮음=하락장  높음=과열)
@@ -646,6 +656,35 @@ function metricSt(id,v){
       if(v>100)return{cls:'b-bull',lbl:'건강',itp:`$${v}B — DeFi 생태계 건강`};
       if(v>60) return{cls:'b-neu', lbl:'보통',itp:`$${v}B — DeFi 정상`};
       return         {cls:'b-bear',lbl:'위축',itp:`$${v}B — DeFi 자금 이탈 주의`};
+    case'nrpl':
+      if(v<-1e9)  return{cls:'b-bull',lbl:'극도패닉',itp:`NRPL ${fmtNRPL(v)} — 대규모 손실매도. 역사적 바닥 신호`};
+      if(v<0)     return{cls:'b-bull',lbl:'손실실현', itp:`NRPL ${fmtNRPL(v)} — 시장 전체 손실 중. 바닥 탐색`};
+      if(v<5e8)   return{cls:'b-neu', lbl:'중립',    itp:`NRPL ${fmtNRPL(v)} — 수익/손실 균형. 방향성 탐색`};
+      if(v<2e9)   return{cls:'b-neu', lbl:'이익실현', itp:`NRPL ${fmtNRPL(v)} — 이익실현 진행. 상승 중기`};
+      return            {cls:'b-bear',lbl:'강한분배', itp:`NRPL ${fmtNRPL(v)} — 대규모 이익실현. 고점 분배 경고`};
+    case'exchreserve':
+      if(v<2e6)   return{cls:'b-bull',lbl:'강한축적', itp:`거래소 보유량 ${fmtReserve(v)} — 대규모 자기보관. 매도 압력 최소`};
+      if(v<2.4e6) return{cls:'b-bull',lbl:'축적중',   itp:`거래소 보유량 ${fmtReserve(v)} — 지속 유출. 강세 신호`};
+      if(v<2.8e6) return{cls:'b-neu', lbl:'중립',    itp:`거래소 보유량 ${fmtReserve(v)} — 보통 수준`};
+      if(v<3.2e6) return{cls:'b-neu', lbl:'증가주의', itp:`거래소 보유량 ${fmtReserve(v)} — 유입 증가. 매도 압력 주의`};
+      return            {cls:'b-bear',lbl:'분배압력', itp:`거래소 보유량 ${fmtReserve(v)} — 대규모 유입. 매도 압력 높음`};
+    case'hodlwave':
+      if(v<8)     return{cls:'b-bear',lbl:'얇음',    itp:`HODL 1yr-2yr ${v}% — 장기보유자 비율 낮음. 분배 완료 or 초기`};
+      if(v<14)    return{cls:'b-neu', lbl:'감소중',   itp:`HODL 1yr-2yr ${v}% — 중간 수준. 시장 성숙 중`};
+      if(v<20)    return{cls:'b-bull',lbl:'축적',    itp:`HODL 1yr-2yr ${v}% — 장기보유자 비율 양호. 축적 진행`};
+      return            {cls:'b-bull',lbl:'강한축적', itp:`HODL 1yr-2yr ${v}% — 장기보유자 집중. 상승 잠재력 높음`};
+    case'lthsopr':
+      if(v<1.0)   return{cls:'b-bull',lbl:'LTH항복', itp:`LTH SOPR ${v} — 장기보유자 손실매도. 역사적 바닥 신호`};
+      if(v<1.5)   return{cls:'b-bull',lbl:'초기상승', itp:`LTH SOPR ${v} — 소폭 이익실현. 상승 초중기`};
+      if(v<2.0)   return{cls:'b-neu', lbl:'중기',    itp:`LTH SOPR ${v} — 이익실현 가속. 상승 중후기`};
+      if(v<2.5)   return{cls:'b-neu', lbl:'후기경고', itp:`LTH SOPR ${v} — 장기보유자 대량 분배. 고점 주의`};
+      return            {cls:'b-bear',lbl:'분배',    itp:`LTH SOPR ${v} — 강력 분배 신호. 즉시 익절 검토`};
+    case'reserverisk':
+      if(v<0.002) return{cls:'b-bull',lbl:'강력매수', itp:`Reserve Risk ${v} — 보유자 확신 극대. 역사적 매수 구간`};
+      if(v<0.006) return{cls:'b-bull',lbl:'매수',    itp:`Reserve Risk ${v} — 리스크 낮음. 매수 적기`};
+      if(v<0.012) return{cls:'b-neu', lbl:'중립',    itp:`Reserve Risk ${v} — 보통 수준. 홀드`};
+      if(v<0.020) return{cls:'b-neu', lbl:'주의',    itp:`Reserve Risk ${v} — 리스크 상승. 신규 매수 자제`};
+      return            {cls:'b-bear',lbl:'분배',    itp:`Reserve Risk ${v} — 고위험 구간. 분배 / 익절`};
     case'coinbasepremium':
       if(v>0.2)  return{cls:'b-bull',lbl:'프리미엄',itp:`코인베이스 프리미엄 +${v}% — 미국 기관 매수 강세`};
       if(v>0.05) return{cls:'b-bull',lbl:'소폭양수',itp:`코인베이스 프리미엄 +${v}% — 미국 수요 우세`};
@@ -700,9 +739,24 @@ const ZONES = {
   utxo1m:  { desc:'1주~1개월 사이 이동된 BTC 비율(실현시가총액 기준). 높으면 단기 투기 과열, 낮으면 HODLing 강세',
              min:0, max:20,
              segs:[{max:4,color:'#22c55e',lbl:'강HODL'},{max:8,color:'#84cc16',lbl:'건전'},{max:15,color:'#eab308',lbl:'보통'},{max:20,color:'#e03535',lbl:'과열'}] },
-  utxo7yr: { desc:'7년 이상 미이동 BTC 비율(공급량 기준). 급등 시 초장기 고래 매도 신호 — 역사적 고점 경고',
-             min:0, max:5,
-             segs:[{max:0.5,color:'#22c55e',lbl:'동면'},{max:1.5,color:'#84cc16',lbl:'소량'},{max:3,color:'#eab308',lbl:'주의'},{max:5,color:'#e03535',lbl:'고래이동'}] }
+  utxo7yr:     { desc:'7년 이상 미이동 BTC 비율(공급량 기준). 급등 시 초장기 고래 매도 신호 — 역사적 고점 경고',
+                 min:0, max:5,
+                 segs:[{max:0.5,color:'#22c55e',lbl:'동면'},{max:1.5,color:'#84cc16',lbl:'소량'},{max:3,color:'#eab308',lbl:'주의'},{max:5,color:'#e03535',lbl:'고래이동'}] },
+  nrpl:        { desc:'순실현손익(USD). 음수=시장 전체 손실 매도(바닥 신호), 양수 급증=대규모 이익실현(분배/고점 경고)',
+                 min:-3e9, max:5e9,
+                 segs:[{max:-1e9,color:'#16a34a',lbl:'극도패닉'},{max:0,color:'#84cc16',lbl:'손실실현'},{max:5e8,color:'#eab308',lbl:'중립'},{max:2e9,color:'#f97316',lbl:'이익실현'},{max:5e9,color:'#e03535',lbl:'강한분배'}] },
+  exchreserve: { desc:'거래소 보유 BTC 총량. 감소=자기보관(강세), 증가=분배/매도 압력(약세). 추세 방향이 핵심',
+                 min:1.5e6, max:3.5e6,
+                 segs:[{max:2e6,color:'#22c55e',lbl:'강한축적'},{max:2.4e6,color:'#84cc16',lbl:'축적중'},{max:2.8e6,color:'#eab308',lbl:'중립'},{max:3.2e6,color:'#f97316',lbl:'증가주의'},{max:3.5e6,color:'#e03535',lbl:'분배압력'}] },
+  hodlwave:    { desc:'1년~2년 보유 BTC 비율(HODL Waves). 높을수록 장기 축적 완료 → 상승 잠재력. 낮으면 분배 단계',
+                 min:5, max:30,
+                 segs:[{max:8,color:'#e03535',lbl:'얇음'},{max:14,color:'#f97316',lbl:'감소중'},{max:20,color:'#22c55e',lbl:'축적'},{max:30,color:'#16a34a',lbl:'강한축적'}] },
+  lthsopr:     { desc:'장기 보유자(155일+) 실현손익비율. 1 이하=손실매도(역사적 바닥), 2.0+ 이상=대규모 분배',
+                 min:0.9, max:3.5,
+                 segs:[{max:1.0,color:'#22c55e',lbl:'LTH항복'},{max:1.5,color:'#84cc16',lbl:'초기상승'},{max:2.0,color:'#eab308',lbl:'중기'},{max:2.5,color:'#f97316',lbl:'후기경고'},{max:3.5,color:'#e03535',lbl:'분배'}] },
+  reserverisk: { desc:'장기 보유자 기회비용 대비 리스크. 낮을수록 매수 적기(보유자 확신 극대), 높을수록 분배 구간',
+                 min:0, max:0.03,
+                 segs:[{max:0.002,color:'#22c55e',lbl:'강력매수'},{max:0.006,color:'#84cc16',lbl:'매수'},{max:0.012,color:'#eab308',lbl:'중립'},{max:0.020,color:'#f97316',lbl:'주의'},{max:0.030,color:'#e03535',lbl:'분배'}] }
 };
 
 function makeZoneBar(id, val){
@@ -919,24 +973,36 @@ function renderAlerts(als){
 
 function renderMetrics(){
   const {fearGreed:fg,fearGreedLabel:fgl,defiTvl:tvl,coinbasePremium:cp}=LIVE;
-  const {mvrvZ,nupl,sopr,netflow,funding,puell,utxo1m,utxo7yr}=MANUAL;
+  const {mvrvZ,nupl,sopr,netflow,funding,puell,utxo1m,utxo7yr,
+         nrpl,exchReserve,hodlWave1y2y,lthSopr,sthSopr,reserveRisk}=MANUAL;
   const metrics=[
-    {id:'fg',    nm:'Fear & Greed Index',     val:fg,          auto:true,  disp:fg!=null?`${fg}`:      '—',  sub:fgl||''},
-    {id:'mvrv',  nm:'MVRV Z-Score',           val:mvrvZ,                   disp:`${mvrvZ}`,                  field:'mvrvZ',   step:'0.01'},
-    {id:'nupl',  nm:'NUPL',                   val:nupl,                    disp:`${nupl}`,                   field:'nupl',    step:'0.01'},
-    {id:'sopr',  nm:'SOPR',                   val:sopr,                    disp:`${sopr}`,                   field:'sopr',    step:'0.001'},
+    // ── 섹션 1: 사이클 심리 · 수급 핵심 ──
+    {id:'fg',    nm:'Fear & Greed Index',     val:fg,          auto:true,  disp:fg!=null?`${fg}`:'—',         sub:fgl||''},
+    {id:'mvrv',  nm:'MVRV Z-Score',           val:mvrvZ,                   disp:`${mvrvZ}`,                   field:'mvrvZ',    step:'0.01'},
+    {id:'nupl',  nm:'NUPL',                   val:nupl,                    disp:`${nupl}`,                    field:'nupl',     step:'0.01'},
+    {id:'sopr',  nm:'SOPR',                   val:sopr,                    disp:`${sopr}`,                    field:'sopr',     step:'0.001'},
     {id:'netflow',nm:'Exchange Netflow (7d)', val:netflow,                 disp:`${netflow>=0?'+':''}${fmt(netflow)} BTC`, field:'netflow', step:'100'},
-    {id:'coinbasepremium', nm:'Coinbase Premium', val:cp, auto:true, disp:cp!=null?`${cp>=0?'+':''}${cp}%`:'—', sub:cp!=null?(cp>0.05?'기관매수↑':cp<-0.05?'매도압력↑':'중립'):''},
-    {id:'utxo1m', nm:'UTXO 1w~1m (실현시가)',  val:utxo1m,                 disp:utxo1m!=null?`${utxo1m}%`:'—',  field:'utxo1m',  step:'0.1'},
-    {id:'utxo7yr',nm:'UTXO 7yr+ (공급량)',     val:utxo7yr,                disp:utxo7yr!=null?`${utxo7yr}%`:'—', field:'utxo7yr', step:'0.01'},
+    {id:'coinbasepremium',nm:'Coinbase Premium',val:cp, auto:true,         disp:cp!=null?`${cp>=0?'+':''}${cp}%`:'—', sub:cp!=null?(cp>0.05?'기관매수↑':cp<-0.05?'매도압력↑':'중립'):''},
+    {id:'utxo1m', nm:'UTXO 1w~1m (실현시가)', val:utxo1m,                  disp:utxo1m!=null?`${utxo1m}%`:'—',  field:'utxo1m',  step:'0.1'},
+    {id:'utxo7yr',nm:'UTXO 7yr+ (공급량)',    val:utxo7yr,                 disp:utxo7yr!=null?`${utxo7yr}%`:'—', field:'utxo7yr', step:'0.01'},
+    // ── 섹션 2: 홀더 행동 · 사이클 국면 ──
+    {id:'nrpl',       nm:'NRPL',                  val:nrpl,        disp:fmtNRPL(nrpl),      field:'nrpl',       step:'1000000'},
+    {id:'exchreserve',nm:'Exchange Reserves',      val:exchReserve, disp:fmtReserve(exchReserve), field:'exchReserve', step:'10000'},
+    {id:'hodlwave',   nm:'HODL Waves 1yr-2yr',    val:hodlWave1y2y,disp:hodlWave1y2y!=null?`${hodlWave1y2y}%`:'—', field:'hodlWave1y2y', step:'0.1'},
+    {id:'lthsopr',    nm:'LTH / STH SOPR',         val:lthSopr,     disp:lthSopr!=null?`${lthSopr}`:'—', sub:sthSopr!=null?`STH ${sthSopr}`:'', field:'lthSopr', step:'0.001'},
+    {id:'reserverisk',nm:'Reserve Risk',           val:reserveRisk, disp:reserveRisk!=null?`${reserveRisk}`:'—', field:'reserveRisk', step:'0.0001'},
+    // ── 섹션 3: 파생 · 생태계 ──
     {id:'funding',nm:'Funding Rate',          val:funding,                 disp:`${funding>=0?'+':''}${funding}%`, field:'funding', step:'0.001'},
-    {id:'puell', nm:'Puell Multiple',         val:MANUAL.puell,            disp:`${MANUAL.puell}`,               field:'puell',   step:'0.01'},
+    {id:'puell', nm:'Puell Multiple',         val:puell,                   disp:`${puell}`,                   field:'puell',    step:'0.01'},
     {id:'tvl',   nm:'DeFi TVL',               val:tvl!=null?Math.round(tvl):null, auto:true, disp:tvl!=null?`$${tvl.toFixed(1)}B`:'—'},
   ];
-  // 섹션 구분자 (상위 8개 온체인 핵심 / 하위 3개 파생·생태계)
-  const DIVIDER_IDX = 8;
+  const DIVIDERS = {
+    8:  { title:'홀더 행동 · 사이클 국면', sub:'NRPL · Exchange Reserves · HODL Waves · LTH/STH SOPR · Reserve Risk' },
+    13: { title:'파생 · 생태계 지표',     sub:'Funding Rate · Puell Multiple · DeFi TVL' }
+  };
   document.getElementById('m-grid').innerHTML=metrics.map((m,i)=>{
-    const divider = i===DIVIDER_IDX ? `<div style="grid-column:1/-1;margin:4px 0 2px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px"><span style="font-size:10px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap">파생 · 생태계 지표</span><span style="font-size:10px;color:var(--txt3)">Funding Rate · Puell Multiple · DeFi TVL</span></div>` : '';
+    const dv = DIVIDERS[i];
+    const divider = dv ? `<div style="grid-column:1/-1;margin:4px 0 2px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px"><span style="font-size:10px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap">${dv.title}</span><span style="font-size:10px;color:var(--txt3)">${dv.sub}</span></div>` : '';
     return divider + renderMetricCard(m);
   }).join('');
 }
@@ -1064,7 +1130,8 @@ function recalc(){
   const {score:cy,bd}=calcCycle(), en=calcEntry(), co=calcCon();
   renderGauge(cy,en); renderBreakdown(bd); renderAlerts(checkAlerts()); renderStrategy(cy,co); updateConUI();
   // update metric badges only
-  ['fg','mvrv','nupl','sopr','netflow','funding','puell','tvl','coinbasepremium','utxo1m','utxo7yr'].forEach(id=>{
+  ['fg','mvrv','nupl','sopr','netflow','funding','puell','tvl','coinbasepremium','utxo1m','utxo7yr',
+   'nrpl','exchreserve','hodlwave','lthsopr','reserverisk'].forEach(id=>{
     let v; switch(id){
       case'fg':v=LIVE.fearGreed;break; case'mvrv':v=MANUAL.mvrvZ;break;
       case'nupl':v=MANUAL.nupl;break; case'sopr':v=MANUAL.sopr;break;
@@ -1072,8 +1139,10 @@ function recalc(){
       case'puell':v=MANUAL.puell;break;
       case'tvl':v=LIVE.defiTvl!=null?Math.round(LIVE.defiTvl):null;break;
       case'coinbasepremium':v=LIVE.coinbasePremium;break;
-      case'utxo1m':v=MANUAL.utxo1m;break;
-      case'utxo7yr':v=MANUAL.utxo7yr;break;
+      case'utxo1m':v=MANUAL.utxo1m;break; case'utxo7yr':v=MANUAL.utxo7yr;break;
+      case'nrpl':v=MANUAL.nrpl;break; case'exchreserve':v=MANUAL.exchReserve;break;
+      case'hodlwave':v=MANUAL.hodlWave1y2y;break; case'lthsopr':v=MANUAL.lthSopr;break;
+      case'reserverisk':v=MANUAL.reserveRisk;break;
     }
     const st=metricSt(id,v);
     const b=document.getElementById(`badge-${id}`); if(b){b.className=`badge ${st.cls}`;b.textContent=st.lbl;}
@@ -1094,7 +1163,10 @@ function renderAll(){
 function updateManual(field,val){
   MANUAL[field]=parseFloat(val); saveState(); recalc();
   // zone bar 갱신
-  const idMap={mvrvZ:'mvrv',nupl:'nupl',sopr:'sopr',netflow:'netflow',funding:'funding',puell:'puell',utxo1m:'utxo1m',utxo7yr:'utxo7yr'};
+  const idMap={mvrvZ:'mvrv',nupl:'nupl',sopr:'sopr',netflow:'netflow',funding:'funding',puell:'puell',
+               utxo1m:'utxo1m',utxo7yr:'utxo7yr',
+               nrpl:'nrpl',exchReserve:'exchreserve',hodlWave1y2y:'hodlwave',
+               lthSopr:'lthsopr',sthSopr:'lthsopr',reserveRisk:'reserverisk'};
   const mid=idMap[field]; if(!mid) return;
   const mc=document.getElementById(`mc-${mid}`); if(!mc) return;
   const zw=mc.querySelector('.zbar-wrap');

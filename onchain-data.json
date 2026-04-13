@@ -7,6 +7,12 @@
   "puell": 0.62,
   "utxo1m": null,
   "utxo7yr": null,
+  "nrpl": null,
+  "exchReserve": null,
+  "hodlWave1y2y": null,
+  "lthSopr": null,
+  "sthSopr": null,
+  "reserveRisk": null,
   "updatedAt": "2026-04-13T00:00:00.000Z",
   "updatedAtKST": "2026. 4. 13. (초기값 — BGeometrics 첫 실행 전)",
   "source": "bitcoin-data.com (BGeometrics)"

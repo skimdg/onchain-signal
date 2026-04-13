@@ -1,15 +1,18 @@
 /**
  * update-onchain.js — BGeometrics API로 온체인 지표 자동 수집
  *
- * 수집 지표:
- *   MVRV Z-Score, NUPL, SOPR, Exchange Netflow, Puell Multiple, Funding Rate
+ * 수집 지표 (총 14개):
+ *   MVRV Z-Score, NUPL, SOPR, Exchange Netflow, Puell Multiple, Funding Rate,
+ *   UTXO 1w~1m, UTXO 7yr+,
+ *   NRPL, Exchange Reserves, HODL Waves 1yr-2yr, LTH SOPR, STH SOPR, Reserve Risk
  *
  * API: https://bitcoin-data.com/v1/{metric}
- *      무료 · 인증 불필요 · 제한: 시간당 8회, 하루 15회
+ *      무료 · 인증 불필요 · 제한: 시간당 8회, 하루 15회 (IP 기준)
+ *      ※ GitHub Actions는 실행마다 새 IP 배정 → 사실상 제한 없음
  *
  * 실행 일정 (update-onchain.yml):
- *   하루 2회 — 07:00 KST (UTC 22:00) · 19:00 KST (UTC 10:00)
- *   1회당 6 요청 × 2 = 12회/일 → 15회/일 한도 내 안전 유지
+ *   하루 1회 — 07:00 KST (UTC 22:00)
+ *   1회당 14 요청 → 15회/일 한도 내 안전 유지
  *
  * 출력: onchain-data.json (루트, GitHub Actions이 commit)
  */
@@ -79,6 +82,49 @@ const METRICS = [
     urlCandidates:  ['/v1/hodl_waves_supply', '/v1/hodlwaves_supply'],
     fieldCandidates:['y7_10', 'y7plus', 'over7y', 'band_7y_10y', 'value'],
     decimals:       2,
+  },
+  // ── 홀더 행동 · 사이클 국면 ─────────────────────────────────
+  {
+    key:            'nrpl',
+    label:          'NRPL (순실현손익, USD)',
+    urlCandidates:  ['/v1/nrpl', '/v1/net_realized_pnl', '/v1/net-realized-pnl'],
+    fieldCandidates:['nrpl', 'net_realized_pnl', 'value'],
+    decimals:       0,
+  },
+  {
+    key:            'exchReserve',
+    label:          'Exchange Reserves (BTC)',
+    urlCandidates:  ['/v1/exchange_reserve', '/v1/exchange_reserves', '/v1/exchange-reserve'],
+    fieldCandidates:['reserve', 'exchange_reserve', 'total_reserve', 'value'],
+    decimals:       0,
+  },
+  {
+    key:            'hodlWave1y2y',
+    label:          'HODL Waves 1yr-2yr (공급량 %)',
+    urlCandidates:  ['/v1/hodl_waves_supply', '/v1/hodlwaves_supply'],
+    fieldCandidates:['y1_2', 'band_1y_2y', '1y_2y', 'y1y2', 'value'],
+    decimals:       2,
+  },
+  {
+    key:            'lthSopr',
+    label:          'LTH SOPR (장기보유자)',
+    urlCandidates:  ['/v1/lth_sopr', '/v1/lth-sopr', '/v1/sopr_lth'],
+    fieldCandidates:['lth_sopr', 'sopr_lth', 'value'],
+    decimals:       4,
+  },
+  {
+    key:            'sthSopr',
+    label:          'STH SOPR (단기보유자)',
+    urlCandidates:  ['/v1/sth_sopr', '/v1/sth-sopr', '/v1/sopr_sth'],
+    fieldCandidates:['sth_sopr', 'sopr_sth', 'value'],
+    decimals:       4,
+  },
+  {
+    key:            'reserveRisk',
+    label:          'Reserve Risk',
+    urlCandidates:  ['/v1/reserve_risk', '/v1/reserve-risk'],
+    fieldCandidates:['reserve_risk', 'value'],
+    decimals:       6,
   },
 ];
 
