@@ -2,7 +2,8 @@ name: Update Onchain Metrics
 
 on:
   schedule:
-    - cron: '0 22 * * *'   # 07:00 KST (UTC 22:00) — 하루 1회 (14개 지표 → 15회/일 한도 내)
+    - cron: '0 22 * * *'   # 07:00 KST (UTC 22:00) — 1차: 상위 8개 지표 수집
+    - cron: '0 10 * * *'   # 19:00 KST (UTC 10:00) — 2차: sthSopr/reserveRisk (일일 잔여 7회)
   workflow_dispatch:         # 수동 실행 버튼
 
 jobs:
@@ -19,7 +20,8 @@ jobs:
         with:
           node-version: '20'
 
-      # BGeometrics API 호출 — 14개 지표 × 1회/일 = ~14회/일 (15회 한도 내)
+      # BGeometrics API 호출 — 10개 지표, 시간당 8회 한도 고려 2회 분산
+      # 1차(07:00): 8개 / 2차(19:00): 2개 → 일일 합계 10회 (15회 한도 내)
       - name: Fetch onchain metrics from BGeometrics
         run: node monitor/update-onchain.js
 

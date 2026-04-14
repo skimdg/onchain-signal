@@ -24,14 +24,19 @@ const OUTPUT_PATH = path.join(__dirname, '..', 'onchain-data.json');
 const BASE_URL    = 'https://bitcoin-data.com/v1';
 
 // ── 수집 지표 정의 ────────────────────────────────────────────
-// fieldCandidates: API 응답 객체에서 값을 찾을 필드명 후보 (우선순위 순)
-// urlCandidates: 엔드포인트명 후보 (첫 번째 성공한 것 사용)
+// ※ 각 지표당 URL 1개만 유지 (404 후보 제거 → 불필요한 rate limit 소모 방지)
+// ※ API 제한: 시간당 8회, 하루 15회
+//   1차 실행(07:00 KST, 8개): mvrv/nupl/sopr/puell/funding/netflow/nrpl/lthSopr
+//   2차 실행(19:00 KST, 2개): sthSopr/reserveRisk  (일일 잔여: 15-8=7)
+// ※ 404 확정 엔드포인트 (무료 티어 미제공) — 수동 입력 전용:
+//   utxo1m(hodl-waves-realized-cap), utxo7yr/hodlWave1y2y(hodl-waves), exchReserve(exchange-reserve)
 const METRICS = [
+  // ── 1차 실행 (우선순위 순, 8개) ─────────────────────────────
   {
     key:            'mvrvZ',
     label:          'MVRV Z-Score',
-    urlCandidates:  ['/v1/mvrv', '/v1/mvrv-z-score', '/v1/mvrvz'],
-    fieldCandidates:['mvrv', 'mvrv_zscore', 'mvrvz', 'value'],
+    urlCandidates:  ['/v1/mvrv'],
+    fieldCandidates:['mvrv', 'value'],
     decimals:       2,
   },
   {
@@ -49,93 +54,53 @@ const METRICS = [
     decimals:       4,
   },
   {
-    key:            'netflow',
-    label:          'Exchange Netflow (BTC)',
-    urlCandidates:  ['/v1/exchange-net-flow', '/v1/exchange-flow', '/v1/exchange-netflow', '/v1/netflow'],
-    fieldCandidates:['exchangeNetFlow', 'exchangeNetflow', 'exchange_netflow', 'netflow', 'value'],
-    decimals:       0,
-  },
-  {
     key:            'puell',
     label:          'Puell Multiple',
-    urlCandidates:  ['/v1/puell-multiple', '/v1/puell_multiple', '/v1/puell'],
+    urlCandidates:  ['/v1/puell-multiple'],
     fieldCandidates:['puellMultiple', 'puell_multiple', 'puell', 'value'],
     decimals:       3,
   },
   {
     key:            'funding',
     label:          'Funding Rate (%)',
-    urlCandidates:  ['/v1/funding-rate', '/v1/funding_rate', '/v1/funding'],
+    urlCandidates:  ['/v1/funding-rate'],
     fieldCandidates:['fundingRate', 'funding_rate', 'funding', 'value'],
     decimals:       5,
   },
   {
-    key:            'utxo1m',
-    label:          'UTXO 1w~1m (실현시가총액 비율 %)',
-    urlCandidates:  [
-      '/v1/hodl-waves-realized-cap', '/v1/realized-cap-hodl-waves',
-      '/v1/hodl-wave', '/v1/hodl-waves', '/v1/utxo-age',
-    ],
-    fieldCandidates:['w1_1m', '1w_1m', 'band_1w_1m', 'pct_1w_1m', 'p1w1m', 'value'],
-    decimals:       2,
+    key:            'netflow',
+    label:          'Exchange Netflow (BTC)',
+    urlCandidates:  ['/v1/netflow'],
+    fieldCandidates:['netflow', 'exchangeNetFlow', 'exchangeNetflow', 'value'],
+    decimals:       0,
   },
-  {
-    key:            'utxo7yr',
-    label:          'UTXO 7yr+ (공급량 비율 %)',
-    urlCandidates:  [
-      '/v1/hodl-wave', '/v1/hodl-waves', '/v1/hodl-waves-supply',
-      '/v1/utxo-age', '/v1/supply-age-bands',
-    ],
-    fieldCandidates:['y7_10', 'y7plus', 'over7y', 'band_7y_plus', 'pct_7y_10y', 'y7_10y', 'p7y10y', 'value'],
-    decimals:       2,
-  },
-  // ── 홀더 행동 · 사이클 국면 ─────────────────────────────────
   {
     key:            'nrpl',
     label:          'NRPL (순실현손익, BTC)',
-    urlCandidates:  ['/v1/nrpl', '/v1/net-realized-pnl', '/v1/net_realized_pnl'],
-    fieldCandidates:['nrpl', 'net_realized_pnl', 'value'],
+    urlCandidates:  ['/v1/nrpl'],
+    fieldCandidates:['nrpl', 'value'],
     decimals:       0,
-  },
-  {
-    key:            'exchReserve',
-    label:          'Exchange Reserves (BTC)',
-    urlCandidates:  [
-      '/v1/exchange-balance', '/v1/exchange-balances', '/v1/exchange-reserve',
-      '/v1/exchange-reserves', '/v1/btc-exchange-reserve',
-    ],
-    fieldCandidates:['exchangeBalance', 'exchangeReserve', 'exchange_reserve', 'balance', 'reserve', 'totalReserve', 'total_reserve', 'value'],
-    decimals:       0,
-  },
-  {
-    key:            'hodlWave1y2y',
-    label:          'HODL Waves 1yr-2yr (공급량 %)',
-    urlCandidates:  [
-      '/v1/hodl-wave', '/v1/hodl-waves', '/v1/hodl-waves-supply',
-      '/v1/utxo-age', '/v1/supply-age-bands',
-    ],
-    fieldCandidates:['y1_2', '1y_2y', 'band_1y_2y', 'pct_1y_2y', 'y1y2', 'p1y2y', 'value'],
-    decimals:       2,
   },
   {
     key:            'lthSopr',
     label:          'LTH SOPR (장기보유자)',
-    urlCandidates:  ['/v1/lth-sopr', '/v1/lth_sopr', '/v1/sopr-lth'],
-    fieldCandidates:['lthSopr', 'lth_sopr', 'soprLth', 'sopr_lth', 'lth', 'value'],
+    urlCandidates:  ['/v1/lth-sopr'],
+    fieldCandidates:['lthSopr', 'lth_sopr', 'value'],
     decimals:       4,
   },
+  // ── 2차 실행 (19:00 KST, 시간당 8회 리셋 후) ─────────────────
   {
     key:            'sthSopr',
     label:          'STH SOPR (단기보유자)',
-    urlCandidates:  ['/v1/sth-sopr', '/v1/sth_sopr', '/v1/sopr-sth'],
-    fieldCandidates:['sthSopr', 'sth_sopr', 'soprSth', 'sopr_sth', 'sth', 'value'],
+    urlCandidates:  ['/v1/sth-sopr'],
+    fieldCandidates:['sthSopr', 'sth_sopr', 'value'],
     decimals:       4,
   },
   {
     key:            'reserveRisk',
     label:          'Reserve Risk',
-    urlCandidates:  ['/v1/reserve-risk', '/v1/reserve_risk', '/v1/reserve-risk-adjusted'],
-    fieldCandidates:['reserveRisk', 'reserve_risk', 'risk', 'value'],
+    urlCandidates:  ['/v1/reserve-risk'],
+    fieldCandidates:['reserveRisk', 'reserve_risk', 'value'],
     decimals:       6,
   },
 ];
