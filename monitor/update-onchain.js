@@ -24,14 +24,22 @@ const OUTPUT_PATH = path.join(__dirname, '..', 'onchain-data.json');
 const BASE_URL    = 'https://bitcoin-data.com/v1';
 
 // ── 수집 지표 정의 ────────────────────────────────────────────
-// ※ 각 지표당 URL 1개만 유지 (404 후보 제거 → 불필요한 rate limit 소모 방지)
-// ※ API 제한: 시간당 8회, 하루 15회
-//   1차 실행(07:00 KST, 8개): mvrv/nupl/sopr/puell/funding/netflow/nrpl/lthSopr
-//   2차 실행(19:00 KST, 2개): sthSopr/reserveRisk  (일일 잔여: 15-8=7)
-// ※ 404 확정 엔드포인트 (무료 티어 미제공) — 수동 입력 전용:
-//   utxo1m(hodl-waves-realized-cap), utxo7yr/hodlWave1y2y(hodl-waves), exchReserve(exchange-reserve)
+// ※ API 제한: 시간당 ~7회 (IP 기준), 하루 15회
+// ※ 각 지표당 URL 1개만 유지 (404도 rate limit 소모 → 낭비 제거)
+//
+// ※ 404 확정 (무료 티어 미제공) — 대시보드 수동 입력 전용:
+//   netflow(/v1/netflow), nrpl(/v1/nrpl),
+//   utxo1m(hodl-waves-realized-cap), utxo7yr/hodlWave1y2y(hodl-waves),
+//   exchReserve(exchange-reserve)
+//
+// ※ 수집 가능 지표 8개 (순서 = 우선순위):
+//   mvrv, nupl, sopr, puell, funding → 5개 안정 수집
+//   lthSopr, sthSopr, reserveRisk    → 나머지 3개 (rate limit 여유 시 수집)
+//
+// ※ 워크플로우 2회/일:
+//   07:00 KST — 상위 5개 안정 수집 + lthSopr/sthSopr 시도
+//   19:00 KST — sthSopr/reserveRisk 재시도 (일일 잔여 활용)
 const METRICS = [
-  // ── 1차 실행 (우선순위 순, 8개) ─────────────────────────────
   {
     key:            'mvrvZ',
     label:          'MVRV Z-Score',
@@ -68,27 +76,12 @@ const METRICS = [
     decimals:       5,
   },
   {
-    key:            'netflow',
-    label:          'Exchange Netflow (BTC)',
-    urlCandidates:  ['/v1/netflow'],
-    fieldCandidates:['netflow', 'exchangeNetFlow', 'exchangeNetflow', 'value'],
-    decimals:       0,
-  },
-  {
-    key:            'nrpl',
-    label:          'NRPL (순실현손익, BTC)',
-    urlCandidates:  ['/v1/nrpl'],
-    fieldCandidates:['nrpl', 'value'],
-    decimals:       0,
-  },
-  {
     key:            'lthSopr',
     label:          'LTH SOPR (장기보유자)',
     urlCandidates:  ['/v1/lth-sopr'],
     fieldCandidates:['lthSopr', 'lth_sopr', 'value'],
     decimals:       4,
   },
-  // ── 2차 실행 (19:00 KST, 시간당 8회 리셋 후) ─────────────────
   {
     key:            'sthSopr',
     label:          'STH SOPR (단기보유자)',
