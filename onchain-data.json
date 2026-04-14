@@ -10,10 +10,10 @@
   "nrpl": null,
   "exchReserve": null,
   "hodlWave1y2y": null,
-  "lthSopr": null,
-  "sthSopr": null,
+  "lthSopr": 1.2634,
+  "sthSopr": 0.9965,
   "reserveRisk": 0.000628,
-  "updatedAt": "2026-04-14T02:19:17.091Z",
-  "updatedAtKST": "2026. 4. 14. AM 11:19:17",
+  "updatedAt": "2026-04-14T02:23:34.258Z",
+  "updatedAtKST": "2026. 4. 14. AM 11:23:34",
   "source": "bitcoin-data.com (BGeometrics)"
 }
