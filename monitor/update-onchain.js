@@ -121,23 +121,26 @@ function extractLatest(data, fieldCandidates) {
     return String(db).localeCompare(String(da));
   });
 
-  const latest = sorted[0];
-  console.log(`   최신 레코드:`, JSON.stringify(latest));
+  console.log(`   최신 레코드:`, JSON.stringify(sorted[0]));
 
-  // 후보 필드명으로 값 탐색 — 숫자형 또는 숫자 문자열 모두 허용
-  for (const f of fieldCandidates) {
-    const raw = latest[f];
-    if (raw != null) {
-      const n = parseFloat(raw);
-      if (!isNaN(n)) return n;
+  // 날짜 최신순으로 순회 — null 값 레코드는 건너뛰고 이전 레코드 fallback
+  for (const record of sorted) {
+    // 후보 필드명으로 값 탐색 — 숫자형 또는 숫자 문자열 모두 허용
+    for (const f of fieldCandidates) {
+      const raw = record[f];
+      if (raw != null) {
+        const n = parseFloat(raw);
+        if (!isNaN(n)) return n;
+      }
     }
-  }
-  // 후보 실패 시 첫 번째 숫자형 필드 자동 탐색 (날짜·ID 제외)
-  for (const [k, v] of Object.entries(latest)) {
-    if (!DATE_KEYS.has(k)) {
-      const n = parseFloat(v);
-      if (!isNaN(n) && isFinite(n)) return n;
+    // 후보 실패 시 첫 번째 숫자형 필드 자동 탐색 (날짜·ID 제외)
+    for (const [k, v] of Object.entries(record)) {
+      if (!DATE_KEYS.has(k)) {
+        const n = parseFloat(v);
+        if (!isNaN(n) && isFinite(n)) return n;
+      }
     }
+    // 이 레코드에서 값 없으면 이전 날짜 레코드로 fallback
   }
   return null;
 }
