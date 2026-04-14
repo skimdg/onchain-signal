@@ -72,15 +72,21 @@ const METRICS = [
   {
     key:            'utxo1m',
     label:          'UTXO 1w~1m (실현시가총액 비율 %)',
-    urlCandidates:  ['/v1/hodl-waves-realized-cap', '/v1/realized-cap-hodl-waves', '/v1/hodl_waves_realized_cap'],
-    fieldCandidates:['w1_1m', '1w_1m', 'band_1w_1m', 'pct_1w_1m', 'value'],
+    urlCandidates:  [
+      '/v1/hodl-waves-realized-cap', '/v1/realized-cap-hodl-waves',
+      '/v1/hodl-wave', '/v1/hodl-waves', '/v1/utxo-age',
+    ],
+    fieldCandidates:['w1_1m', '1w_1m', 'band_1w_1m', 'pct_1w_1m', 'p1w1m', 'value'],
     decimals:       2,
   },
   {
     key:            'utxo7yr',
     label:          'UTXO 7yr+ (공급량 비율 %)',
-    urlCandidates:  ['/v1/hodl-waves', '/v1/hodl-waves-supply', '/v1/hodl_waves_supply'],
-    fieldCandidates:['y7_10', 'y7plus', 'over7y', 'band_7y_plus', 'pct_7y_10y', 'y7_10y', 'value'],
+    urlCandidates:  [
+      '/v1/hodl-wave', '/v1/hodl-waves', '/v1/hodl-waves-supply',
+      '/v1/utxo-age', '/v1/supply-age-bands',
+    ],
+    fieldCandidates:['y7_10', 'y7plus', 'over7y', 'band_7y_plus', 'pct_7y_10y', 'y7_10y', 'p7y10y', 'value'],
     decimals:       2,
   },
   // ── 홀더 행동 · 사이클 국면 ─────────────────────────────────
@@ -94,15 +100,21 @@ const METRICS = [
   {
     key:            'exchReserve',
     label:          'Exchange Reserves (BTC)',
-    urlCandidates:  ['/v1/exchange-reserve', '/v1/exchange_reserve', '/v1/exchange-reserves'],
-    fieldCandidates:['exchangeReserve', 'exchange_reserve', 'reserve', 'totalReserve', 'total_reserve', 'value'],
+    urlCandidates:  [
+      '/v1/exchange-balance', '/v1/exchange-balances', '/v1/exchange-reserve',
+      '/v1/exchange-reserves', '/v1/btc-exchange-reserve',
+    ],
+    fieldCandidates:['exchangeBalance', 'exchangeReserve', 'exchange_reserve', 'balance', 'reserve', 'totalReserve', 'total_reserve', 'value'],
     decimals:       0,
   },
   {
     key:            'hodlWave1y2y',
     label:          'HODL Waves 1yr-2yr (공급량 %)',
-    urlCandidates:  ['/v1/hodl-waves', '/v1/hodl-waves-supply', '/v1/hodl_waves_supply'],
-    fieldCandidates:['y1_2', '1y_2y', 'band_1y_2y', 'pct_1y_2y', 'y1y2', 'value'],
+    urlCandidates:  [
+      '/v1/hodl-wave', '/v1/hodl-waves', '/v1/hodl-waves-supply',
+      '/v1/utxo-age', '/v1/supply-age-bands',
+    ],
+    fieldCandidates:['y1_2', '1y_2y', 'band_1y_2y', 'pct_1y_2y', 'y1y2', 'p1y2y', 'value'],
     decimals:       2,
   },
   {
@@ -170,10 +182,11 @@ function extractLatest(data, fieldCandidates) {
 
 // ── 단일 지표 수집 ────────────────────────────────────────────
 async function fetchMetric(metric) {
-  // 최근 5일 범위 (데이터 지연 대비)
-  const endDay   = new Date();
-  const startDay = new Date(endDay.getTime() - 5 * 86400000);
-  const params   = `?startday=${fmtDate(startDay)}&endday=${fmtDate(endDay)}&size=5`;
+  // 날짜 필터 없이 최신 5개 레코드 요청
+  // ※ 일부 엔드포인트(lth-sopr 등)는 무료 티어 데이터가 2026까지 없어
+  //   startday/endday 필터 시 빈 배열 반환 → extractLatest가 null 리턴함
+  //   날짜 필터 제거 후 extractLatest의 날짜 내림차순 정렬로 최신값 추출
+  const params = `?size=5`;
 
   for (const ep of metric.urlCandidates) {
     const url = `https://bitcoin-data.com${ep}${params}`;

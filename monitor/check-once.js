@@ -3,19 +3,14 @@
  * 15분마다 실행 → 이전 상태(state.json)와 비교해 변경 감지 → 텔레그램 알림
  *
  * 감지 조건:
- *   1. 애널리스트 스탠스 변경 (analyst-data.json 읽기, 15명)
- *   2. 사이클 점수 구간 변경 (0~20 / 20~40 / 40~60 / 60~75 / 75+)
- *      대시보드와 동일 공식: MVRV-Z(45%) + NUPL(35%) + F&G(20%)
- *   3. 온체인 지표 구간 변경 (F&G 자동 / 나머지 MANUAL 하드코딩)
- *   4. 즉시 경보 (F&G ≤15, F&G ≥85, BTC 24h ≤-10%, BTC 24h ≥+10%)
- *   5. 매일 07:15 KST 이후 첫 번째 실행에서 일일 리포트 1회 전송
- *      (state.json의 lastReportDate로 중복 방지, GitHub Actions 지연에 강건함)
- *
- * ⚠️  온체인 지표(MVRV-Z/NUPL/SOPR/Netflow/Funding/Puell)는 Glassnode API 없이
- *     자동 수집 불가 → 대시보드에서 수동 업데이트 후 아래 MANUAL 값도 같이 수정 필요
+ *   1. 사이클 점수 구간 변경 (0~20 / 20~40 / 40~60 / 60~75 / 75+)
+ *   2. 온체인 지표 구간 변경 → "A구간 → B구간" 형식으로 전송
+ *   3. 애널리스트 스탠스 변경 (15% 이상) → 변경 내역 + 최근 뉴스 헤드라인 포함
+ *   4. 즉시 경보 (BTC 24h ±10%, F&G 극단값)
+ *   5. 매일 07:15 KST 이후 첫 번째 실행 → "📅 정기알림" 전송
  *
  * ENV: TG_TOKEN, TG_CHAT_ID (GitHub Secrets)
- * 상태 파일: monitor/state.json (GitHub Actions Cache로 지속)
+ * 상태 파일: monitor/state.json
  */
 
 const fs   = require('fs');
@@ -28,16 +23,14 @@ const ANALYST_PATH  = path.join(__dirname, '..', 'analyst-data.json');
 const ONCHAIN_PATH  = path.join(__dirname, '..', 'onchain-data.json');
 
 // ══════════════════════════════════════════════════════════════
-//  온체인 지표 — update-onchain.js가 BGeometrics API로 자동 수집
-//  onchain-data.json 없을 때만 아래 폴백 값 사용
+//  온체인 지표 로드 — onchain-data.json (update-onchain.js가 BGeometrics API로 자동 수집)
 // ══════════════════════════════════════════════════════════════
 const FALLBACK = {
-  mvrvZ:   0.43,
-  nupl:    0.15,
-  sopr:    0.98,
-  netflow: -5000,
-  funding: 0.008,
-  puell:   0.62,
+  mvrvZ: 1.32, nupl: 0.266, sopr: 0.9978,
+  netflow: -5000, funding: 0.008, puell: 0.79,
+  utxo1m: null, utxo7yr: null, nrpl: null,
+  exchReserve: null, hodlWave1y2y: null,
+  lthSopr: null, sthSopr: null, reserveRisk: null,
 };
 
 function loadOnchainData() {
@@ -45,12 +38,20 @@ function loadOnchainData() {
     const d = JSON.parse(fs.readFileSync(ONCHAIN_PATH, 'utf8'));
     console.log(`📊 온체인 데이터 로드: ${d.updatedAtKST || d.updatedAt || '날짜 불명'}`);
     return {
-      mvrvZ:   d.mvrvZ   ?? FALLBACK.mvrvZ,
-      nupl:    d.nupl    ?? FALLBACK.nupl,
-      sopr:    d.sopr    ?? FALLBACK.sopr,
-      netflow: d.netflow ?? FALLBACK.netflow,
-      funding: d.funding ?? FALLBACK.funding,
-      puell:   d.puell   ?? FALLBACK.puell,
+      mvrvZ:       d.mvrvZ       ?? FALLBACK.mvrvZ,
+      nupl:        d.nupl        ?? FALLBACK.nupl,
+      sopr:        d.sopr        ?? FALLBACK.sopr,
+      netflow:     d.netflow     ?? FALLBACK.netflow,
+      funding:     d.funding     ?? FALLBACK.funding,
+      puell:       d.puell       ?? FALLBACK.puell,
+      utxo1m:      d.utxo1m      ?? null,
+      utxo7yr:     d.utxo7yr     ?? null,
+      nrpl:        d.nrpl        ?? null,
+      exchReserve: d.exchReserve ?? null,
+      hodlWave1y2y:d.hodlWave1y2y?? null,
+      lthSopr:     d.lthSopr     ?? null,
+      sthSopr:     d.sthSopr     ?? null,
+      reserveRisk: d.reserveRisk ?? null,
     };
   } catch {
     console.warn('⚠️  onchain-data.json 없음 → 폴백값 사용');
@@ -60,7 +61,7 @@ function loadOnchainData() {
 
 const MANUAL = loadOnchainData();
 
-// 애널리스트 이름 맵 (ID → 표시명)
+// 애널리스트 이름 맵
 const NAME_MAP = {
   capriole:     'Charles Edwards',
   checkmate:    'Checkmate',
@@ -80,8 +81,7 @@ const NAME_MAP = {
 };
 
 // ══════════════════════════════════════════════════════════════
-//  사이클 점수 계산 — 대시보드 calcCycle()과 동일 공식
-//  MVRV-Z(45%) + NUPL(35%) + F&G(20%)
+//  사이클 점수 계산
 // ══════════════════════════════════════════════════════════════
 function calcCycleScore(mvrvZ, nupl, fg) {
   const z = mvrvZ, n = nupl;
@@ -91,7 +91,6 @@ function calcCycleScore(mvrvZ, nupl, fg) {
   return Math.round(mv * 0.45 + np * 0.35 + fg2 * 0.20);
 }
 
-// 사이클 점수 → 구간 레이블 (사용자 지정: 0~20/20~40/40~60/60~75/75+)
 function cycleZone(score) {
   return score <= 20 ? '바닥권(0~20)'
        : score <= 40 ? '하락장(20~40)'
@@ -101,26 +100,29 @@ function cycleZone(score) {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  온체인 지표 구간 함수
+//  온체인 지표 구간 함수 — metricSt()와 동일 기준
 // ══════════════════════════════════════════════════════════════
-function fgZone(v)      { return v<=15?'극도공포':v<=25?'공포':v<=55?'중립':v<=75?'탐욕':'극도탐욕'; }
-function mvrvZone(v)    { return v<0?'극저평가':v<2?'저평가':v<3.5?'적정':v<6?'고평가':'극과열'; }
-function nuplZone(v)    { return v<0?'항복':v<0.25?'희망':v<0.5?'낙관':v<0.75?'믿음':'행복'; }
-function soprZone(v)    { return v<0.97?'패닉':v<1.0?'손익분기':v<1.05?'건전이익실현':'이익실현과잉'; }
-function netflowZone(v) { return v<-20000?'강한유출':v<0?'순유출':v<5000?'소폭유입':'강한유입'; }
-function fundingZone(v) { return v<-0.01?'숏과다':v<=0.01?'중립':v<=0.03?'롱과다':'극과열'; }
-function puellZone(v)   { return v<0.5?'채굴자항복':v<0.8?'저평가':v<1.5?'적정':v<2.0?'과열주의':'극과열'; }
+function fgZone(v)          { return v<=24?'극도공포':v<=49?'공포':v<=54?'중립':v<=75?'탐욕':'극도탐욕'; }
+function mvrvZone(v)        { return v<0?'극저평가':v<2?'저평가':v<4?'공정가치':v<7?'고평가':'극과열'; }
+function nuplZone(v)        { return v<0?'항복(Capitulation)':v<0.25?'희망(Hope)':v<0.5?'낙관(Optimism)':v<0.75?'믿음(Belief)':'행복(Euphoria)'; }
+function soprZone(v)        { return v<0.95?'패닉매도':v<1.0?'손익분기':v<1.05?'건전이익실현':'이익실현과잉'; }
+function netflowZone(v)     { return v<-15000?'강유출':v<-3000?'유출':v<=3000?'중립':v<=15000?'유입':'강유입'; }
+function fundingZone(v)     { return v<-0.05?'숏과다':v<0?'약베어':v<=0.03?'중립':v<=0.1?'롱주의':'극과열'; }
+function puellZone(v)       { return v<0.5?'채굴자항복':v<1.0?'저평가':v<3.0?'중립':v<4.0?'과열주의':'극과열'; }
+function lthSoprZone(v)     { return v<0.9?'LTH항복':v<1.0?'LTH손실':v<1.5?'초기상승':v<2.5?'중기':v<4.0?'후기경고':'분배'; }
+function reserveRiskZone(v) { return v<0.002?'강력매수':v<0.005?'매수':v<0.01?'중립':v<0.02?'주의':'분배'; }
+function nrplZone(v)        { return v<-30000?'극도패닉':v<0?'손실실현':v<=20000?'중립':v<=80000?'이익실현':'강한분배'; }
+function exchReserveZone(v) { return v<2e6?'강한축적':v<2.3e6?'축적중':v<2.6e6?'중립':v<2.9e6?'증가주의':'분배압력'; }
+function utxo1mZone(v)      { return v<5?'강HODL':v<8?'건전':v<12?'보통':v<18?'과열':'분배'; }
+function utxo7yrZone(v)     { return v>35?'극강홀딩':v>30?'강한홀딩':v>25?'정상':v>20?'감소':'대규모이동'; }
+function sthSoprZone(v)     { return v<0.95?'STH패닉':v<1.0?'손익분기':v<1.05?'건전':'과잉'; }
 
 // ══════════════════════════════════════════════════════════════
 //  STATE 읽기/쓰기
 // ══════════════════════════════════════════════════════════════
-function readState()    { try { return JSON.parse(fs.readFileSync(STATE_PATH, 'utf8')); } catch { return {}; } }
-function writeState(s)  { fs.writeFileSync(STATE_PATH, JSON.stringify(s, null, 2)); }
-
-function loadAnalystData() {
-  try { return JSON.parse(fs.readFileSync(ANALYST_PATH, 'utf8')); }
-  catch { return null; }
-}
+function readState()   { try { return JSON.parse(fs.readFileSync(STATE_PATH, 'utf8')); } catch { return {}; } }
+function writeState(s) { fs.writeFileSync(STATE_PATH, JSON.stringify(s, null, 2)); }
+function loadAnalystData() { try { return JSON.parse(fs.readFileSync(ANALYST_PATH, 'utf8')); } catch { return null; } }
 
 // ══════════════════════════════════════════════════════════════
 //  TELEGRAM
@@ -147,18 +149,16 @@ async function sendTelegram(text) {
 //  MAIN
 // ══════════════════════════════════════════════════════════════
 async function main() {
-  const nowDate   = new Date();
-  const now       = nowDate.toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
-  const hour      = parseInt(nowDate.toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', hour: 'numeric', hour12: false }));
-  const mins      = nowDate.getMinutes(); // 분(0~59)은 시간대 무관
-  // 오늘 날짜 (KST 기준 YYYY.M.D. 형식) — 일일 리포트 중복 방지용
-  const todayKST  = nowDate.toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul' });
+  const nowDate  = new Date();
+  const now      = nowDate.toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+  const hour     = parseInt(nowDate.toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', hour: 'numeric', hour12: false }));
+  const mins     = nowDate.getMinutes();
+  const todayKST = nowDate.toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul' });
   console.log(`[${now}] 체크 시작`);
 
-  // ── 상태 / analyst-data 로드 ──
   const prev        = readState();
-  const analystData = loadAnalystData(); // GitHub Actions가 매일 07:00 KST 업데이트
-  const changes        = [];
+  const analystData = loadAnalystData();
+  const changes     = [];
   const immediateAlerts = [];
 
   // ── 실시간 데이터 수집 (F&G, BTC) ──
@@ -175,7 +175,7 @@ async function main() {
   console.log(`BTC $${btcPrice?.toLocaleString()} (${btcChange?.toFixed(2)}%) | F&G ${fg} ${fgl}`);
 
   // ────────────────────────────────────────────────────────────
-  //  1. 즉시 경보 (임계값 초과)
+  //  1. 즉시 경보
   // ────────────────────────────────────────────────────────────
   if (fg !== null) {
     if (fg <= 15) immediateAlerts.push(`🔴 <b>극도 공포</b> F&amp;G ${fg} — 패닉 구간, 역발상 매수 타이밍`);
@@ -183,15 +183,13 @@ async function main() {
   }
   if (btcChange !== null) {
     if (btcChange <= -10) immediateAlerts.push(`📉 <b>BTC 급락</b> 24h ${btcChange.toFixed(1)}%`);
-    if (btcChange >= 10)  immediateAlerts.push(`📈 <b>BTC 급등</b> 24h +${btcChange.toFixed(1)}%`);
+    if (btcChange >=  10) immediateAlerts.push(`📈 <b>BTC 급등</b> 24h +${btcChange.toFixed(1)}%`);
   }
 
   // ────────────────────────────────────────────────────────────
   //  2. 사이클 점수 구간 변경 감지
-  //     대시보드와 동일 공식 사용 (MVRV-Z·NUPL·F&G 가중평균)
-  //     구간: 바닥권(0~20) / 하락장(20~40) / 회복(40~60) / 상승(60~75) / 과열(75+)
   // ────────────────────────────────────────────────────────────
-  const cycleScore = calcCycleScore(MANUAL.mvrvZ, MANUAL.nupl, fg ?? 50);
+  const cycleScore   = calcCycleScore(MANUAL.mvrvZ, MANUAL.nupl, fg ?? 50);
   const curCycleZone = cycleZone(cycleScore);
   console.log(`사이클 점수: ${cycleScore} → ${curCycleZone}`);
   if (prev.cycleZone && prev.cycleZone !== curCycleZone) {
@@ -200,46 +198,63 @@ async function main() {
 
   // ────────────────────────────────────────────────────────────
   //  3. 온체인 지표 구간 변경 감지
-  //     ⚠️ F&G만 자동 수집, 나머지는 MANUAL 하드코딩
-  //        → 대시보드 값 변경 시 위 MANUAL 상수도 함께 수정 필요
+  //     → "이전구간 → 현재구간" 형식으로 알림
   // ────────────────────────────────────────────────────────────
   const metricChecks = [
-    { key: 'fg',      label: 'Fear & Greed',    cur: fg !== null ? fgZone(fg)           : null },
-    { key: 'mvrv',    label: 'MVRV Z-Score',    cur: mvrvZone(MANUAL.mvrvZ)                    },
-    { key: 'nupl',    label: 'NUPL',             cur: nuplZone(MANUAL.nupl)                     },
-    { key: 'sopr',    label: 'SOPR',             cur: soprZone(MANUAL.sopr)                     },
-    { key: 'netflow', label: 'Exchange Netflow', cur: netflowZone(MANUAL.netflow)               },
-    { key: 'funding', label: 'Funding Rate',     cur: fundingZone(MANUAL.funding)               },
-    { key: 'puell',   label: 'Puell Multiple',   cur: puellZone(MANUAL.puell)                   },
-  ];
+    { key: 'fg',          label: 'Fear &amp; Greed',    val: fg,                    zoneFn: fgZone          },
+    { key: 'mvrv',        label: 'MVRV Z-Score',        val: MANUAL.mvrvZ,          zoneFn: mvrvZone        },
+    { key: 'nupl',        label: 'NUPL',                val: MANUAL.nupl,           zoneFn: nuplZone        },
+    { key: 'sopr',        label: 'SOPR',                val: MANUAL.sopr,           zoneFn: soprZone        },
+    { key: 'netflow',     label: 'Exchange Netflow',    val: MANUAL.netflow,        zoneFn: netflowZone     },
+    { key: 'funding',     label: 'Funding Rate',        val: MANUAL.funding,        zoneFn: fundingZone     },
+    { key: 'puell',       label: 'Puell Multiple',      val: MANUAL.puell,          zoneFn: puellZone       },
+    { key: 'lthSopr',     label: 'LTH SOPR',            val: MANUAL.lthSopr,        zoneFn: lthSoprZone     },
+    { key: 'sthSopr',     label: 'STH SOPR',            val: MANUAL.sthSopr,        zoneFn: sthSoprZone     },
+    { key: 'reserveRisk', label: 'Reserve Risk',        val: MANUAL.reserveRisk,    zoneFn: reserveRiskZone },
+    { key: 'nrpl',        label: 'NRPL',                val: MANUAL.nrpl,           zoneFn: nrplZone        },
+    { key: 'exchReserve', label: 'Exchange Reserves',   val: MANUAL.exchReserve,    zoneFn: exchReserveZone },
+    { key: 'utxo1m',      label: 'UTXO 1w~1m',          val: MANUAL.utxo1m,         zoneFn: utxo1mZone      },
+    { key: 'utxo7yr',     label: 'UTXO 7yr+',           val: MANUAL.utxo7yr,        zoneFn: utxo7yrZone     },
+  ].map(m => ({ ...m, cur: m.val != null ? m.zoneFn(m.val) : null }));
 
   for (const m of metricChecks) {
     if (!m.cur) continue;
     const prevZone = prev.zones?.[m.key];
     if (prevZone && prevZone !== m.cur) {
-      changes.push(`📊 <b>${m.label} 구간 변경</b>\n  ${prevZone} → <b>${m.cur}</b>`);
+      const valStr = typeof m.val === 'number'
+        ? (m.val > 1000 ? m.val.toLocaleString('en-US', {maximumFractionDigits:0})
+           : m.val.toFixed(m.val < 0.01 ? 5 : m.val < 1 ? 3 : 2))
+        : m.val;
+      changes.push(`📊 <b>${m.label} 구간 변경</b>\n  <s>${prevZone}</s> → <b>${m.cur}</b>  (값: ${valStr})`);
     }
   }
 
   // ────────────────────────────────────────────────────────────
-  //  4. 애널리스트 스탠스 변경 감지 (analyst-data.json, 15명)
+  //  4. 애널리스트 스탠스 변경 감지 (15% 이상)
+  //     → 이름, 이전%, 현재%, 최근 헤드라인 포함
   // ────────────────────────────────────────────────────────────
   if (analystData?.analysts?.length) {
     for (const a of analystData.analysts) {
       const curStance  = a.bullPct >= 60 ? '강세' : a.bullPct >= 40 ? '중립' : '약세';
       const prevA      = prev.analysts?.[a.id];
-      if (prevA && prevA.stance !== curStance) {
-        const dir  = curStance === '강세' ? '📈' : curStance === '약세' ? '📉' : '➡️';
-        const name = NAME_MAP[a.id] || a.id;
-        changes.push(`${dir} <b>애널리스트 포지션 변경</b> — ${name}\n  ${prevA.stance} (${prevA.bullPct}%) → <b>${curStance}</b> (${a.bullPct}%)`);
-      }
+      if (!prevA) continue;
+      const diff = Math.abs(prevA.bullPct - a.bullPct);
+      if (diff < 15) continue;
+
+      const dir  = curStance === '강세' ? '📈' : curStance === '약세' ? '📉' : '➡️';
+      const name = NAME_MAP[a.id] || a.id;
+      const pctStr = `${prevA.bullPct}% ${prevA.stance} → <b>${a.bullPct}% ${curStance}</b>`;
+      const headline = a.headlines?.[0]
+        ? `\n  📰 ${a.headlines[0].replace(/^\d{4}\.\s*\d+\.\s*\d+\.\s*[—-]\s*/, '').substring(0, 70)}`
+        : (a.summary ? `\n  💬 ${a.summary.substring(0, 70)}` : '');
+      changes.push(`${dir} <b>애널리스트 포지션 변경</b> — ${name}\n  ${pctStr}${headline}`);
     }
   }
 
   // ────────────────────────────────────────────────────────────
   //  알림 전송
   // ────────────────────────────────────────────────────────────
-  const avgBull  = analystData?.avgBull
+  const avgBull = analystData?.avgBull
     ?? Math.round((analystData?.analysts || []).reduce((s,a) => s+a.bullPct, 0) / (analystData?.analysts?.length || 1));
   const dashLink = `🔗 <a href="https://skimdg.github.io/onchain-signal/onchain-signal-v5.html">대시보드 열기</a>`;
   const summary  = [
@@ -265,10 +280,7 @@ async function main() {
   }
 
   // ────────────────────────────────────────────────────────────
-  //  5. 매일 07:30 KST 일일 리포트
-  //     update-analysts.yml이 07:00 KST 실행 → 완료 후 최신 데이터로 보고
-  //     alert.yml은 */15분 실행 → 07:15 이후 첫 번째 실행 시 전송
-  //     ★ 분 범위 체크 대신 lastReportDate 비교 사용 (GitHub Actions 지연 대응)
+  //  5. 매일 07:15 KST 이후 첫 번째 실행 → 📅 정기알림
   // ────────────────────────────────────────────────────────────
   const shouldReport = hour === 7 && mins >= 15 && prev.lastReportDate !== todayKST;
   if (shouldReport) {
@@ -277,7 +289,6 @@ async function main() {
     const neuts    = analysts.filter(a => a.bullPct >= 40 && a.bullPct < 60);
     const bears    = analysts.filter(a => a.bullPct < 40);
 
-    // 온체인 장기 / 단기 전문 분리
     const onchainIds   = ['capriole','checkmate','kiyoungju','willclemente','bencowen','maartunn','axeladler','cryptoviz','skew','carpenoctom'];
     const shorttermIds = ['route2fi','alexkruger','crypnuevo','ecoinometrics','rektcapital'];
 
@@ -285,14 +296,14 @@ async function main() {
       .map(id => analysts.find(a => a.id === id))
       .filter(Boolean)
       .map(a => {
-        const icon = a.bullPct >= 60 ? '🟢' : a.bullPct >= 40 ? '🟡' : '🔴';
+        const icon  = a.bullPct >= 60 ? '🟢' : a.bullPct >= 40 ? '🟡' : '🔴';
         const stance = a.bullPct >= 60 ? '강세' : a.bullPct >= 40 ? '중립' : '약세';
         const prevTxt = (a.prevBullPct != null && a.prevBullPct !== a.bullPct)
-          ? ` (이전 ${a.prevBullPct}%)` : '';
-        const hl = a.headlines?.[0]
+          ? ` <s>${a.prevBullPct}%</s>→` : '';
+        const headline = a.headlines?.[0]
           ? `\n    📰 ${a.headlines[0].replace(/^\d{4}\.\s*\d+\.\s*\d+\.\s*[—-]\s*/, '').substring(0, 65)}`
           : `\n    💬 ${(a.summary || '—').substring(0, 65)}`;
-        return `${icon} <b>${NAME_MAP[a.id] || a.id}</b>  ${a.bullPct}% ${stance}${prevTxt}${hl}`;
+        return `${icon} <b>${NAME_MAP[a.id] || a.id}</b> ${prevTxt} ${a.bullPct}% ${stance}${headline}`;
       }).join('\n\n');
 
     const analystSection = analysts.length
@@ -302,24 +313,28 @@ async function main() {
         + `<b>⚡ 단기 전문</b>\n${makeLines(shorttermIds)}`
       : '';
 
-    const metricSection = `\n\n──── 📈 온체인 지표 현황 ────\n`
-      + metricChecks.map(m => `• ${m.label}: <b>${m.cur}</b>`).join('\n');
+    const metricLines = metricChecks
+      .filter(m => m.cur)
+      .map(m => `• ${m.label}: <b>${m.cur}</b>`)
+      .join('\n');
+    const metricSection = `\n\n──── 📈 온체인 지표 현황 ────\n${metricLines}`;
 
-    const reportMsg = `📊 <b>Onchain Signal 일일 리포트</b>\n${now}\n\n${summary}${metricSection}${analystSection}\n\n`
+    const reportMsg = `📅 <b>Onchain Signal 정기알림</b>\n${now}\n\n${summary}${metricSection}${analystSection}\n\n`
       + (immediateAlerts.length > 0
           ? `⚠️ 활성 즉시알림: ${immediateAlerts.length}건\n` + immediateAlerts.join('\n')
           : '✅ 즉시 알림 조건 없음');
 
     await sendTelegram(reportMsg);
-    console.log('📊 일일 리포트 전송 완료');
+    console.log('📅 정기알림 전송 완료');
   }
 
   // ── 상태 저장 ──
   const newState = {
-    cycleZone: curCycleZone,
+    cycleZone:  curCycleZone,
     cycleScore,
-    zones: Object.fromEntries(metricChecks.filter(m => m.cur).map(m => [m.key, m.cur])),
-    // 애널리스트: ID 기준, bullPct와 stance 모두 저장
+    zones: Object.fromEntries(
+      metricChecks.filter(m => m.cur).map(m => [m.key, m.cur])
+    ),
     analysts: Object.fromEntries(
       (analystData?.analysts || []).map(a => [
         a.id,
@@ -328,7 +343,6 @@ async function main() {
     ),
     btcPrice,
     fg,
-    // 일일 리포트 전송 날짜 저장 (오늘 전송했으면 오늘 날짜, 아니면 이전 값 유지)
     lastReportDate: shouldReport ? todayKST : (prev.lastReportDate || null),
     updatedAt: new Date().toISOString(),
   };

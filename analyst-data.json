@@ -3,6 +3,7 @@
     {
       "id": "capriole",
       "bullPct": 50,
+      "prevBullPct": 45,
       "summary": "Charles Edwards Says Bitcoin Is In A Value Zone, But Not Yet At Deep Value (2026.03.13) — 딥밸류 아직 아님, 가치구간 진입 신중론",
       "headlines": [
         "2026. 03. 13. — Charles Edwards Says Bitcoin Is In A Value Zone, But Not Yet At Deep V"
@@ -16,6 +17,7 @@
     {
       "id": "checkmate",
       "bullPct": 20,
+      "prevBullPct": 30,
       "summary": "Bitcoin Price (BTC) Analysis: $95K Needs to Hold - CoinDesk",
       "headlines": [
         "2025. 11. 5. — Bitcoin Price (BTC) Analysis: $95K Needs to Hold - CoinDesk",
@@ -28,6 +30,7 @@
     {
       "id": "kiyoungju",
       "bullPct": 20,
+      "prevBullPct": 25,
       "summary": "Ki Young Ju Says Bitcoin May Need to Hit $55K Before True Recovery Begins -",
       "headlines": [
         "2026. 02. 18. — Ki Young Ju Says Bitcoin May Need to Hit $55K Before True Recovery Beg",
@@ -45,6 +48,7 @@
     {
       "id": "willclemente",
       "bullPct": 55,
+      "prevBullPct": 40,
       "summary": "Bitcoin’s 100 BTC club edges toward 20K wallets (2026.02.26) — 온체인 지표 일부 긍정, 직접 발언 기사 미확인",
       "headlines": [
         "2026. 2. 26. — Bitcoin’s 100 BTC club edges toward 20K wallets in a ‘bullish sign’ - TradingView",
@@ -57,6 +61,7 @@
     {
       "id": "bencowen",
       "bullPct": 38,
+      "prevBullPct": 20,
       "summary": "Ethereum unlikely to reach new highs in 2026: Ben Cowen - MSN",
       "headlines": [
         "2025. 12. 26. — Ethereum unlikely to reach new highs in 2026: Ben Cowen - MSN",
@@ -69,6 +74,7 @@
     {
       "id": "maartunn",
       "bullPct": 42,
+      "prevBullPct": 28,
       "summary": "LTH 325,600 BTC 매도 + Zcash 유동성 이탈 신호 (2025.10~11), Surge $74K 기사는 시황 보도 — 직접 발언 포지션 미확인",
       "headlines": [
         "2026. 3. 5. — Bitcoin Surge To $74,000 Fueled By US Institutions, Coinbase Premium Signals - TradingView",
@@ -82,6 +88,7 @@
     {
       "id": "axeladler",
       "bullPct": 55,
+      "prevBullPct": 32,
       "summary": "Bitcoin Deleveraging Finally Over? + Luna-Level Capitulation Signal (2026.01~02) — 저점 가능성 언급, 단 2개월 이상 전 기사",
       "headlines": [
         "2026. 01. 30. — Bitcoin Deleveraging Finally Over? What The Derivatives Data Says - Tr",
@@ -109,6 +116,7 @@
     {
       "id": "skew",
       "bullPct": 20,
+      "prevBullPct": 30,
       "summary": "Bitcoin options signal extreme fear as downside protection premium hits new",
       "headlines": [
         "2026. 03. 21. — Bitcoin options signal extreme fear as downside protection premium hit",
@@ -126,6 +134,7 @@
     {
       "id": "carpenoctom",
       "bullPct": 50,
+      "prevBullPct": 42,
       "summary": "최근 BTC 직접 발언 기사 없음 — Hyperliquid 관련 기사는 BTC 포지션 근거 불가",
       "headlines": [],
       "sourceUrls": [],
@@ -162,6 +171,7 @@
     {
       "id": "ecoinometrics",
       "bullPct": 25,
+      "prevBullPct": 30,
       "summary": "Ecoinometrics Warns Bitcoin at Risk if Equities Roll Over - Live Bitcoin Ne",
       "headlines": [
         "2026. 02. 22. — Ecoinometrics Warns Bitcoin at Risk if Equities Roll Over - Live Bitco",
@@ -179,6 +189,7 @@
     {
       "id": "rektcapital",
       "bullPct": 20,
+      "prevBullPct": 30,
       "summary": "Bitcoin risks 2018-style crash if 200-week EMA breaks, warns analyst - Bitg",
       "headlines": [
         "2026. 02. 23. — Bitcoin risks 2018-style crash if 200-week EMA breaks, warns analyst -",

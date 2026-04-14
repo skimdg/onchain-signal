@@ -227,13 +227,13 @@ async function scanOne(analyst) {
     console.log(`     • ${it.pubDate ? new Date(it.pubDate).toLocaleDateString('ko-KR') : '?'}  ${it.title.substring(0, 70)}`)
   );
 
-  // 이전 값 저장 — 15% 이상 차이날 때만 포지션 변경으로 인정
-  //   (소폭 등락은 노이즈로 간주, 알림·대시보드 오보 방지)
-  const CHANGE_THRESHOLD = 15;
+  // 이전 값 저장 — 변화가 있으면 항상 prevBullPct 보존 (대시보드 히스토리용)
+  // ※ 15% 이상 변화 = check-once.js에서 텔레그램 알림 발송 기준 (별도)
+  //   여기서는 ANY 변화 시 prev 저장, 이전 prev가 있으면 그것도 유지
   const oldData = prevData[analyst.id];
-  const changed      = oldData && Math.abs(oldData.bullPct - bullPct) >= CHANGE_THRESHOLD;
-  const prevBullPct  = changed ? oldData.bullPct  : (oldData?.prevBullPct  ?? null);
-  const prevSummary  = changed ? oldData.summary  : (oldData?.prevSummary  ?? null);
+  const anyChange    = oldData && oldData.bullPct !== bullPct;
+  const prevBullPct  = anyChange ? oldData.bullPct  : (oldData?.prevBullPct  ?? null);
+  const prevSummary  = anyChange ? oldData.summary  : (oldData?.prevSummary  ?? null);
 
   return { id: analyst.id, bullPct, summary, headlines, sourceUrls, lastScan: today, scanning: false,
            ...(prevBullPct !== null ? { prevBullPct } : {}),
