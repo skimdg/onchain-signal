@@ -110,8 +110,12 @@ function fmtDate(d) {
   return d.toISOString().split('T')[0]; // YYYY-MM-DD
 }
 
-// ── 응답 배열에서 최신 값 추출 ────────────────────────────────
+// ── 응답 배열(또는 단일 객체)에서 최신 값 추출 ───────────────
 function extractLatest(data, fieldCandidates) {
+  // 단일 객체 응답 처리 (일부 엔드포인트가 배열 대신 단일 객체 반환)
+  if (data && !Array.isArray(data) && typeof data === 'object' && !data.error) {
+    data = [data];
+  }
   if (!Array.isArray(data) || data.length === 0) return null;
 
   // 날짜/메타 필드 (숫자 자동탐색 제외 대상)
