@@ -1,7 +1,7 @@
 {
   "mvrvZ": 1.39,
-  "nupl": 0.266,
-  "sopr": 0.9978,
+  "nupl": 0.237,
+  "sopr": 1.0028,
   "netflow": -5000,
   "funding": -0.00005,
   "puell": 0.756,
@@ -10,10 +10,10 @@
   "nrpl": null,
   "exchReserve": null,
   "hodlWave1y2y": null,
-  "lthSopr": 1.2634,
-  "sthSopr": 0.9965,
+  "lthSopr": 1.2215,
+  "sthSopr": 1.0016,
   "reserveRisk": 0.000628,
-  "updatedAt": "2026-04-14T02:23:34.258Z",
-  "updatedAtKST": "2026. 4. 14. AM 11:23:34",
+  "updatedAt": "2026-04-14T11:11:45.271Z",
+  "updatedAtKST": "2026. 4. 14. PM 8:11:45",
   "source": "bitcoin-data.com (BGeometrics)"
 }
