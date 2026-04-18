@@ -1,18 +1,12 @@
 /**
- * update-onchain.js — BGeometrics API로 온체인 지표 자동 수집
+ * update-onchain.js — 온체인 지표 자동 수집
  *
- * 수집 지표 (총 14개):
- *   MVRV Z-Score, NUPL, SOPR, Exchange Netflow, Puell Multiple, Funding Rate,
- *   UTXO 1w~1m, UTXO 7yr+,
- *   NRPL, Exchange Reserves, HODL Waves 1yr-2yr, LTH SOPR, STH SOPR, Reserve Risk
+ * ① BGeometrics (bitcoin-data.com) — 무료, API 키 불필요
+ *    수집: mvrvZ, nupl, sopr, puell, funding, lthSopr, sthSopr, reserveRisk (8개)
  *
- * API: https://bitcoin-data.com/v1/{metric}
- *      무료 · 인증 불필요 · 제한: 시간당 8회, 하루 15회 (IP 기준)
- *      ※ GitHub Actions는 실행마다 새 IP 배정 → 사실상 제한 없음
- *
- * 실행 일정 (update-onchain.yml):
- *   하루 1회 — 07:00 KST (UTC 22:00)
- *   1회당 14 요청 → 15회/일 한도 내 안전 유지
+ * ② Foredex.io — Professional 플랜($50/mo), FOREDEX_API_KEY 환경변수 필요
+ *    수집: exchReserve, netflow, nrpl, utxo1m, utxo7yr (5개)
+ *    설정: GitHub Settings → Secrets → Actions → FOREDEX_API_KEY
  *
  * 출력: onchain-data.json (루트, GitHub Actions이 commit)
  */
@@ -98,42 +92,87 @@ const METRICS = [
   },
 ];
 
-// ── CoinGlass Exchange Reserves (무료 공개 API 시도) ─────────
-async function fetchExchangeReserve() {
-  const candidates = [
-    'https://open-api.coinglass.com/public/v2/indicator/exchange_reserve',
-    'https://open-api.coinglass.com/public/v2/indicator/btc_reserve',
-  ];
-  for (const url of candidates) {
-    try {
-      const res = await fetch(url, {
-        headers: { 'Accept': 'application/json' },
-        signal: AbortSignal.timeout(12000),
-      });
-      console.log(`   CoinGlass: ${url} → HTTP ${res.status}`);
-      if (!res.ok) continue;
-      const body = await res.json();
-      // 응답 구조 로그 (첫 200자)
-      console.log(`   응답 샘플:`, JSON.stringify(body).slice(0, 300));
-      // 일반적인 CoinGlass v2 구조: { code: "0", data: [...] }
-      const rows = body?.data;
-      if (Array.isArray(rows) && rows.length > 0) {
-        const latest = rows[rows.length - 1];
-        const val = latest?.total ?? latest?.btcAmount ?? latest?.value ?? latest?.amount;
-        if (val != null) {
-          console.log(`   ✅ exchReserve: ${val}`);
-          return parseFloat(val);
-        }
-      } else if (body?.data != null && typeof body.data === 'object') {
-        const v = body.data?.total ?? body.data?.btcAmount;
-        if (v != null) return parseFloat(v);
-      }
-    } catch (e) {
-      console.log(`   오류: ${e.message}`);
+// ── Foredex.io API ────────────────────────────────────────────
+// FOREDEX_API_KEY 환경변수 있을 때만 실행
+// GitHub Secrets에 FOREDEX_API_KEY 등록 시 활성화
+const FOREDEX_BASE = 'https://api.foredex.io/external/v1';
+
+// foredex 수집 지표 (API 키 필요)
+const FOREDEX_METRICS = [
+  {
+    key:            'exchReserve',
+    label:          'Exchange Reserves',
+    endpoint:       '/exchange/reserve',
+    fieldCandidates:['reserve','total','btcReserve','btcAmount','amount','value'],
+    decimals:       0,
+  },
+  {
+    key:            'netflow',
+    label:          'Exchange Netflow',
+    endpoint:       '/exchange/flow',
+    fieldCandidates:['netflow','net_flow','netFlow','flow','value'],
+    decimals:       0,
+  },
+  {
+    key:            'nrpl',
+    label:          'NRPL',
+    endpoint:       '/onchain/nrpl',
+    fieldCandidates:['nrpl','value'],
+    decimals:       0,
+  },
+  {
+    key:            'utxo1m',
+    label:          'UTXO 1W~1M',
+    // foredex 엔드포인트 명 미확인 → 응답 로그로 구조 파악
+    endpoint:       '/onchain/hodl-waves',
+    fieldCandidates:['utxo1m','oneWeekToOneMonth','1w1m','shortTerm','value'],
+    decimals:       1,
+  },
+  {
+    key:            'utxo7yr',
+    label:          'UTXO 7yr+',
+    endpoint:       '/onchain/hodl-waves',
+    fieldCandidates:['utxo7yr','sevenYearPlus','7yr','longTermHodl','value'],
+    decimals:       2,
+  },
+];
+
+async function fetchForedex(metric) {
+  const key = process.env.FOREDEX_API_KEY;
+  if (!key) return null;
+
+  const url = `${FOREDEX_BASE}${metric.endpoint}?limit=3`;
+  try {
+    const res = await fetch(url, {
+      headers: { 'X-API-KEY': key, 'Accept': 'application/json' },
+      signal: AbortSignal.timeout(12000),
+    });
+    console.log(`   Foredex ${metric.endpoint}: HTTP ${res.status}`);
+    if (!res.ok) {
+      const errBody = await res.text().catch(() => '');
+      console.log(`   오류 본문: ${errBody.slice(0, 200)}`);
+      return null;
     }
+    const body = await res.json();
+    // 응답 구조 로그 (첫 400자) — 초기 연동 시 필드명 파악용
+    console.log(`   응답 샘플:`, JSON.stringify(body).slice(0, 400));
+
+    // 배열 또는 {data:[...]} 구조 통합 처리
+    const rows = Array.isArray(body) ? body
+               : (body?.data ?? body?.items ?? body?.result ?? body);
+    const arr  = Array.isArray(rows) ? rows : [rows];
+    const value = extractLatest(arr, metric.fieldCandidates);
+    if (value != null) {
+      const rounded = parseFloat(value.toFixed(metric.decimals));
+      console.log(`   ✅ ${metric.key}: ${rounded}`);
+      return rounded;
+    }
+    console.log(`   ⚠️  필드 매칭 실패 — fieldCandidates 재확인 필요`);
+    return null;
+  } catch (e) {
+    console.log(`   오류: ${e.message}`);
+    return null;
   }
-  console.log(`   ⚠️  CoinGlass exchReserve 수집 실패`);
-  return null;
 }
 
 // ── 날짜 헬퍼 ─────────────────────────────────────────────────
@@ -256,14 +295,26 @@ async function main() {
     await new Promise(r => setTimeout(r, 1500)); // 요청 간 간격
   }
 
-  // Exchange Reserves (CoinGlass 무료 공개 API)
-  console.log('\n📊 Exchange Reserves (CoinGlass)');
-  const exchReserve = await fetchExchangeReserve();
-  if (exchReserve != null) {
-    result.exchReserve = exchReserve;
-    log.push(`  ✅ Exchange Reserves: ${Math.round(exchReserve).toLocaleString()} BTC`);
+  // ── Foredex.io 추가 지표 (API 키 있을 때만) ─────────────────
+  if (process.env.FOREDEX_API_KEY) {
+    console.log('\n🔑 FOREDEX_API_KEY 감지 → Foredex.io 지표 수집 시작');
+    // utxo1m/utxo7yr는 같은 엔드포인트(/onchain/hodl-waves) → 중복 요청 방지
+    const seenEndpoints = new Map(); // endpoint → {body, arr}
+    for (const metric of FOREDEX_METRICS) {
+      console.log(`\n📊 ${metric.label} (Foredex)`);
+      const value = await fetchForedex(metric);
+      if (value != null) {
+        result[metric.key] = value;
+        log.push(`  ✅ ${metric.label}: ${value}  (foredex:${metric.endpoint})`);
+      } else {
+        log.push(`  ⚠️  ${metric.label}: Foredex 수집 실패`);
+      }
+      await new Promise(r => setTimeout(r, 800));
+    }
   } else {
-    log.push(`  ⚠️  Exchange Reserves: 수집 실패 → 이전값 ${prev.exchReserve ?? '없음'} 유지`);
+    console.log('\n   ℹ️  FOREDEX_API_KEY 없음 — exchReserve/netflow/nrpl/utxo 자동수집 불가');
+    console.log('   설정: GitHub Settings → Secrets → Actions → FOREDEX_API_KEY 에 foredex.io API 키 등록');
+    log.push('  ℹ️  Foredex: API 키 없음 (exchReserve/netflow/nrpl/utxo1m/utxo7yr 수동 유지)');
   }
 
   result.updatedAt    = new Date().toISOString();

@@ -20,9 +20,10 @@ jobs:
         with:
           node-version: '20'
 
-      # BGeometrics API 호출 — 10개 지표, 시간당 8회 한도 고려 2회 분산
-      # 1차(07:00): 8개 / 2차(19:00): 2개 → 일일 합계 10회 (15회 한도 내)
-      - name: Fetch onchain metrics from BGeometrics
+      # BGeometrics(무료) + Foredex.io(FOREDEX_API_KEY 시크릿 있을 때 자동 활성화)
+      - name: Fetch onchain metrics
+        env:
+          FOREDEX_API_KEY: ${{ secrets.FOREDEX_API_KEY }}
         run: node monitor/update-onchain.js
 
       - name: Commit updated onchain data
