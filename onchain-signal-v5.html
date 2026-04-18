@@ -507,9 +507,13 @@ let ANALYSTS = [
 //  온체인 데이터 — BGeometrics API 자동 수집 (update-onchain.yml)
 //  onchain-data.json에서 로드, 실패 시 하드코딩 폴백 사용
 // ═══════════════════════════════════════════════════════════════
+// ※ utxo1m/utxo7yr: 무료 API 미지원 → 참고 기본값 설정 (Glassnode 등에서 수동 갱신 필요)
+// ※ exchReserve: CoinGlass API로 자동 수집 시도 (실패 시 기본값 사용)
 let MANUAL = { mvrvZ:0.43, nupl:0.15, sopr:0.98, netflow:-5000, funding:0.008, puell:0.62,
-               utxo1m:null, utxo7yr:null,
-               nrpl:null, exchReserve:null, hodlWave1y2y:null, lthSopr:null, sthSopr:null, reserveRisk:null };
+               utxo1m:8.5, utxo7yr:27.5,
+               nrpl:null, exchReserve:2380000, hodlWave1y2y:null, lthSopr:null, sthSopr:null, reserveRisk:null };
+// 수동갱신 필요 지표 목록 (배지 표시용)
+const MANUAL_ONLY = new Set(['utxo1m','utxo7yr','exchReserve','nrpl','hodlWave1y2y']);
 let ONCHAIN_UPDATED = null; // 마지막 자동 업데이트 시각
 
 async function loadOnchainData() {
@@ -551,7 +555,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 function fmt(n){ return (n==null||isNaN(n))?'—':n.toLocaleString('en-US',{maximumFractionDigits:0}); }
 function fmtP(n){ if(!n)return'—'; if(n>=1000)return'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); return'$'+n.toFixed(4); }
 function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
-function fmtNRPL(v){ if(v==null||isNaN(v)) return'—'; const a=Math.abs(v),s=v>=0?'+':'-'; return a>=1e9?`${s}$${(a/1e9).toFixed(2)}B`:a>=1e6?`${s}$${(a/1e6).toFixed(0)}M`:a>=1e3?`${s}$${(a/1e3).toFixed(0)}K`:`${s}$${a.toFixed(0)}`; }
+function fmtNRPL(v){ if(v==null||isNaN(v)) return'—'; const s=v>=0?'+':'-'; const a=Math.abs(v); return `${s}${a.toLocaleString('en-US',{maximumFractionDigits:0})}`; }
 function fmtReserve(v){ if(v==null||isNaN(v)) return'—'; return v>=1e6?`${(v/1e6).toFixed(3)}M BTC`:v>=1e3?`${(v/1e3).toFixed(0)}K BTC`:`${v.toFixed(0)} BTC`; }
 
 // ═══════════════════════════════════════════════════════════════
@@ -574,8 +578,8 @@ function calcEntry(){
   const np=n<0?96:n<0.15?85:n<0.25?74:n<0.4?60:n<0.5?45:n<0.65?30:16;
   const fg2=fg<15?92:fg<25?82:fg<35?70:fg<45?58:fg<55?46:fg<65?36:fg<75?26:16;
   const sp=s<0.95?88:s<0.97?78:s<1.0?66:s<1.03?50:s<1.05?36:20;
-  const nfe=nf<-20000?84:nf<-5000?73:nf<0?60:nf<5000?44:nf<15000?28:14;
-  const pue=pu<0.5?88:pu<0.8?76:pu<1.5?52:pu<2.0?30:14;
+  const nfe=nf<-15000?84:nf<-3000?73:nf<0?60:nf<3000?44:nf<15000?28:14;
+  const pue=pu<0.5?88:pu<1.0?76:pu<3.0?52:pu<4.0?30:14;
   return Math.round(mv*0.25+np*0.20+fg2*0.20+sp*0.15+nfe*0.10+pue*0.10);
 }
 
@@ -617,95 +621,106 @@ function metricSt(id,v){
   if(v==null||isNaN(v)) return {cls:'b-neu',lbl:'—',itp:'데이터 없음'};
   switch(id){
     case'fg':
-      if(v<=15) return{cls:'b-bear',lbl:'극도공포',itp:`극도 공포(${v}) — 패닉 구간, 역발상 주목`};
-      if(v<=25) return{cls:'b-bear',lbl:'공포',    itp:`공포(${v}) — 약세 지속, 손절선 관리`};
-      if(v<=40) return{cls:'b-neu', lbl:'공포',    itp:`공포(${v}) — 약세 분위기, 소량 접근 가능`};
-      if(v<=55) return{cls:'b-neu', lbl:'중립',    itp:`중립(${v}) — 방향성 불확실, 관망`};
-      if(v<=70) return{cls:'b-bull',lbl:'탐욕',    itp:`탐욕(${v}) — 건전한 상승 분위기, 홀드`};
-      if(v<=80) return{cls:'b-neu', lbl:'과탐욕',  itp:`과탐욕(${v}) — 신규 매수 자제, 익절 시작`};
-      return          {cls:'b-bear',lbl:'극탐욕',  itp:`극도 탐욕(${v}) — 고점 신호, 즉시 익절`};
+      if(v<=24) return{cls:'b-bear',lbl:'극도공포',itp:`극도 공포(${v}) — 패닉 바닥권, 역발상 강력 매수`};
+      if(v<=49) return{cls:'b-neu', lbl:'공포',    itp:`공포(${v}) — 약세 분위기, 분할 매수 기회`};
+      if(v<=54) return{cls:'b-neu', lbl:'중립',    itp:`중립(${v}) — 방향성 없음, 관망`};
+      if(v<=75) return{cls:'b-bull',lbl:'탐욕',    itp:`탐욕(${v}) — 조정 가능성 주의, 홀드`};
+      return          {cls:'b-bear',lbl:'극탐욕',  itp:`극도 탐욕(${v}) — 사이클 고점 신호, 강력 매도`};
     case'mvrv':
-      if(v<0)   return{cls:'b-bear',lbl:'극저평가',itp:`극저평가(${v}) — 역사적 매수 구간`};
+      if(v<0)   return{cls:'b-bear',lbl:'극저평가',itp:`극저평가(${v}) — 사이클 바닥 구간, 역사적 강력 매수`};
       if(v<=2)  return{cls:'b-neu', lbl:'저평가',  itp:`저평가(${v}) — 상승 초기 진입 가능`};
-      if(v<=3.5)return{cls:'b-bull',lbl:'적정',    itp:`적정(${v}) — 상승 중기, 홀드`};
-      if(v<=6)  return{cls:'b-neu', lbl:'고평가',  itp:`고평가(${v}) — 30~50% 익절 준비`};
-      return          {cls:'b-bear',lbl:'극과열',  itp:`극과열(${v}) — 전량 익절 검토`};
+      if(v<=4)  return{cls:'b-bull',lbl:'공정가치',itp:`공정 가치(${v}) — 중립~홀드`};
+      if(v<=7)  return{cls:'b-neu', lbl:'고평가',  itp:`고평가(${v}) — 매도 압력 증가, 30~50% 익절`};
+      return          {cls:'b-bear',lbl:'극과열',  itp:`극과열(${v}) — 사이클 탑 신호, 전량 익절 검토`};
     case'nupl':
-      if(v<0)    return{cls:'b-bear',lbl:'항복',  itp:`Capitulation(${v}) — 역사적 매수 구간`};
+      if(v<0)    return{cls:'b-bear',lbl:'항복',  itp:`Capitulation(${v}) — ${v<-0.1?'극도 항복(-0.1 이하), 역사적 최강 매수':'역사적 매수 구간'}`};
       if(v<=0.25)return{cls:'b-neu', lbl:'희망',  itp:`Hope(${v}) — 회복 초기, 분할 매수 시작`};
       if(v<=0.5) return{cls:'b-bull',lbl:'낙관',  itp:`Optimism(${v}) — 상승 중기, 홀드`};
       if(v<=0.75)return{cls:'b-neu', lbl:'믿음',  itp:`Belief(${v}) — 상승 후기, 익절 준비`};
-      return           {cls:'b-bear',lbl:'행복',  itp:`Euphoria(${v}) — 고점권, 단계적 익절`};
+      return           {cls:'b-bear',lbl:'행복',  itp:`Euphoria(${v}) — ${v>0.8?'극도 탐욕(0.8 초과), 사이클 탑 임박, 강력 익절':'고점권, 단계적 익절'}`};
     case'sopr':
-      if(v<0.97) return{cls:'b-bear',lbl:'패닉',  itp:`패닉 매도(${v}) — 손실 투매, 역발상 진입 가능`};
-      if(v<1.0)  return{cls:'b-neu', lbl:'손익',  itp:`손익분기(${v}) — 지지 확인 중`};
-      if(v<1.05) return{cls:'b-bull',lbl:'건전',  itp:`건전 이익실현(${v}) — 홀드`};
-      return           {cls:'b-neu', lbl:'과잉',  itp:`이익실현 과잉(${v}) — 단기 조정 대비`};
+      if(v<0.95) return{cls:'b-bear',lbl:'패닉',  itp:`패닉 매도(${v}) — 대규모 손실 실현, 강력 매수`};
+      if(v<1.0)  return{cls:'b-neu', lbl:'손익',  itp:`손익분기(${v}) — 손실/중립 구간, 매수`};
+      if(v<1.05) return{cls:'b-bull',lbl:'건전',  itp:`건전 이익실현(${v}) — 매도 주의, 홀드`};
+      return           {cls:'b-neu', lbl:'과잉',  itp:`이익실현 과잉(${v}) — 대규모 분배, 강력 매도`};
     case'netflow':
-      if(v<-20000)return{cls:'b-bull',lbl:'강유출',itp:`강한 HODLing(${fmt(v)} BTC) — 매수 유지`};
-      if(v<0)     return{cls:'b-bull',lbl:'유출',  itp:`순유출(${fmt(v)} BTC) — 축적 중`};
-      if(v<5000)  return{cls:'b-neu', lbl:'중립',  itp:`소폭 유입(${fmt(v)} BTC) — 주의`};
-      return            {cls:'b-bear',lbl:'유입',  itp:`강한 매도 압력(+${fmt(v)} BTC) — 비중 축소`};
+      if(v<-15000)return{cls:'b-bull',lbl:'강유출', itp:`대규모 유출(${fmt(v)} BTC) — 공급 쇼크, 강력 매수`};
+      if(v<-3000) return{cls:'b-bull',lbl:'유출',   itp:`중간 유출(${fmt(v)} BTC) — HODLing 증가, 매수`};
+      if(v<=3000) return{cls:'b-neu', lbl:'중립',   itp:`중립(${fmt(v)} BTC) — 관망`};
+      if(v<=15000)return{cls:'b-neu', lbl:'유입',   itp:`중간 유입(+${fmt(v)} BTC) — 매도 압력 증가`};
+      return            {cls:'b-bear',lbl:'강유입',  itp:`대규모 유입(+${fmt(v)} BTC) — 강한 매도 압력, 비중 축소`};
     case'funding':
-      if(v<-0.01) return{cls:'b-bull',lbl:'숏과다',itp:`숏 과다(${v}%) — 숏스퀴즈 가능`};
-      if(v<=0.01) return{cls:'b-neu', lbl:'중립',  itp:`중립(${v}%) — 레버리지 정상`};
-      if(v<=0.03) return{cls:'b-neu', lbl:'롱주의',itp:`롱 과다(${v}%) — 레버리지 축소`};
-      return            {cls:'b-bear',lbl:'극과열',itp:`극과열(${v}%) — 즉시 레버리지 청산`};
+      if(v<-0.05) return{cls:'b-bull',lbl:'숏과다',  itp:`숏 과다(${v}%) — 과도 공포, 숏스퀴즈 가능, 강력 매수`};
+      if(v<0)     return{cls:'b-bull',lbl:'약베어',   itp:`약한 베어(${v}%) — 조정 국면, 매수`};
+      if(v<=0.03) return{cls:'b-neu', lbl:'중립',    itp:`중립(${v}%) — 레버리지 균형`};
+      if(v<=0.1)  return{cls:'b-neu', lbl:'롱주의',  itp:`롱 과열(${v}%) — 롱 과다 구간, 매도 주의`};
+      return            {cls:'b-bear',lbl:'극과열',  itp:`극단 롱 과열(${v}%) — 청산 위험, 강력 매도`};
     case'puell':
-      if(v<0.5) return{cls:'b-bear',lbl:'채굴자항복',itp:`퓰 멀티플(${v}) — 채굴자 항복 구간, 역사적 매수 타이밍`};
-      if(v<0.8) return{cls:'b-neu', lbl:'저평가',   itp:`퓰 멀티플(${v}) — 채굴 수익 낮음, 하락장 후기`};
-      if(v<1.5) return{cls:'b-bull',lbl:'적정',     itp:`퓰 멀티플(${v}) — 정상 범위`};
-      if(v<2.0) return{cls:'b-neu', lbl:'과열주의', itp:`퓰 멀티플(${v}) — 채굴 수익 급증, 고점 주의`};
-      return          {cls:'b-bear',lbl:'극과열',   itp:`퓰 멀티플(${v}) — 역사적 고점 구간, 익절 신호`};
+      if(v<0.5) return{cls:'b-bear',lbl:'채굴자항복',itp:`퓰 멀티플(${v}) — Green Zone, 채굴자 항복 구간, 역사적 강력 매수`};
+      if(v<1.0) return{cls:'b-neu', lbl:'저평가',   itp:`퓰 멀티플(${v}) — 채굴 수익 낮음, 매수`};
+      if(v<3.0) return{cls:'b-bull',lbl:'중립',     itp:`퓰 멀티플(${v}) — 정상 범위`};
+      if(v<4.0) return{cls:'b-neu', lbl:'과열주의', itp:`퓰 멀티플(${v}) — 채굴 수익 과다, 매도`};
+      return          {cls:'b-bear',lbl:'극과열',   itp:`퓰 멀티플(${v}) — Red Zone, 역사적 고점 구간, 강력 매도`};
     case'tvl':
       if(v>100)return{cls:'b-bull',lbl:'건강',itp:`$${v}B — DeFi 생태계 건강`};
       if(v>60) return{cls:'b-neu', lbl:'보통',itp:`$${v}B — DeFi 정상`};
       return         {cls:'b-bear',lbl:'위축',itp:`$${v}B — DeFi 자금 이탈 주의`};
     case'nrpl':
-      if(v<-1e9)  return{cls:'b-bull',lbl:'극도패닉',itp:`NRPL ${fmtNRPL(v)} — 대규모 손실매도. 역사적 바닥 신호`};
-      if(v<0)     return{cls:'b-bull',lbl:'손실실현', itp:`NRPL ${fmtNRPL(v)} — 시장 전체 손실 중. 바닥 탐색`};
-      if(v<5e8)   return{cls:'b-neu', lbl:'중립',    itp:`NRPL ${fmtNRPL(v)} — 수익/손실 균형. 방향성 탐색`};
-      if(v<2e9)   return{cls:'b-neu', lbl:'이익실현', itp:`NRPL ${fmtNRPL(v)} — 이익실현 진행. 상승 중기`};
-      return            {cls:'b-bear',lbl:'강한분배', itp:`NRPL ${fmtNRPL(v)} — 대규모 이익실현. 고점 분배 경고`};
+      if(v<-30000) return{cls:'b-bull',lbl:'극도패닉', itp:`NRPL ${fmtNRPL(v)} BTC — 대규모 손실 매도, 역사적 바닥 신호`};
+      if(v<0)      return{cls:'b-bull',lbl:'손실실현',  itp:`NRPL ${fmtNRPL(v)} BTC — 시장 전체 손실 중, 조정 → 매수`};
+      if(v<=20000) return{cls:'b-neu', lbl:'중립',     itp:`NRPL ${fmtNRPL(v)} BTC — 수익/손실 균형, 관망`};
+      if(v<=80000) return{cls:'b-neu', lbl:'이익실현',  itp:`NRPL ${fmtNRPL(v)} BTC — 이익실현 진행, 매도 압력`};
+      return             {cls:'b-bear',lbl:'강한분배',  itp:`NRPL ${fmtNRPL(v)} BTC — 극대 이익실현, 강력 매도 (과열)`};
     case'exchreserve':
-      if(v<2e6)   return{cls:'b-bull',lbl:'강한축적', itp:`거래소 보유량 ${fmtReserve(v)} — 대규모 자기보관. 매도 압력 최소`};
-      if(v<2.4e6) return{cls:'b-bull',lbl:'축적중',   itp:`거래소 보유량 ${fmtReserve(v)} — 지속 유출. 강세 신호`};
-      if(v<2.8e6) return{cls:'b-neu', lbl:'중립',    itp:`거래소 보유량 ${fmtReserve(v)} — 보통 수준`};
-      if(v<3.2e6) return{cls:'b-neu', lbl:'증가주의', itp:`거래소 보유량 ${fmtReserve(v)} — 유입 증가. 매도 압력 주의`};
-      return            {cls:'b-bear',lbl:'분배압력', itp:`거래소 보유량 ${fmtReserve(v)} — 대규모 유입. 매도 압력 높음`};
-    case'hodlwave':
-      if(v<8)     return{cls:'b-bear',lbl:'얇음',    itp:`HODL 1yr-2yr ${v}% — 장기보유자 비율 낮음. 분배 완료 or 초기`};
-      if(v<14)    return{cls:'b-neu', lbl:'감소중',   itp:`HODL 1yr-2yr ${v}% — 중간 수준. 시장 성숙 중`};
-      if(v<20)    return{cls:'b-bull',lbl:'축적',    itp:`HODL 1yr-2yr ${v}% — 장기보유자 비율 양호. 축적 진행`};
-      return            {cls:'b-bull',lbl:'강한축적', itp:`HODL 1yr-2yr ${v}% — 장기보유자 집중. 상승 잠재력 높음`};
+      if(v<2e6)   return{cls:'b-bull',lbl:'강한축적', itp:`거래소 보유량 ${fmtReserve(v)} — 대규모 자기보관, 공급 쇼크 (추세 확인 필수)`};
+      if(v<2.3e6) return{cls:'b-bull',lbl:'축적중',   itp:`거래소 보유량 ${fmtReserve(v)} — 지속 유출, 강세 신호 (추세 하락 시 매수)`};
+      if(v<2.6e6) return{cls:'b-neu', lbl:'중립',    itp:`거래소 보유량 ${fmtReserve(v)} — 보통 수준 (월 ±2% 안정 시 중립)`};
+      if(v<2.9e6) return{cls:'b-neu', lbl:'증가주의', itp:`거래소 보유량 ${fmtReserve(v)} — 유입 증가, 매도 압력 주의`};
+      return            {cls:'b-bear',lbl:'분배압력', itp:`거래소 보유량 ${fmtReserve(v)} — 대규모 유입, 강력 매도 압력 (추세 확인 필수)`};
+    case'hodlwave':{
+      const u7=MANUAL.utxo7yr, u1=MANUAL.utxo1m;
+      let sig=' ▶ UTXO 7yr+/1m 데이터 대기';
+      if(u7!=null&&u1!=null){
+        if(u7>30&&u1<8) sig=' ▶ 7yr+↑·단기↓ = 강한 HODL 구조';
+        else if(u7<25&&u1>12) sig=' ▶ 7yr+↓·단기↑ = 분배 경고';
+        else sig=' ▶ HODL 구조 정상';
+      }
+      if(v<8)  return{cls:'b-bear',lbl:'얇음',   itp:`1yr-2yr ${v}% — 장기 축적층 얇음.${sig}`};
+      if(v<14) return{cls:'b-neu', lbl:'감소중',  itp:`1yr-2yr ${v}% — 중간 수준.${sig}`};
+      if(v<20) return{cls:'b-bull',lbl:'축적',   itp:`1yr-2yr ${v}% — 장기보유자 비율 양호.${sig}`};
+      return        {cls:'b-bull',lbl:'강한축적', itp:`1yr-2yr ${v}% — 장기보유자 집중, 상승 잠재력.${sig}`};
+    }
     case'lthsopr':
-      if(v<1.0)   return{cls:'b-bull',lbl:'LTH항복', itp:`LTH SOPR ${v} — 장기보유자 손실매도. 역사적 바닥 신호`};
-      if(v<1.5)   return{cls:'b-bull',lbl:'초기상승', itp:`LTH SOPR ${v} — 소폭 이익실현. 상승 초중기`};
-      if(v<2.0)   return{cls:'b-neu', lbl:'중기',    itp:`LTH SOPR ${v} — 이익실현 가속. 상승 중후기`};
-      if(v<2.5)   return{cls:'b-neu', lbl:'후기경고', itp:`LTH SOPR ${v} — 장기보유자 대량 분배. 고점 주의`};
-      return            {cls:'b-bear',lbl:'분배',    itp:`LTH SOPR ${v} — 강력 분배 신호. 즉시 익절 검토`};
+      if(v<0.9)   return{cls:'b-bull',lbl:'LTH항복', itp:`LTH SOPR ${v} — 장기보유자 손실 매도(<0.9), 역사적 강력 매수`};
+      if(v<1.0)   return{cls:'b-bull',lbl:'LTH손실',  itp:`LTH SOPR ${v} — 장기보유자 손익분기 아래, 매수`};
+      if(v<1.5)   return{cls:'b-bull',lbl:'초기상승', itp:`LTH SOPR ${v} — 소폭 이익실현, 상승 초중기`};
+      if(v<2.5)   return{cls:'b-neu', lbl:'중기',    itp:`LTH SOPR ${v} — 이익실현 가속, 상승 중후기`};
+      if(v<4.0)   return{cls:'b-neu', lbl:'후기경고', itp:`LTH SOPR ${v} — 장기보유자 대량 분배, 고점 주의`};
+      return            {cls:'b-bear',lbl:'분배',    itp:`LTH SOPR ${v} — 강력 분배 신호, 즉시 익절 검토`};
     case'reserverisk':
-      if(v<0.002) return{cls:'b-bull',lbl:'강력매수', itp:`Reserve Risk ${v} — 보유자 확신 극대. 역사적 매수 구간`};
-      if(v<0.006) return{cls:'b-bull',lbl:'매수',    itp:`Reserve Risk ${v} — 리스크 낮음. 매수 적기`};
-      if(v<0.012) return{cls:'b-neu', lbl:'중립',    itp:`Reserve Risk ${v} — 보통 수준. 홀드`};
-      if(v<0.020) return{cls:'b-neu', lbl:'주의',    itp:`Reserve Risk ${v} — 리스크 상승. 신규 매수 자제`};
-      return            {cls:'b-bear',lbl:'분배',    itp:`Reserve Risk ${v} — 고위험 구간. 분배 / 익절`};
+      if(v<0.002) return{cls:'b-bull',lbl:'강력매수', itp:`Reserve Risk ${v} — LTH 확신 극대·가격 저, 역사적 매수 구간`};
+      if(v<0.005) return{cls:'b-bull',lbl:'매수',    itp:`Reserve Risk ${v} — 리스크 낮음, 매수 적기`};
+      if(v<0.01)  return{cls:'b-neu', lbl:'중립',    itp:`Reserve Risk ${v} — 보통 수준, 홀드`};
+      if(v<0.02)  return{cls:'b-neu', lbl:'주의',    itp:`Reserve Risk ${v} — 위험 증가, 신규 매수 자제`};
+      return            {cls:'b-bear',lbl:'분배',    itp:`Reserve Risk ${v} — 극단 위험 구간, 분배·익절`};
     case'coinbasepremium':
-      if(v>0.2)  return{cls:'b-bull',lbl:'프리미엄',itp:`코인베이스 프리미엄 +${v}% — 미국 기관 매수 강세`};
-      if(v>0.05) return{cls:'b-bull',lbl:'소폭양수',itp:`코인베이스 프리미엄 +${v}% — 미국 수요 우세`};
-      if(v>=-0.05)return{cls:'b-neu',lbl:'중립',   itp:`코인베이스 프리미엄 ${v}% — 수급 균형`};
-      if(v>=-0.2)return{cls:'b-neu', lbl:'소폭음수',itp:`코인베이스 프리미엄 ${v}% — 아시아 수요 우세`};
-      return          {cls:'b-bear',lbl:'디스카운트',itp:`코인베이스 프리미엄 ${v}% — 미국 기관 매도 우세`};
+      if(v<-0.2) return{cls:'b-bear',lbl:'디스카운트',itp:`코인베이스 디스카운트 ${v}% — 미국 기관 매도 우세, 주의`};
+      if(v<0)    return{cls:'b-neu', lbl:'약매도',   itp:`코인베이스 프리미엄 ${v}% — US 수요 약함, 매수`};
+      if(v<=0.2) return{cls:'b-neu', lbl:'중립',    itp:`코인베이스 프리미엄 ${v}% — 수급 균형, 중립`};
+      if(v<=0.5) return{cls:'b-bull',lbl:'프리미엄', itp:`코인베이스 프리미엄 +${v}% — 미국 기관 유입, 매수`};
+      return          {cls:'b-bull',lbl:'강프리미엄',itp:`코인베이스 프리미엄 +${v}% — 강한 US 매수, 기관 FOMO, 강력 매수`};
     case'utxo1m':
-      if(v>15)  return{cls:'b-bear',lbl:'과열',   itp:`단기 보유자 비율 ${v}% — 신규 매수 과잉, 조정 위험`};
-      if(v>8)   return{cls:'b-neu', lbl:'보통',   itp:`단기 보유자 비율 ${v}% — 정상 범위`};
-      if(v>4)   return{cls:'b-bull',lbl:'건전',   itp:`단기 보유자 비율 ${v}% — HODLing 우세, 건전한 상승`};
-      return          {cls:'b-bull',lbl:'강HODL', itp:`단기 보유자 비율 ${v}% — 강한 장기 보유 신호`};
+      if(v<5)   return{cls:'b-bull',lbl:'강HODL', itp:`단기 보유자 비율 ${v}% — 극저 활동, 강한 홀딩 → 매수`};
+      if(v<8)   return{cls:'b-bull',lbl:'건전',   itp:`단기 보유자 비율 ${v}% — 낮음, 축적 → 매수`};
+      if(v<12)  return{cls:'b-neu', lbl:'보통',   itp:`단기 보유자 비율 ${v}% — 정상 범위`};
+      if(v<18)  return{cls:'b-neu', lbl:'과열',   itp:`단기 보유자 비율 ${v}% — 단기 매도 증가, 주의`};
+      return          {cls:'b-bear',lbl:'분배',   itp:`단기 보유자 비율 ${v}% — 대규모 분배, 강력 매도`};
     case'utxo7yr':
-      if(v>3)   return{cls:'b-bear',lbl:'고래이동',itp:`7년+ UTXO ${v}% 이동 — 초장기 고래 매도 가능성 경고`};
-      if(v>1.5) return{cls:'b-neu', lbl:'주의',   itp:`7년+ UTXO ${v}% 이동 — 고래 움직임 모니터링 필요`};
-      if(v>0.5) return{cls:'b-neu', lbl:'소량',   itp:`7년+ UTXO ${v}% 이동 — 소량 고래 활동`};
-      return          {cls:'b-bull',lbl:'동면',   itp:`7년+ UTXO ${v}% — 초장기 보유자 동면 중, 매도 압력 없음`};
+      if(v>35)  return{cls:'b-bull',lbl:'극강홀딩', itp:`7yr+ 보유 비율 ${v}% — 공급 쇼크 극대, 강력 매수`};
+      if(v>30)  return{cls:'b-bull',lbl:'강한홀딩', itp:`7yr+ 보유 비율 ${v}% — LTH 축적 강세, 매수`};
+      if(v>25)  return{cls:'b-neu', lbl:'정상',    itp:`7yr+ 보유 비율 ${v}% — 정상 범위`};
+      if(v>20)  return{cls:'b-neu', lbl:'감소',    itp:`7yr+ 보유 비율 ${v}% — LTH 분배 시작, 매도`};
+      return          {cls:'b-bear',lbl:'대규모이동',itp:`7yr+ 보유 비율 ${v}% — 초장기 고래 이동, 강력 매도`};
     default: return{cls:'b-neu',lbl:'—',itp:'—'};
   }
 }
@@ -716,52 +731,52 @@ function metricSt(id,v){
 const ZONES = {
   fg:      { desc:'시장 심리 지수. 공포(매도 과다) ↔ 탐욕(매수 과다) — 역발상: 극도공포가 매수 기회',
              min:0, max:100,
-             segs:[{max:25,color:'#e03535',lbl:'극도공포'},{max:45,color:'#f97316',lbl:'공포'},{max:55,color:'#eab308',lbl:'중립'},{max:75,color:'#84cc16',lbl:'탐욕'},{max:100,color:'#dc2626',lbl:'극탐욕'}] },
+             segs:[{max:25,color:'#e03535',lbl:'극도공포'},{max:49,color:'#f97316',lbl:'공포'},{max:55,color:'#eab308',lbl:'중립'},{max:75,color:'#84cc16',lbl:'탐욕'},{max:100,color:'#dc2626',lbl:'극탐욕'}] },
   mvrv:    { desc:'시장가 ÷ 실현가. 높으면 수익자 많아 과열. 2 이하 = 역사적 매수 구간',
              min:-2, max:8,
-             segs:[{max:0,  color:'#e03535',lbl:'극저평가'},{max:2,  color:'#f97316',lbl:'저평가'},{max:3.5,color:'#22c55e',lbl:'적정'},{max:6,  color:'#eab308',lbl:'고평가'},{max:8,  color:'#dc2626',lbl:'극과열'}] },
+             segs:[{max:0,  color:'#e03535',lbl:'극저평가'},{max:2,  color:'#f97316',lbl:'저평가'},{max:4,  color:'#22c55e',lbl:'공정가치'},{max:7,  color:'#eab308',lbl:'고평가'},{max:8,  color:'#dc2626',lbl:'극과열'}] },
   nupl:    { desc:'보유자 전체 미실현 손익. 음수 = 항복 구간 (역사적 최적 진입점)',
              min:-0.4, max:1.0,
              segs:[{max:0,   color:'#e03535',lbl:'항복'},{max:0.25,color:'#f97316',lbl:'희망'},{max:0.5, color:'#22c55e',lbl:'낙관'},{max:0.75,color:'#eab308',lbl:'믿음'},{max:1.0, color:'#dc2626',lbl:'행복'}] },
-  sopr:    { desc:'이동 코인 수익률. 1 이하 = 손실 매도 = 바닥 신호 (SOPR < 0.97 최적 매수)',
-             min:0.92, max:1.12,
-             segs:[{max:0.97,color:'#e03535',lbl:'패닉'},{max:1.0, color:'#f97316',lbl:'손익분기'},{max:1.05,color:'#22c55e',lbl:'건전'},{max:1.12,color:'#eab308',lbl:'이익과잉'}] },
+  sopr:    { desc:'이동 코인 수익률. 1 이하 = 손실 매도 = 바닥 신호 (SOPR < 0.95 강력 매수)',
+             min:0.90, max:1.12,
+             segs:[{max:0.95,color:'#e03535',lbl:'패닉'},{max:1.0, color:'#f97316',lbl:'손익분기'},{max:1.05,color:'#22c55e',lbl:'건전'},{max:1.12,color:'#eab308',lbl:'이익과잉'}] },
   netflow: { desc:'거래소 유입-유출 BTC. 음수 = HODLing(강세), 양수 = 매도 압력(약세)',
-             min:-40000, max:30000,
-             segs:[{max:-20000,color:'#16a34a',lbl:'강유출'},{max:0,    color:'#84cc16',lbl:'유출'},{max:10000, color:'#eab308',lbl:'소유입'},{max:30000, color:'#e03535',lbl:'강유입'}] },
+             min:-30000, max:25000,
+             segs:[{max:-15000,color:'#16a34a',lbl:'강유출'},{max:-3000,color:'#84cc16',lbl:'유출'},{max:3000,color:'#eab308',lbl:'중립'},{max:15000,color:'#f97316',lbl:'유입'},{max:25000,color:'#e03535',lbl:'강유입'}] },
   funding: { desc:'선물 자금조달률. 음수 = 숏 과다(숏스퀴즈↑), 양수 과열 = 조정 위험',
-             min:-0.05, max:0.10,
-             segs:[{max:-0.01,color:'#22c55e',lbl:'숏과다'},{max:0.01, color:'#eab308',lbl:'중립'},{max:0.03, color:'#f97316',lbl:'롱주의'},{max:0.10, color:'#e03535',lbl:'극과열'}] },
+             min:-0.10, max:0.15,
+             segs:[{max:-0.05,color:'#22c55e',lbl:'숏과다'},{max:0,    color:'#84cc16',lbl:'약베어'},{max:0.03, color:'#eab308',lbl:'중립'},{max:0.10, color:'#f97316',lbl:'롱주의'},{max:0.15, color:'#e03535',lbl:'극과열'}] },
   puell:   { desc:'채굴자 일일 수익 ÷ 365일 이동평균. 0.5 이하 = 채굴자 항복 구간 (역사적 매수 타이밍)',
-             min:0, max:3,
-             segs:[{max:0.5,color:'#e03535',lbl:'채굴자항복'},{max:0.8,color:'#f97316',lbl:'저평가'},{max:1.5,color:'#22c55e',lbl:'적정'},{max:2.0,color:'#eab308',lbl:'과열주의'},{max:3,color:'#dc2626',lbl:'극과열'}] },
+             min:0, max:5,
+             segs:[{max:0.5,color:'#e03535',lbl:'채굴자항복'},{max:1.0,color:'#f97316',lbl:'저평가'},{max:3.0,color:'#22c55e',lbl:'중립'},{max:4.0,color:'#eab308',lbl:'과열주의'},{max:5,color:'#dc2626',lbl:'극과열'}] },
   tvl:     { desc:'DeFi 예치 총 자산. 생태계 건전성 및 시장 신뢰도 지표',
              min:0, max:120,
              segs:[{max:40, color:'#e03535',lbl:'위축'},{max:80, color:'#eab308',lbl:'보통'},{max:120,color:'#22c55e',lbl:'건강'}] },
-  coinbasepremium:{ desc:'코인베이스 BTC 가격 - 바이낸스 BTC 가격(%). 양수 = 미국 기관 매수 우세, 음수 = 아시아/셀 프레셔',
-             min:-0.5, max:0.5,
-             segs:[{max:-0.2,color:'#e03535',lbl:'디스카운트'},{max:-0.05,color:'#f97316',lbl:'소폭음수'},{max:0.05,color:'#eab308',lbl:'중립'},{max:0.2,color:'#84cc16',lbl:'소폭양수'},{max:0.5,color:'#22c55e',lbl:'프리미엄'}] },
-  utxo1m:  { desc:'1주~1개월 사이 이동된 BTC 비율(실현시가총액 기준). 높으면 단기 투기 과열, 낮으면 HODLing 강세',
+  coinbasepremium:{ desc:'코인베이스 BTC 가격 - 바이낸스 BTC 가격(%). 양수 = 미국 기관 매수 우세, 음수 = 매도 압력',
+             min:-0.5, max:0.7,
+             segs:[{max:-0.2,color:'#e03535',lbl:'디스카운트'},{max:0,color:'#f97316',lbl:'약매도'},{max:0.2,color:'#eab308',lbl:'중립'},{max:0.5,color:'#84cc16',lbl:'프리미엄'},{max:0.7,color:'#22c55e',lbl:'강프리미엄'}] },
+  utxo1m:  { desc:'1주~1개월 사이 이동된 BTC 비율(실현시가총액 기준). 낮으면 HODLing 강세, 높으면 단기 투기 과열',
              min:0, max:20,
-             segs:[{max:4,color:'#22c55e',lbl:'강HODL'},{max:8,color:'#84cc16',lbl:'건전'},{max:15,color:'#eab308',lbl:'보통'},{max:20,color:'#e03535',lbl:'과열'}] },
-  utxo7yr:     { desc:'7년 이상 미이동 BTC 비율(공급량 기준). 급등 시 초장기 고래 매도 신호 — 역사적 고점 경고',
-                 min:0, max:5,
-                 segs:[{max:0.5,color:'#22c55e',lbl:'동면'},{max:1.5,color:'#84cc16',lbl:'소량'},{max:3,color:'#eab308',lbl:'주의'},{max:5,color:'#e03535',lbl:'고래이동'}] },
-  nrpl:        { desc:'순실현손익(USD). 음수=시장 전체 손실 매도(바닥 신호), 양수 급증=대규모 이익실현(분배/고점 경고)',
-                 min:-3e9, max:5e9,
-                 segs:[{max:-1e9,color:'#16a34a',lbl:'극도패닉'},{max:0,color:'#84cc16',lbl:'손실실현'},{max:5e8,color:'#eab308',lbl:'중립'},{max:2e9,color:'#f97316',lbl:'이익실현'},{max:5e9,color:'#e03535',lbl:'강한분배'}] },
-  exchreserve: { desc:'거래소 보유 BTC 총량. 감소=자기보관(강세), 증가=분배/매도 압력(약세). 추세 방향이 핵심',
+             segs:[{max:5,color:'#22c55e',lbl:'강HODL'},{max:8,color:'#84cc16',lbl:'건전'},{max:12,color:'#eab308',lbl:'보통'},{max:18,color:'#f97316',lbl:'과열'},{max:20,color:'#e03535',lbl:'분배'}] },
+  utxo7yr:     { desc:'7년 이상 미이동 BTC 비율(공급량 기준). 높을수록 공급 잠김·강한 HODL(강세), 낮을수록 장기 고래 이동(약세)',
+                 min:15, max:40,
+                 segs:[{max:20,color:'#e03535',lbl:'대규모이동'},{max:25,color:'#f97316',lbl:'감소'},{max:30,color:'#eab308',lbl:'정상'},{max:35,color:'#84cc16',lbl:'강한홀딩'},{max:40,color:'#22c55e',lbl:'극강홀딩'}] },
+  nrpl:        { desc:'순실현손익(일일 BTC 기준). 음수=대규모 손실 매도(바닥), 양수 급증=이익 실현 과열(고점 경고)',
+                 min:-80000, max:120000,
+                 segs:[{max:-30000,color:'#16a34a',lbl:'극도패닉'},{max:0,color:'#84cc16',lbl:'손실실현'},{max:20000,color:'#eab308',lbl:'중립'},{max:80000,color:'#f97316',lbl:'이익실현'},{max:120000,color:'#e03535',lbl:'강한분배'}] },
+  exchreserve: { desc:'거래소 보유 BTC 총량(절대값 기준). 핵심: 월간 추세 방향 — 감소=자기보관(강세), 증가=매도 압력(약세)',
                  min:1.5e6, max:3.5e6,
-                 segs:[{max:2e6,color:'#22c55e',lbl:'강한축적'},{max:2.4e6,color:'#84cc16',lbl:'축적중'},{max:2.8e6,color:'#eab308',lbl:'중립'},{max:3.2e6,color:'#f97316',lbl:'증가주의'},{max:3.5e6,color:'#e03535',lbl:'분배압력'}] },
-  hodlwave:    { desc:'1년~2년 보유 BTC 비율(HODL Waves). 높을수록 장기 축적 완료 → 상승 잠재력. 낮으면 분배 단계',
+                 segs:[{max:2e6,color:'#22c55e',lbl:'강한축적'},{max:2.3e6,color:'#84cc16',lbl:'축적중'},{max:2.6e6,color:'#eab308',lbl:'중립'},{max:2.9e6,color:'#f97316',lbl:'증가주의'},{max:3.5e6,color:'#e03535',lbl:'분배압력'}] },
+  hodlwave:    { desc:'1yr~2yr 보유 BTC 비율(HODL Waves). UTXO 7yr+↑·단기↓ 조합이 핵심 신호 — 좌측 두 UTXO 카드와 함께 판단',
                  min:5, max:30,
                  segs:[{max:8,color:'#e03535',lbl:'얇음'},{max:14,color:'#f97316',lbl:'감소중'},{max:20,color:'#22c55e',lbl:'축적'},{max:30,color:'#16a34a',lbl:'강한축적'}] },
-  lthsopr:     { desc:'장기 보유자(155일+) 실현손익비율. 1 이하=손실매도(역사적 바닥), 2.0+ 이상=대규모 분배',
-                 min:0.9, max:3.5,
-                 segs:[{max:1.0,color:'#22c55e',lbl:'LTH항복'},{max:1.5,color:'#84cc16',lbl:'초기상승'},{max:2.0,color:'#eab308',lbl:'중기'},{max:2.5,color:'#f97316',lbl:'후기경고'},{max:3.5,color:'#e03535',lbl:'분배'}] },
+  lthsopr:     { desc:'장기 보유자(155일+) 실현손익비율. 0.9 이하=손실매도(역사적 바닥), 4.0 이상=대규모 분배',
+                 min:0.85, max:6.0,
+                 segs:[{max:0.9,color:'#16a34a',lbl:'LTH항복'},{max:1.0,color:'#84cc16',lbl:'LTH손실'},{max:1.5,color:'#22c55e',lbl:'초기상승'},{max:2.5,color:'#eab308',lbl:'중기'},{max:4.0,color:'#f97316',lbl:'후기경고'},{max:6.0,color:'#e03535',lbl:'분배'}] },
   reserverisk: { desc:'장기 보유자 기회비용 대비 리스크. 낮을수록 매수 적기(보유자 확신 극대), 높을수록 분배 구간',
-                 min:0, max:0.03,
-                 segs:[{max:0.002,color:'#22c55e',lbl:'강력매수'},{max:0.006,color:'#84cc16',lbl:'매수'},{max:0.012,color:'#eab308',lbl:'중립'},{max:0.020,color:'#f97316',lbl:'주의'},{max:0.030,color:'#e03535',lbl:'분배'}] }
+                 min:0, max:0.025,
+                 segs:[{max:0.002,color:'#22c55e',lbl:'강력매수'},{max:0.005,color:'#84cc16',lbl:'매수'},{max:0.010,color:'#eab308',lbl:'중립'},{max:0.020,color:'#f97316',lbl:'주의'},{max:0.025,color:'#e03535',lbl:'분배'}] }
 };
 
 function makeZoneBar(id, val){
@@ -791,21 +806,47 @@ function makeZoneBar(id, val){
 //  ALERTS
 // ═══════════════════════════════════════════════════════════════
 function checkAlerts(){
-  const al=[], {fearGreed:fg,stableMcap:st}=LIVE, {mvrvZ:z,nupl:n,sopr:s,netflow:nf,funding:fr}=MANUAL;
-  if(fg!=null&&fg<=15)   al.push({t:'bear',m:`시장 극도 공포 (F&G ${fg}) — 패닉 구간. 추가 하락 위험`});
-  else if(fg!=null&&fg<=25) al.push({t:'bear',m:`시장 공포 (F&G ${fg}) — 약세 지속, 손절선 관리 필요`});
-  if(fg!=null&&fg>=80)   al.push({t:'bear',m:`시장 극도 탐욕 (F&G ${fg}) — 고점 신호, 즉시 익절`});
-  else if(fg!=null&&fg>=70) al.push({t:'neu', m:`시장 과탐욕 (F&G ${fg}) — 신규 매수 자제, 분할 익절 시작`});
-  if(z>=5.0)  al.push({t:'bear',m:`MVRV Z ${z} — 극과열. 전량 익절 검토`});
-  else if(z>=3.5) al.push({t:'bear',m:`MVRV Z ${z} — 고평가 경고. 30~50% 익절 준비`});
-  if(n>=0.75) al.push({t:'bear',m:`NUPL ${n} — Euphoria 고점권. 즉시 단계적 익절`});
-  if(fr>0.05) al.push({t:'bear',m:`Funding ${fr}% — 레버리지 극과열. 즉시 청산`});
-  if(nf>20000)al.push({t:'bear',m:`Netflow +${fmt(nf)} BTC — 거래소 유입 급증. 매도 압력`});
-  if(fg!=null&&fg<=20&&z<1.5) al.push({t:'entry',m:`📍 역발상 구간 — 극도공포 + 저평가 동시 발생. 분할 매수 타이밍`});
-  if(z<0&&n<0)                al.push({t:'entry',m:`📍 항복 구간 — MVRV(${z}) + NUPL(${n}) 음수. 역사적 최적 진입`});
-  if(s<0.97)                  al.push({t:'entry',m:`📍 SOPR ${s} — 손실 투매 구간 = 바닥 신호. 분할 매수 가능`});
-  if(nf<-20000)               al.push({t:'entry',m:`📍 Netflow ${fmt(nf)} BTC — 강한 HODLing. 장기 축적 신호`});
-  if(st!=null&&st>300)        al.push({t:'entry',m:`📍 스테이블코인 $${st.toFixed(0)}B — 대기 매수력 최대`});
+  const al=[];
+  const {fearGreed:fg,stableMcap:st,coinbasePremium:cp}=LIVE;
+  const {mvrvZ:z,nupl:n,sopr:s,netflow:nf,funding:fr,puell:pu,
+         utxo1m:u1m,utxo7yr:u7yr,nrpl:nrl,lthSopr:lth,reserveRisk:rr}=MANUAL;
+
+  // ── 매도 경고 (bear / neu) ──────────────────────────────────
+  if(fg!=null&&fg>=76)   al.push({t:'bear',m:`F&G ${fg} — 극도탐욕. 사이클 고점 신호, 즉시 익절`});
+  else if(fg!=null&&fg>=55) al.push({t:'neu', m:`F&G ${fg} — 탐욕 구간. 조정 가능성, 분할 익절 시작`});
+  if(z>=7.0)  al.push({t:'bear',m:`MVRV Z ${z} — 극과열(>7). 전량 익절 검토`});
+  else if(z>=4.0) al.push({t:'bear',m:`MVRV Z ${z} — 고평가(>4). 30~50% 익절 준비`});
+  if(n>=0.75) al.push({t:'bear',m:`NUPL ${n} — Euphoria 고점권. 단계적 익절`});
+  if(fr>0.1)  al.push({t:'bear',m:`Funding ${fr}% — 레버리지 극과열. 즉시 청산`});
+  else if(fr>0.03) al.push({t:'neu', m:`Funding ${fr}% — 롱 과열 구간. 레버리지 주의`});
+  if(nf>15000) al.push({t:'bear',m:`Netflow +${fmt(nf)} BTC — 거래소 유입 급증. 매도 압력`});
+  if(pu!=null&&pu>=4.0) al.push({t:'bear',m:`Puell ${pu} — Red Zone 극과열. 역사적 사이클 고점`});
+  else if(pu!=null&&pu>=3.0) al.push({t:'neu', m:`Puell ${pu} — 채굴 수익 과다(>3). 매도 검토`});
+  if(lth!=null&&lth>=4.0) al.push({t:'bear',m:`LTH SOPR ${lth} — 강력 분배 신호(>4). 즉시 익절`});
+  else if(lth!=null&&lth>=2.5) al.push({t:'neu', m:`LTH SOPR ${lth} — 장기보유자 대량 분배 시작`});
+  if(rr!=null&&rr>=0.02) al.push({t:'bear',m:`Reserve Risk ${rr} — 극단 위험(>0.02). 분배 구간`});
+  else if(rr!=null&&rr>=0.01) al.push({t:'neu', m:`Reserve Risk ${rr} — 위험 증가(>0.01). 신규 매수 자제`});
+  if(u1m!=null&&u1m>=18) al.push({t:'bear',m:`UTXO 1w~1m ${u1m}% — 대규모 분배(>18%). 강력 매도 신호`});
+  else if(u1m!=null&&u1m>=12) al.push({t:'neu', m:`UTXO 1w~1m ${u1m}% — 단기 매도 증가(>12%). 주의`});
+  if(u7yr!=null&&u7yr<=20) al.push({t:'bear',m:`UTXO 7yr+ ${u7yr}% — 초장기 고래 이동(<20%). 경고`});
+  else if(u7yr!=null&&u7yr<=25) al.push({t:'neu', m:`UTXO 7yr+ ${u7yr}% — LTH 분배 시작(<25%). 주의`});
+  if(nrl!=null&&nrl>=80000) al.push({t:'bear',m:`NRPL +${fmt(nrl)} BTC — 극대 이익실현(>80k). 분배 경고`});
+  if(cp!=null&&cp<-0.2) al.push({t:'neu', m:`Coinbase 디스카운트 ${cp}% — 미국 기관 매도 우세. 주의`});
+
+  // ── 역발상 매수 신호 (entry) ────────────────────────────────
+  if(fg!=null&&fg<=24&&z<1.5) al.push({t:'entry',m:`📍 역발상 구간 — 극도공포+저평가 동시 발생. 분할 매수`});
+  if(z<0&&n<0)  al.push({t:'entry',m:`📍 항복 구간 — MVRV(${z})+NUPL(${n}) 음수. 역사적 최적 진입`});
+  if(n<0)       al.push({t:'entry',m:`📍 NUPL ${n} — Capitulation. 역사적 매수 구간`});
+  if(s<0.95)    al.push({t:'entry',m:`📍 SOPR ${s} — 손실 투매 = 바닥 신호. 분할 매수 가능`});
+  if(nf<-15000) al.push({t:'entry',m:`📍 Netflow ${fmt(nf)} BTC — 강한 HODLing. 장기 축적 신호`});
+  if(fr<-0.05)  al.push({t:'entry',m:`📍 Funding ${fr}% — 숏 과다. 숏스퀴즈 가능, 역발상 매수`});
+  if(pu!=null&&pu<0.5) al.push({t:'entry',m:`📍 Puell ${pu} — Green Zone 채굴자 항복(<0.5). 역사적 강력 매수`});
+  if(lth!=null&&lth<0.9) al.push({t:'entry',m:`📍 LTH SOPR ${lth} — LTH 항복(<0.9). 역사적 강력 매수`});
+  if(rr!=null&&rr<0.002) al.push({t:'entry',m:`📍 Reserve Risk ${rr} — 보유자 확신 극대(<0.002). 역사적 매수`});
+  if(nrl!=null&&nrl<-30000) al.push({t:'entry',m:`📍 NRPL ${fmt(nrl)} BTC — 극도 손실 패닉(<-30k). 바닥 신호`});
+  if(u7yr!=null&&u7yr>35) al.push({t:'entry',m:`📍 UTXO 7yr+ ${u7yr}% — 공급 쇼크 극대(>35%). 강력 매수`});
+  if(cp!=null&&cp>0.5)  al.push({t:'entry',m:`📍 Coinbase +${cp}% — 미국 기관 FOMO(>0.5%). 강력 매수 신호`});
+  if(st!=null&&st>300)  al.push({t:'entry',m:`📍 스테이블코인 $${st.toFixed(0)}B — 대기 매수력 최대`});
   return al;
 }
 
@@ -990,7 +1031,7 @@ function renderMetrics(){
         {id:'nupl',        nm:'NUPL',                val:nupl,                disp:`${nupl}`,            field:'nupl',     step:'0.01'},
         {id:'sopr',        nm:'SOPR',                val:sopr,                disp:`${sopr}`,            field:'sopr',     step:'0.001'},
         {id:'netflow',     nm:'Exchange Netflow (7d)',val:netflow,             disp:`${netflow>=0?'+':''}${fmt(netflow)} BTC`, field:'netflow', step:'100'},
-        {id:'coinbasepremium',nm:'Coinbase Premium', val:cp,       auto:true, disp:cp!=null?`${cp>=0?'+':''}${cp}%`:'—', sub:cp!=null?(cp>0.05?'기관매수↑':cp<-0.05?'매도압력↑':'중립'):''},
+        {id:'coinbasepremium',nm:'Coinbase Premium', val:cp,       auto:true, disp:cp!=null?`${cp>=0?'+':''}${cp}%`:'—', sub:cp!=null?(cp>0.5?'기관FOMO↑':cp>0.2?'기관매수↑':cp<-0.2?'매도압력↑':cp<0?'US수요약':'중립'):''},
         {id:'utxo1m',      nm:'UTXO 1w~1m (실현시가)',val:utxo1m,             disp:utxo1m!=null?`${utxo1m}%`:'—',  field:'utxo1m',  step:'0.1'},
         {id:'utxo7yr',     nm:'UTXO 7yr+ (공급량)',  val:utxo7yr,             disp:utxo7yr!=null?`${utxo7yr}%`:'—', field:'utxo7yr', step:'0.01'},
       ]
@@ -999,7 +1040,7 @@ function renderMetrics(){
       title: '홀더 행동 · 파생 지표',
       sub: 'NRPL · Exchange Reserves · HODL Waves · LTH/STH SOPR · Reserve Risk · Funding · Puell · DeFi TVL',
       metrics: [
-        {id:'nrpl',        nm:'NRPL',                val:nrpl,                disp:fmtNRPL(nrpl),        field:'nrpl',       step:'1000000'},
+        {id:'nrpl',        nm:'NRPL (일일 BTC)',       val:nrpl,                disp:nrpl!=null?`${fmtNRPL(nrpl)} BTC`:'—', field:'nrpl', step:'1000'},
         {id:'exchreserve', nm:'Exchange Reserves',   val:exchReserve,         disp:fmtReserve(exchReserve), field:'exchReserve', step:'10000'},
         {id:'hodlwave',    nm:'HODL Waves 1yr-2yr',  val:hodlWave1y2y,        disp:hodlWave1y2y!=null?`${hodlWave1y2y}%`:'—', field:'hodlWave1y2y', step:'0.1'},
         {id:'lthsopr',     nm:'LTH / STH SOPR',      val:lthSopr,             disp:lthSopr!=null?`${lthSopr}`:'—', sub:sthSopr!=null?`STH ${sthSopr}`:'', field:'lthSopr', step:'0.001'},
@@ -1029,6 +1070,7 @@ function renderMetricCard(m){
     <div class="mc-hd"><span class="mc-nm">${m.nm}</span>
       <div style="display:flex;gap:4px;align-items:center">
         ${m.auto?'<span class="badge b-auto">AUTO</span>':''}
+        ${(m.field&&MANUAL_ONLY.has(m.field))?'<span class="badge" style="background:rgba(234,179,8,.18);color:#ca8a04;font-size:9px">수동갱신</span>':''}
         <span class="badge ${st2.cls}" id="badge-${m.id}">${st2.lbl}</span>
       </div>
     </div>

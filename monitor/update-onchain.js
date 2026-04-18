@@ -98,6 +98,44 @@ const METRICS = [
   },
 ];
 
+// ── CoinGlass Exchange Reserves (무료 공개 API 시도) ─────────
+async function fetchExchangeReserve() {
+  const candidates = [
+    'https://open-api.coinglass.com/public/v2/indicator/exchange_reserve',
+    'https://open-api.coinglass.com/public/v2/indicator/btc_reserve',
+  ];
+  for (const url of candidates) {
+    try {
+      const res = await fetch(url, {
+        headers: { 'Accept': 'application/json' },
+        signal: AbortSignal.timeout(12000),
+      });
+      console.log(`   CoinGlass: ${url} → HTTP ${res.status}`);
+      if (!res.ok) continue;
+      const body = await res.json();
+      // 응답 구조 로그 (첫 200자)
+      console.log(`   응답 샘플:`, JSON.stringify(body).slice(0, 300));
+      // 일반적인 CoinGlass v2 구조: { code: "0", data: [...] }
+      const rows = body?.data;
+      if (Array.isArray(rows) && rows.length > 0) {
+        const latest = rows[rows.length - 1];
+        const val = latest?.total ?? latest?.btcAmount ?? latest?.value ?? latest?.amount;
+        if (val != null) {
+          console.log(`   ✅ exchReserve: ${val}`);
+          return parseFloat(val);
+        }
+      } else if (body?.data != null && typeof body.data === 'object') {
+        const v = body.data?.total ?? body.data?.btcAmount;
+        if (v != null) return parseFloat(v);
+      }
+    } catch (e) {
+      console.log(`   오류: ${e.message}`);
+    }
+  }
+  console.log(`   ⚠️  CoinGlass exchReserve 수집 실패`);
+  return null;
+}
+
 // ── 날짜 헬퍼 ─────────────────────────────────────────────────
 function fmtDate(d) {
   return d.toISOString().split('T')[0]; // YYYY-MM-DD
@@ -216,6 +254,16 @@ async function main() {
       log.push(`  ⚠️  ${metric.label}: 수집 실패 → 이전값 ${prev[metric.key] ?? '없음'} 유지`);
     }
     await new Promise(r => setTimeout(r, 1500)); // 요청 간 간격
+  }
+
+  // Exchange Reserves (CoinGlass 무료 공개 API)
+  console.log('\n📊 Exchange Reserves (CoinGlass)');
+  const exchReserve = await fetchExchangeReserve();
+  if (exchReserve != null) {
+    result.exchReserve = exchReserve;
+    log.push(`  ✅ Exchange Reserves: ${Math.round(exchReserve).toLocaleString()} BTC`);
+  } else {
+    log.push(`  ⚠️  Exchange Reserves: 수집 실패 → 이전값 ${prev.exchReserve ?? '없음'} 유지`);
   }
 
   result.updatedAt    = new Date().toISOString();
