@@ -3,7 +3,7 @@
   "nupl": 0.277,
   "sopr": 1.0025,
   "netflow": -5000,
-  "funding": -0.00002,
+  "funding": -0.00011,
   "puell": 0.811,
   "utxo1m": null,
   "utxo7yr": null,
@@ -13,7 +13,7 @@
   "lthSopr": 0.9802,
   "sthSopr": 1.0029,
   "reserveRisk": 0.000632,
-  "updatedAt": "2026-04-17T22:53:02.175Z",
-  "updatedAtKST": "2026. 4. 18. AM 7:53:02",
+  "updatedAt": "2026-04-18T02:04:56.913Z",
+  "updatedAtKST": "2026. 4. 18. AM 11:04:56",
   "source": "bitcoin-data.com (BGeometrics)"
 }
