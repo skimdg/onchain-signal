@@ -2,14 +2,19 @@ name: Update Onchain Metrics
 
 on:
   schedule:
-    - cron: '0 22 * * *'   # 07:00 KST (UTC 22:00) — 1차: 상위 8개 지표 수집
-    - cron: '0 10 * * *'   # 19:00 KST (UTC 10:00) — 2차: sthSopr/reserveRisk (일일 잔여 7회)
-  workflow_dispatch:         # 수동 실행 버튼
+    - cron: '20 22 * * *'   # 07:20 KST → 아침 배치 (8개 지표 + 정기알림)
+    - cron: '20 9 * * *'    # 18:20 KST → 저녁 배치 (5개 지표 + 정기알림)
+  workflow_dispatch:
+    inputs:
+      batch:
+        description: 'morning 또는 evening'
+        required: false
+        default: 'morning'
 
 jobs:
   update-onchain:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     permissions:
       contents: write
 
@@ -20,16 +25,38 @@ jobs:
         with:
           node-version: '20'
 
-      # BGeometrics(무료) + Foredex.io(FOREDEX_API_KEY 시크릿 있을 때 자동 활성화)
+      # 배치 타입 결정 (스케줄 or workflow_dispatch)
+      - name: Determine batch type
+        run: |
+          SCHED="${{ github.event.schedule }}"
+          if [ "$SCHED" = "20 22 * * *" ]; then
+            echo "BATCH=morning" >> $GITHUB_ENV
+            echo "REPORT_TYPE=morning" >> $GITHUB_ENV
+          elif [ "$SCHED" = "20 9 * * *" ]; then
+            echo "BATCH=evening" >> $GITHUB_ENV
+            echo "REPORT_TYPE=evening" >> $GITHUB_ENV
+          else
+            BATCH_VAL="${{ github.event.inputs.batch || 'morning' }}"
+            echo "BATCH=$BATCH_VAL" >> $GITHUB_ENV
+            echo "REPORT_TYPE=$BATCH_VAL" >> $GITHUB_ENV
+          fi
+
+      # 온체인 지표 수집 (BATCH에 따라 아침/저녁 분리)
       - name: Fetch onchain metrics
-        env:
-          FOREDEX_API_KEY: ${{ secrets.FOREDEX_API_KEY }}
         run: node monitor/update-onchain.js
 
+      # 변경사항 커밋
       - name: Commit updated onchain data
         run: |
           git config user.name "Onchain Signal Bot"
           git config user.email "action@github.com"
-          git add onchain-data.json
-          git diff --staged --quiet || git commit -m "auto: 온체인 지표 업데이트 $(TZ=Asia/Seoul date +'%Y.%m.%d %H:%M') KST"
+          git add onchain-data.json monitor/state.json
+          git diff --staged --quiet || git commit -m "auto: 온체인 지표 업데이트 $(TZ=Asia/Seoul date +'%Y.%m.%d %H:%M') KST (${{ env.BATCH }})"
           git push
+
+      # 텔레그램 정기알림 전송 (REPORT_TYPE=morning/evening)
+      - name: Send Telegram report
+        env:
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        run: node monitor/check-once.js

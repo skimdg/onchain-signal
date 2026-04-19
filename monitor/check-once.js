@@ -1,23 +1,25 @@
 /**
  * check-once.js — GitHub Actions 단발성 실행용
- * 15분마다 실행 → 이전 상태(state.json)와 비교해 변경 감지 → 텔레그램 알림
+ * 데이터 수집 후 실행 → 이전 상태(state.json)와 비교해 변경 감지 → 텔레그램 알림
  *
  * 감지 조건:
  *   1. 사이클 점수 구간 변경 (0~20 / 20~40 / 40~60 / 60~75 / 75+)
- *   2. 온체인 지표 구간 변경 → "A구간 → B구간" 형식으로 전송
+ *   2. 온체인 지표 구간 변경 → 정기알림에 "이전구간 → 현재구간" 형식으로 표시
  *   3. 애널리스트 스탠스 변경 (15% 이상) → 변경 내역 + 최근 뉴스 헤드라인 포함
  *   4. 즉시 경보 (BTC 24h ±10%, F&G 극단값)
- *   5. 매일 07:15 KST 이후 첫 번째 실행 → "📅 정기알림" 전송
+ *   5. REPORT_TYPE=morning → 07:30 KST 정기알림 (아침)
+ *      REPORT_TYPE=evening → 18:30 KST 정기알림 (저녁)
  *
- * ENV: TG_TOKEN, TG_CHAT_ID (GitHub Secrets)
+ * ENV: TG_TOKEN, TG_CHAT_ID, REPORT_TYPE (GitHub Actions)
  * 상태 파일: monitor/state.json
  */
 
 const fs   = require('fs');
 const path = require('path');
 
-const TG_TOKEN      = process.env.TG_TOKEN   || '';
-const TG_CHAT_ID    = process.env.TG_CHAT_ID || '';
+const TG_TOKEN      = process.env.TG_TOKEN     || '';
+const TG_CHAT_ID    = process.env.TG_CHAT_ID   || '';
+const REPORT_TYPE   = process.env.REPORT_TYPE  || ''; // 'morning' | 'evening'
 const STATE_PATH    = path.join(__dirname, 'state.json');
 const ANALYST_PATH  = path.join(__dirname, '..', 'analyst-data.json');
 const ONCHAIN_PATH  = path.join(__dirname, '..', 'onchain-data.json');
@@ -149,11 +151,10 @@ async function sendTelegram(text) {
 //  MAIN
 // ══════════════════════════════════════════════════════════════
 async function main() {
-  const nowDate  = new Date();
-  const now      = nowDate.toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
-  const hour     = parseInt(nowDate.toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', hour: 'numeric', hour12: false }));
-  const mins     = nowDate.getMinutes();
-  const todayKST = nowDate.toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul' });
+  const nowDate   = new Date();
+  const now       = nowDate.toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+  const todayKST  = nowDate.toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul' });
+  const reportLabel = REPORT_TYPE === 'evening' ? '저녁' : '아침';
   console.log(`[${now}] 체크 시작`);
 
   const prev        = readState();
@@ -265,24 +266,17 @@ async function main() {
     dashLink,
   ].join('\n');
 
+  // 즉시 경보 (F&G 극단, BTC 급변) — 항상 별도 전송
   if (immediateAlerts.length > 0) {
     const msg = `🚨 <b>Onchain Signal 즉시 알림</b>\n${now}\n\n${immediateAlerts.join('\n')}\n\n─────────────────\n${summary}`;
     await sendTelegram(msg);
   }
 
-  if (changes.length > 0) {
-    const msg = `🔔 <b>Onchain Signal 구간 변경 감지</b>\n${now}\n\n${changes.join('\n\n')}\n\n─────────────────\n${summary}`;
-    await sendTelegram(msg);
-  }
-
-  if (immediateAlerts.length === 0 && changes.length === 0) {
-    console.log('✅ 변경 없음 — 정상 구간');
-  }
-
   // ────────────────────────────────────────────────────────────
-  //  5. 매일 07:15 KST 이후 첫 번째 실행 → 📅 정기알림
+  //  5. REPORT_TYPE 환경변수 기반 📅 정기알림 (아침/저녁)
   // ────────────────────────────────────────────────────────────
-  const shouldReport = hour === 7 && mins >= 15 && prev.lastReportDate !== todayKST;
+  const reportStateKey = REPORT_TYPE === 'evening' ? 'lastEveningDate' : 'lastMorningDate';
+  const shouldReport   = !!REPORT_TYPE && prev[reportStateKey] !== todayKST;
   if (shouldReport) {
     const analysts = analystData?.analysts || [];
     const bulls    = analysts.filter(a => a.bullPct >= 60);
@@ -313,13 +307,25 @@ async function main() {
         + `<b>⚡ 단기 전문</b>\n${makeLines(shorttermIds)}`
       : '';
 
+    // 지표 현황: 변경된 지표는 "이전구간 → 현재구간" 표시
     const metricLines = metricChecks
       .filter(m => m.cur)
-      .map(m => `• ${m.label}: <b>${m.cur}</b>`)
+      .map(m => {
+        const prevZone = prev.zones?.[m.key];
+        if (prevZone && prevZone !== m.cur) {
+          return `• ${m.label}: <s>${prevZone}</s> → <b>${m.cur}</b>`;
+        }
+        return `• ${m.label}: <b>${m.cur}</b>`;
+      })
       .join('\n');
     const metricSection = `\n\n──── 📈 온체인 지표 현황 ────\n${metricLines}`;
 
-    const reportMsg = `📅 <b>Onchain Signal 정기알림</b>\n${now}\n\n${summary}${metricSection}${analystSection}\n\n`
+    // 이전 회차 대비 구간 변경 요약 (changes 배열 재활용)
+    const changesSection = changes.length > 0
+      ? `\n\n──── 🔄 전 회차 대비 변경 ────\n${changes.join('\n\n')}`
+      : '';
+
+    const reportMsg = `📅 <b>Onchain Signal 정기알림 (${reportLabel})</b>\n${now}\n\n${summary}${metricSection}${changesSection}${analystSection}\n\n`
       + (immediateAlerts.length > 0
           ? `⚠️ 활성 즉시알림: ${immediateAlerts.length}건\n` + immediateAlerts.join('\n')
           : '✅ 즉시 알림 조건 없음');
@@ -343,7 +349,8 @@ async function main() {
     ),
     btcPrice,
     fg,
-    lastReportDate: shouldReport ? todayKST : (prev.lastReportDate || null),
+    lastMorningDate: (shouldReport && REPORT_TYPE === 'morning') ? todayKST : (prev.lastMorningDate || null),
+    lastEveningDate: (shouldReport && REPORT_TYPE === 'evening') ? todayKST : (prev.lastEveningDate || null),
     updatedAt: new Date().toISOString(),
   };
   writeState(newState);

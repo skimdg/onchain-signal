@@ -1,13 +1,11 @@
 /**
  * update-onchain.js — 온체인 지표 자동 수집
  *
- * ① BGeometrics (bitcoin-data.com) — 무료, API 키 불필요
- *    수집: mvrvZ, nupl, sopr, puell, funding, lthSopr, sthSopr, reserveRisk (8개)
+ * BGeometrics (bitcoin-data.com) — 무료, API 키 불필요
+ *   BATCH=morning (07:20 KST): mvrvZ, nupl, sopr, puell, funding, lthSopr, sthSopr, reserveRisk (8개)
+ *   BATCH=evening (18:20 KST): netflow, nrpl, exchReserve, utxo1m, utxo7yr (5개)
  *
- * ② Foredex.io — Professional 플랜($50/mo), FOREDEX_API_KEY 환경변수 필요
- *    수집: exchReserve, netflow, nrpl, utxo1m, utxo7yr (5개)
- *    설정: GitHub Settings → Secrets → Actions → FOREDEX_API_KEY
- *
+ * 제한: 시간당 8회, 하루 15회 (IP 기준)
  * 출력: onchain-data.json (루트, GitHub Actions이 commit)
  */
 
@@ -17,23 +15,12 @@ const path = require('path');
 const OUTPUT_PATH = path.join(__dirname, '..', 'onchain-data.json');
 const BASE_URL    = 'https://bitcoin-data.com/v1';
 
-// ── 수집 지표 정의 ────────────────────────────────────────────
-// ※ API 제한: 시간당 ~7회 (IP 기준), 하루 15회
-// ※ 각 지표당 URL 1개만 유지 (404도 rate limit 소모 → 낭비 제거)
-//
-// ※ 404 확정 (무료 티어 미제공) — 대시보드 수동 입력 전용:
-//   netflow(/v1/netflow), nrpl(/v1/nrpl),
-//   utxo1m(hodl-waves-realized-cap), utxo7yr/hodlWave1y2y(hodl-waves),
-//   exchReserve(exchange-reserve)
-//
-// ※ 수집 가능 지표 8개 (순서 = 우선순위):
-//   mvrv, nupl, sopr, puell, funding → 5개 안정 수집
-//   lthSopr, sthSopr, reserveRisk    → 나머지 3개 (rate limit 여유 시 수집)
-//
-// ※ 워크플로우 2회/일:
-//   07:00 KST — 상위 5개 안정 수집 + lthSopr/sthSopr 시도
-//   19:00 KST — sthSopr/reserveRisk 재시도 (일일 잔여 활용)
-const METRICS = [
+// BATCH=morning(기본): 8개 수집 | BATCH=evening: 5개 추가 수집
+const BATCH = process.env.BATCH || 'morning';
+console.log(`🕐 실행 배치: ${BATCH}`);
+
+// ── 아침 배치 (8개) ───────────────────────────────────────────
+const MORNING_METRICS = [
   {
     key:            'mvrvZ',
     label:          'MVRV Z-Score',
@@ -92,93 +79,50 @@ const METRICS = [
   },
 ];
 
-// ── Foredex.io API ────────────────────────────────────────────
-// FOREDEX_API_KEY 환경변수 있을 때만 실행
-// GitHub Secrets에 FOREDEX_API_KEY 등록 시 활성화
-const FOREDEX_BASE = 'https://api.foredex.io/external/v1';
-
-// foredex 수집 지표 (API 키 필요)
-const FOREDEX_METRICS = [
-  {
-    key:            'exchReserve',
-    label:          'Exchange Reserves',
-    endpoint:       '/exchange/reserve',
-    fieldCandidates:['reserve','total','btcReserve','btcAmount','amount','value'],
-    decimals:       0,
-  },
+// ── 저녁 배치 (5개, BGeometrics camelCase 엔드포인트) ──────────
+// ※ 엔드포인트명: kebab-case ❌ → camelCase 복수형 ✅
+// ※ 첫 실행 후 로그의 "최신 레코드" 에서 정확한 필드명 확인 가능
+const EVENING_METRICS = [
   {
     key:            'netflow',
-    label:          'Exchange Netflow',
-    endpoint:       '/exchange/flow',
-    fieldCandidates:['netflow','net_flow','netFlow','flow','value'],
+    label:          'Exchange Netflow (BTC)',
+    urlCandidates:  ['/v1/exchangeNetflowBtcs'],
+    fieldCandidates:['exchangeNetflowBtc', 'netflowBtc', 'netflow', 'value'],
     decimals:       0,
   },
   {
     key:            'nrpl',
-    label:          'NRPL',
-    endpoint:       '/onchain/nrpl',
-    fieldCandidates:['nrpl','value'],
+    label:          'NRPL (BTC)',
+    urlCandidates:  ['/v1/nrplBtcs'],
+    fieldCandidates:['nrplBtc', 'nrpl', 'value'],
     decimals:       0,
   },
   {
+    key:            'exchReserve',
+    label:          'Exchange Reserves (BTC)',
+    urlCandidates:  ['/v1/exchangeReserveBtcs'],
+    fieldCandidates:['exchangeReserveBtc', 'reserveBtc', 'reserve', 'value'],
+    decimals:       0,
+  },
+  {
+    // ※ 실현시가 HODL waves — 1주~1개월 밴드 필드명은 첫 실행 로그 확인 후 수정
     key:            'utxo1m',
-    label:          'UTXO 1W~1M',
-    // foredex 엔드포인트 명 미확인 → 응답 로그로 구조 파악
-    endpoint:       '/onchain/hodl-waves',
-    fieldCandidates:['utxo1m','oneWeekToOneMonth','1w1m','shortTerm','value'],
+    label:          'UTXO 1W~1M (%)',
+    urlCandidates:  ['/v1/realizedCapHodlWaveses'],
+    fieldCandidates:['oneWeekToOneMonth', '1wTo1m', 'week1month1', '1w1m', 'w1m'],
     decimals:       1,
   },
   {
+    // ※ 공급량 기준 HODL waves — 7년+ 밴드 필드명은 첫 실행 로그 확인 후 수정
     key:            'utxo7yr',
-    label:          'UTXO 7yr+',
-    endpoint:       '/onchain/hodl-waves',
-    fieldCandidates:['utxo7yr','sevenYearPlus','7yr','longTermHodl','value'],
+    label:          'UTXO 7yr+ (%)',
+    urlCandidates:  ['/v1/hodlWavesSupplies'],
+    fieldCandidates:['sevenYearsPlus', 'moreThan7y', '7yPlus', 'over7Years'],
     decimals:       2,
   },
 ];
 
-async function fetchForedex(metric) {
-  const key = process.env.FOREDEX_API_KEY;
-  if (!key) return null;
-
-  const url = `${FOREDEX_BASE}${metric.endpoint}?limit=3`;
-  try {
-    const res = await fetch(url, {
-      headers: { 'X-API-KEY': key, 'Accept': 'application/json' },
-      signal: AbortSignal.timeout(12000),
-    });
-    console.log(`   Foredex ${metric.endpoint}: HTTP ${res.status}`);
-    if (!res.ok) {
-      const errBody = await res.text().catch(() => '');
-      console.log(`   오류 본문: ${errBody.slice(0, 200)}`);
-      return null;
-    }
-    const body = await res.json();
-    // 응답 구조 로그 (첫 400자) — 초기 연동 시 필드명 파악용
-    console.log(`   응답 샘플:`, JSON.stringify(body).slice(0, 400));
-
-    // 배열 또는 {data:[...]} 구조 통합 처리
-    const rows = Array.isArray(body) ? body
-               : (body?.data ?? body?.items ?? body?.result ?? body);
-    const arr  = Array.isArray(rows) ? rows : [rows];
-    const value = extractLatest(arr, metric.fieldCandidates);
-    if (value != null) {
-      const rounded = parseFloat(value.toFixed(metric.decimals));
-      console.log(`   ✅ ${metric.key}: ${rounded}`);
-      return rounded;
-    }
-    console.log(`   ⚠️  필드 매칭 실패 — fieldCandidates 재확인 필요`);
-    return null;
-  } catch (e) {
-    console.log(`   오류: ${e.message}`);
-    return null;
-  }
-}
-
-// ── 날짜 헬퍼 ─────────────────────────────────────────────────
-function fmtDate(d) {
-  return d.toISOString().split('T')[0]; // YYYY-MM-DD
-}
+const METRICS = BATCH === 'evening' ? EVENING_METRICS : MORNING_METRICS;
 
 // ── 응답 배열(또는 단일 객체)에서 최신 값 추출 ───────────────
 function extractLatest(data, fieldCandidates) {
@@ -277,7 +221,7 @@ function loadPrev() {
 // ── MAIN ──────────────────────────────────────────────────────
 async function main() {
   console.log('🚀 BGeometrics 온체인 지표 수집 시작');
-  console.log(`   API: ${BASE_URL} | 하루 최대 15회 제한\n`);
+  console.log(`   API: ${BASE_URL} | 하루 최대 15회 | BATCH=${BATCH}\n`);
 
   const prev   = loadPrev();
   const result = { ...prev }; // 수집 실패한 지표는 이전 값 유지
@@ -293,28 +237,6 @@ async function main() {
       log.push(`  ⚠️  ${metric.label}: 수집 실패 → 이전값 ${prev[metric.key] ?? '없음'} 유지`);
     }
     await new Promise(r => setTimeout(r, 1500)); // 요청 간 간격
-  }
-
-  // ── Foredex.io 추가 지표 (API 키 있을 때만) ─────────────────
-  if (process.env.FOREDEX_API_KEY) {
-    console.log('\n🔑 FOREDEX_API_KEY 감지 → Foredex.io 지표 수집 시작');
-    // utxo1m/utxo7yr는 같은 엔드포인트(/onchain/hodl-waves) → 중복 요청 방지
-    const seenEndpoints = new Map(); // endpoint → {body, arr}
-    for (const metric of FOREDEX_METRICS) {
-      console.log(`\n📊 ${metric.label} (Foredex)`);
-      const value = await fetchForedex(metric);
-      if (value != null) {
-        result[metric.key] = value;
-        log.push(`  ✅ ${metric.label}: ${value}  (foredex:${metric.endpoint})`);
-      } else {
-        log.push(`  ⚠️  ${metric.label}: Foredex 수집 실패`);
-      }
-      await new Promise(r => setTimeout(r, 800));
-    }
-  } else {
-    console.log('\n   ℹ️  FOREDEX_API_KEY 없음 — exchReserve/netflow/nrpl/utxo 자동수집 불가');
-    console.log('   설정: GitHub Settings → Secrets → Actions → FOREDEX_API_KEY 에 foredex.io API 키 등록');
-    log.push('  ℹ️  Foredex: API 키 없음 (exchReserve/netflow/nrpl/utxo1m/utxo7yr 수동 유지)');
   }
 
   result.updatedAt    = new Date().toISOString();
