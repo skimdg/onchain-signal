@@ -65,23 +65,18 @@ function loadOnchainData() {
 
 const MANUAL = loadOnchainData();
 
-// 애널리스트 이름 맵
+// 애널리스트 이름 맵 (foredex.io TOP 10)
 const NAME_MAP = {
-  capriole:     'Charles Edwards',
-  checkmate:    'Checkmate',
-  kiyoungju:    'Ki Young Ju',
-  willclemente: 'Will Clemente',
-  bencowen:     'Ben Cowen',
-  maartunn:     'Maartunn',
-  axeladler:    'Axel Adler Jr',
-  cryptoviz:    'CryptoVizArt',
-  skew:         'Skew',
-  carpenoctom:  'CarpeNoctom',
-  route2fi:     'Route 2 Fi',
-  alexkruger:   'Alex Kruger',
-  crypnuevo:    'CrypNuevo',
-  ecoinometrics:'ecoinometrics',
-  rektcapital:  'Rekt Capital',
+  dancoininvestor:  'Crypto Dan',
+  whitepeach:       '백도',
+  gaah_im:          'Gaah',
+  crypto_glass:     'Zizcrypto',
+  abramchart:       'AbramChart',
+  colu_farmer:      '코루',
+  defioasis:        'defioasis.eth',
+  fivedragontigger: '오룡타이거',
+  satoureireal:     'Rei Researcher',
+  simplspark:       '심플',
 };
 
 // ══════════════════════════════════════════════════════════════
@@ -288,8 +283,10 @@ async function main() {
     const neuts    = analysts.filter(a => a.bullPct >= 40 && a.bullPct < 60);
     const bears    = analysts.filter(a => a.bullPct < 40);
 
-    const onchainIds   = ['capriole','checkmate','kiyoungju','willclemente','bencowen','maartunn','axeladler','cryptoviz','skew','carpenoctom'];
-    const shorttermIds = ['route2fi','alexkruger','crypnuevo','ecoinometrics','rektcapital'];
+    // 온체인 장기: Crypto Dan, Gaah, Zizcrypto, AbramChart, defioasis.eth, Rei Researcher
+    const onchainIds   = ['dancoininvestor','gaah_im','crypto_glass','abramchart','defioasis','satoureireal'];
+    // 트레이딩 단기: 백도, 코루, 오룡타이거, 심플
+    const shorttermIds = ['whitepeach','colu_farmer','fivedragontigger','simplspark'];
 
     const makeLines = ids => ids
       .map(id => analysts.find(a => a.id === id))

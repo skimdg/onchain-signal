@@ -14,23 +14,19 @@ const path = require('path');
 
 const OUTPUT_PATH = path.join(__dirname, '..', 'analyst-data.json');
 
+// foredex.io 분석가 순위 TOP 10
+// korean:true — 한국어 뉴스 검색 병행, 한국어 감성 구문 적용
 const ANALYSTS = [
-  { id:'capriole',     name:'Charles Edwards', handle:'caprioleio',      specialty:'해시 리본 · 온체인 정량 모델' },
-  { id:'checkmate',    name:'Checkmate',        handle:'_Checkmatey_',    specialty:'UTXO · 사이클 온체인 분석' },
-  { id:'kiyoungju',    name:'Ki Young Ju',      handle:'ki_young_ju',     specialty:'거래소 플로우 · 고래 추적' },
-  { id:'willclemente', name:'Will Clemente',    handle:'WClementeIII',    specialty:'기관 온체인 · 수요 분석' },
-  { id:'bencowen',     name:'Ben Cowen',        handle:'intocryptoverse', specialty:'수학 사이클 · 확률 기반 모델' },
-  { id:'maartunn',     name:'Maartunn',          handle:'JA_Maartun',      specialty:'OI · 레버리지 분석' },
-  { id:'axeladler',    name:'Axel Adler Jr',    handle:'AxelAdlerJr',     specialty:'거시 경제 + 온체인 통합' },
-  { id:'cryptoviz',    name:'CryptoVizArt',     handle:'CryptovizArt',    specialty:'알트코인 · 네트워크 지표' },
-  { id:'skew',         name:'Skew',              handle:'52kskew',         specialty:'파생상품 · OI 심층 분석' },
-  { id:'carpenoctom',  name:'CarpeNoctom',       handle:'CarpeNoctom',     specialty:'포지션 트레이딩 · 거시 전략' },
-  // ── 단기 전문 ──────────────────────────────────────────────
-  { id:'route2fi',     name:'Route 2 Fi',        handle:'Route2FI',        specialty:'단기 가격 예측 · TA 사이클' },
-  { id:'alexkruger',   name:'Alex Kruger',       handle:'krugermacro',     specialty:'거시 경제 · 단기 트레이딩' },
-  { id:'crypnuevo',    name:'CrypNuevo',          handle:'CrypNuevo',       specialty:'기술적 분석 · 단기 차트' },
-  { id:'ecoinometrics',name:'ecoinometrics',     handle:'ecoinometrics',   specialty:'계량 경제 · 단기 사이클' },
-  { id:'rektcapital',  name:'Rekt Capital',      handle:'rektcapital',     specialty:'차트 패턴 · 지지/저항 분석' },
+  { id:'dancoininvestor',  name:'Crypto Dan',       handle:'dancoininvestor',  specialty:'온체인 장기 · 사이클 분석' },
+  { id:'whitepeach',       name:'백도',              handle:'whitepeach',       specialty:'트레이딩 · 단기 가격 예측', korean:true },
+  { id:'gaah_im',          name:'Gaah',              handle:'gaah_im',          specialty:'온체인 장기 분석' },
+  { id:'crypto_glass',     name:'Zizcrypto',         handle:'_crypto_glass',    specialty:'온체인 장기 · UTXO 분석' },
+  { id:'abramchart',       name:'AbramChart',        handle:'abramchart',       specialty:'온체인 장기 · 차트 패턴' },
+  { id:'colu_farmer',      name:'코루',              handle:'colu_farmer',      specialty:'트레이딩 · 단기 전략', korean:true },
+  { id:'defioasis',        name:'defioasis.eth',     handle:'defioasis',        specialty:'온체인 장기 · DeFi 분석' },
+  { id:'fivedragontigger', name:'오룡타이거',         handle:'fivedragontigger', specialty:'트레이딩 · 포지션 관리', korean:true },
+  { id:'satoureireal',     name:'Rei Researcher',    handle:'satoureireal',     specialty:'온체인 장기 연구' },
+  { id:'simplspark',       name:'심플',              handle:'simplspark',       specialty:'트레이딩 · 단기 분석', korean:true },
 ];
 
 // ── 감성 구문 (문맥 포함 — 단일 단어 의존 탈피) ──────────────
@@ -52,6 +48,16 @@ const BULL_PHRASES = [
   'upside ahead', 'sees upside', 'higher highs',
   'recovery confirmed', 'trend reversal', 'bull run',
   'institutional buying', 'accumulation zone',
+];
+
+// 한국어 감성 구문 (korean:true 애널리스트 기사에 적용)
+const KO_BEAR_PHRASES = [
+  '하락', '매도', '조정', '약세', '폭락', '경고', '주의', '손절',
+  '저항', '고점', '단기 고점', '돌파 실패', '리스크', '위험',
+];
+const KO_BULL_PHRASES = [
+  '상승', '매수', '강세', '돌파', '목표가', '바닥', '반등', '축적',
+  '롱', '불런', '저점 매수', '지지', '상방', '급등',
 ];
 
 let prevData = {};
@@ -88,8 +94,12 @@ function parseRSS(xml) {
 
 // ── Google News RSS 검색 ───────────────────────────────────────
 async function fetchNews(analyst) {
-  // 직접 발언 위주 검색 (says/warns/predicts 포함)
-  const queries = [
+  // korean:true 애널리스트 — 한국어 Google News 병행 검색
+  const queries = analyst.korean ? [
+    `${analyst.handle} 비트코인`,
+    `"${analyst.name}" 비트코인 상승 OR 하락 OR 전망`,
+    `${analyst.handle} bitcoin`,
+  ] : [
     `"${analyst.name}" bitcoin says OR warns OR predicts OR expects`,
     `"${analyst.name}" bitcoin bullish OR bearish`,
     `${analyst.handle} bitcoin`,
@@ -98,7 +108,8 @@ async function fetchNews(analyst) {
   const allItems = [];
   for (const q of queries) {
     try {
-      const url = `https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=en&gl=US&ceid=US:en`;
+      const locale = analyst.korean ? 'hl=ko&gl=KR&ceid=KR:ko' : 'hl=en&gl=US&ceid=US:en';
+      const url = `https://news.google.com/rss/search?q=${encodeURIComponent(q)}&${locale}`;
       const res = await fetch(url, {
         headers: { 'User-Agent': 'Mozilla/5.0 (compatible; OnchainSignal/1.0)' },
         signal:  AbortSignal.timeout(12000),
@@ -118,11 +129,11 @@ async function fetchNews(analyst) {
 // ── 스탠스 계산 — 직접 발언(제목에 이름 포함) + BTC 언급 기사만 채점 ──
 // ★ 핵심 원칙:
 //   1. 제목에 애널리스트 이름 또는 핸들이 없으면 무시 (간접 기사 제외)
-//   2. 제목+본문에 bitcoin/btc 언급 없으면 무시 (XRP·ETH·HYPE 등 제외)
+//   2. 제목+본문에 bitcoin/btc/비트코인 언급 없으면 무시 (XRP·ETH·HYPE 등 제외)
 //   3. 위 두 조건을 모두 만족하는 기사가 60일 내 없으면 null 반환 (이전값 유지)
-function calcStance(items, analystFirstName, analystHandle) {
+function calcStance(items, analystFirstName, analystHandle, isKorean = false) {
   const now    = Date.now();
-  const handle = analystHandle.replace('@', '').toLowerCase();
+  const handle = (analystHandle || '').replace('@', '').toLowerCase();
   let bull = 0, bear = 0, directRecent = 0;
 
   items.forEach(({ title, desc, pubDate }) => {
@@ -133,8 +144,8 @@ function calcStance(items, analystFirstName, analystHandle) {
     const titleLow = title.toLowerCase();
     const fullTxt  = (title + ' ' + desc).toLowerCase();
 
-    // ① 제목에 BTC/Bitcoin 언급 필수 (다른 코인 단독 기사 차단)
-    if (!/\b(bitcoin|btc)\b/.test(fullTxt)) return;
+    // ① BTC/Bitcoin 또는 비트코인 언급 필수 (다른 코인 단독 기사 차단)
+    if (!/\b(bitcoin|btc)\b/.test(fullTxt) && !/비트코인/.test(fullTxt)) return;
 
     // ② 제목에 애널리스트 이름 또는 핸들 필수 (직접 발언 기사만 인정)
     const isDirect = titleLow.includes(analystFirstName.toLowerCase())
@@ -157,6 +168,11 @@ function calcStance(items, analystFirstName, analystHandle) {
     BULL_PHRASES.forEach(p => {
       if (matchPhrase(fullTxt, p)) negBull ? (bear += weight * 0.5) : (bull += weight);
     });
+    // 한국어 감성 구문 (korean 애널리스트)
+    if (isKorean) {
+      KO_BEAR_PHRASES.forEach(p => { if (fullTxt.includes(p)) bear += weight; });
+      KO_BULL_PHRASES.forEach(p => { if (fullTxt.includes(p)) bull += weight; });
+    }
   });
 
   // 60일 내 직접 발언 기사 없으면 신호 없음 → 이전값 유지
@@ -172,7 +188,7 @@ async function scanOne(analyst) {
   console.log(`\n🔍 ${analyst.name}`);
   const items    = await fetchNews(analyst);
   const firstName = analyst.name.split(' ')[0];
-  const bullPct   = calcStance(items, firstName, analyst.handle);
+  const bullPct   = calcStance(items, firstName, analyst.handle, analyst.korean || false);
 
   if (bullPct === null) {
     const prev = prevData[analyst.id];
