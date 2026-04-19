@@ -1,18 +1,98 @@
 {
   "analysts": [
-    { "id": "dancoininvestor",  "bullPct": 50, "summary": "(최근 뉴스 없음)", "headlines": [], "sourceUrls": [], "lastScan": null, "scanning": false },
-    { "id": "whitepeach",       "bullPct": 50, "summary": "(최근 뉴스 없음)", "headlines": [], "sourceUrls": [], "lastScan": null, "scanning": false },
-    { "id": "gaah_im",          "bullPct": 50, "summary": "(최근 뉴스 없음)", "headlines": [], "sourceUrls": [], "lastScan": null, "scanning": false },
-    { "id": "crypto_glass",     "bullPct": 50, "summary": "(최근 뉴스 없음)", "headlines": [], "sourceUrls": [], "lastScan": null, "scanning": false },
-    { "id": "abramchart",       "bullPct": 50, "summary": "(최근 뉴스 없음)", "headlines": [], "sourceUrls": [], "lastScan": null, "scanning": false },
-    { "id": "colu_farmer",      "bullPct": 50, "summary": "(최근 뉴스 없음)", "headlines": [], "sourceUrls": [], "lastScan": null, "scanning": false },
-    { "id": "defioasis",        "bullPct": 50, "summary": "(최근 뉴스 없음)", "headlines": [], "sourceUrls": [], "lastScan": null, "scanning": false },
-    { "id": "fivedragontigger", "bullPct": 50, "summary": "(최근 뉴스 없음)", "headlines": [], "sourceUrls": [], "lastScan": null, "scanning": false },
-    { "id": "satoureireal",     "bullPct": 50, "summary": "(최근 뉴스 없음)", "headlines": [], "sourceUrls": [], "lastScan": null, "scanning": false },
-    { "id": "simplspark",       "bullPct": 50, "summary": "(최근 뉴스 없음)", "headlines": [], "sourceUrls": [], "lastScan": null, "scanning": false }
+    {
+      "id": "dancoininvestor",
+      "bullPct": 50,
+      "summary": "(최근 뉴스 없음)",
+      "headlines": [],
+      "sourceUrls": [],
+      "lastScan": null,
+      "scanning": false
+    },
+    {
+      "id": "whitepeach",
+      "bullPct": 50,
+      "summary": "(최근 뉴스 없음)",
+      "headlines": [],
+      "sourceUrls": [],
+      "lastScan": null,
+      "scanning": false
+    },
+    {
+      "id": "gaah_im",
+      "bullPct": 50,
+      "summary": "(최근 뉴스 없음)",
+      "headlines": [],
+      "sourceUrls": [],
+      "lastScan": null,
+      "scanning": false
+    },
+    {
+      "id": "crypto_glass",
+      "bullPct": 50,
+      "summary": "(최근 뉴스 없음)",
+      "headlines": [],
+      "sourceUrls": [],
+      "lastScan": null,
+      "scanning": false
+    },
+    {
+      "id": "abramchart",
+      "bullPct": 50,
+      "summary": "(최근 뉴스 없음)",
+      "headlines": [],
+      "sourceUrls": [],
+      "lastScan": null,
+      "scanning": false
+    },
+    {
+      "id": "colu_farmer",
+      "bullPct": 50,
+      "summary": "(최근 뉴스 없음)",
+      "headlines": [],
+      "sourceUrls": [],
+      "lastScan": null,
+      "scanning": false
+    },
+    {
+      "id": "defioasis",
+      "bullPct": 50,
+      "summary": "(최근 뉴스 없음)",
+      "headlines": [],
+      "sourceUrls": [],
+      "lastScan": null,
+      "scanning": false
+    },
+    {
+      "id": "fivedragontigger",
+      "bullPct": 50,
+      "summary": "(최근 뉴스 없음)",
+      "headlines": [],
+      "sourceUrls": [],
+      "lastScan": null,
+      "scanning": false
+    },
+    {
+      "id": "satoureireal",
+      "bullPct": 50,
+      "summary": "(최근 뉴스 없음)",
+      "headlines": [],
+      "sourceUrls": [],
+      "lastScan": null,
+      "scanning": false
+    },
+    {
+      "id": "simplspark",
+      "bullPct": 50,
+      "summary": "(최근 뉴스 없음)",
+      "headlines": [],
+      "sourceUrls": [],
+      "lastScan": null,
+      "scanning": false
+    }
   ],
   "avgBull": 50,
-  "updatedAt": "2026-04-19T00:00:00.000Z",
-  "updatedAtKST": "2026. 4. 19. 오전 9:00:00",
+  "updatedAt": "2026-04-19T22:46:23.591Z",
+  "updatedAtKST": "2026. 4. 20. AM 7:46:23",
   "method": "web-search"
 }
