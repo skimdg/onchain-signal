@@ -511,7 +511,8 @@ let ANALYSTS = [
 // ※ exchReserve: CoinGlass API로 자동 수집 시도 (실패 시 기본값 사용)
 let MANUAL = { mvrvZ:0.43, nupl:0.15, sopr:0.98, netflow:-5000, funding:0.008, puell:0.62,
                utxo1m:8.5, utxo7yr:27.5,
-               nrpl:null, exchReserve:2380000, hodlWave1y2y:null, lthSopr:null, sthSopr:null, reserveRisk:null };
+               nrpl:null, exchReserve:2380000, hodlWave1y2y:null, lthSopr:null, sthSopr:null, reserveRisk:null,
+               etfFlow:null };
 // 수동갱신 필요 지표 목록 (배지 표시용)
 const MANUAL_ONLY = new Set(['utxo1m','utxo7yr','exchReserve','nrpl','hodlWave1y2y']);
 let ONCHAIN_UPDATED = null; // 마지막 자동 업데이트 시각
@@ -535,6 +536,7 @@ async function loadOnchainData() {
     if (d.lthSopr     != null) MANUAL.lthSopr     = d.lthSopr;
     if (d.sthSopr     != null) MANUAL.sthSopr     = d.sthSopr;
     if (d.reserveRisk != null) MANUAL.reserveRisk = d.reserveRisk;
+    if (d.etfFlow     != null) MANUAL.etfFlow     = d.etfFlow;
     ONCHAIN_UPDATED = d.updatedAtKST || d.updatedAt || null;
     console.log('📊 온체인 데이터 로드:', ONCHAIN_UPDATED);
   } catch(e) {
@@ -556,6 +558,7 @@ function fmt(n){ return (n==null||isNaN(n))?'—':n.toLocaleString('en-US',{maxi
 function fmtP(n){ if(!n)return'—'; if(n>=1000)return'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); return'$'+n.toFixed(4); }
 function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
 function fmtNRPL(v){ if(v==null||isNaN(v)) return'—'; const s=v>=0?'+':'-'; const a=Math.abs(v); return `${s}${a.toLocaleString('en-US',{maximumFractionDigits:0})}`; }
+function fmtEtfFlow(v){ if(v==null||isNaN(v)) return'—'; const s=v>=0?'+':'-'; const a=Math.abs(v); return a>=1e9?`${s}$${(a/1e9).toFixed(2)}B`:a>=1e6?`${s}$${(a/1e6).toFixed(0)}M`:`${s}$${a.toLocaleString('en-US',{maximumFractionDigits:0})}`; }
 function fmtReserve(v){ if(v==null||isNaN(v)) return'—'; return v>=1e6?`${(v/1e6).toFixed(3)}M BTC`:v>=1e3?`${(v/1e3).toFixed(0)}K BTC`:`${v.toFixed(0)} BTC`; }
 
 // ═══════════════════════════════════════════════════════════════
@@ -703,6 +706,12 @@ function metricSt(id,v){
       if(v<0.01)  return{cls:'b-neu', lbl:'중립',    itp:`Reserve Risk ${v} — 보통 수준, 홀드`};
       if(v<0.02)  return{cls:'b-neu', lbl:'주의',    itp:`Reserve Risk ${v} — 위험 증가, 신규 매수 자제`};
       return            {cls:'b-bear',lbl:'분배',    itp:`Reserve Risk ${v} — 극단 위험 구간, 분배·익절`};
+    case'etfflow':
+      if(v<-300e6) return{cls:'b-bear',lbl:'강유출',  itp:`ETF 일일 ${fmtEtfFlow(v)} — 기관 강한 매도, 약세 신호`};
+      if(v<0)      return{cls:'b-neu', lbl:'순유출',  itp:`ETF 일일 ${fmtEtfFlow(v)} — 기관 매도 우세`};
+      if(v<100e6)  return{cls:'b-neu', lbl:'중립',   itp:`ETF 일일 ${fmtEtfFlow(v)} — 소폭 유입, 관망`};
+      if(v<300e6)  return{cls:'b-bull',lbl:'유입',   itp:`ETF 일일 ${fmtEtfFlow(v)} — 기관 매수 우세, 강세`};
+      return            {cls:'b-bull',lbl:'강유입',  itp:`ETF 일일 ${fmtEtfFlow(v)} — 기관 강한 매수, 강력 강세`};
     case'coinbasepremium':
       if(v<-0.2) return{cls:'b-bear',lbl:'디스카운트',itp:`코인베이스 디스카운트 ${v}% — 미국 기관 매도 우세, 주의`};
       if(v<0)    return{cls:'b-neu', lbl:'약매도',   itp:`코인베이스 프리미엄 ${v}% — US 수요 약함, 매수`};
@@ -776,7 +785,10 @@ const ZONES = {
                  segs:[{max:0.9,color:'#16a34a',lbl:'LTH항복'},{max:1.0,color:'#84cc16',lbl:'LTH손실'},{max:1.5,color:'#22c55e',lbl:'초기상승'},{max:2.5,color:'#eab308',lbl:'중기'},{max:4.0,color:'#f97316',lbl:'후기경고'},{max:6.0,color:'#e03535',lbl:'분배'}] },
   reserverisk: { desc:'장기 보유자 기회비용 대비 리스크. 낮을수록 매수 적기(보유자 확신 극대), 높을수록 분배 구간',
                  min:0, max:0.025,
-                 segs:[{max:0.002,color:'#22c55e',lbl:'강력매수'},{max:0.005,color:'#84cc16',lbl:'매수'},{max:0.010,color:'#eab308',lbl:'중립'},{max:0.020,color:'#f97316',lbl:'주의'},{max:0.025,color:'#e03535',lbl:'분배'}] }
+                 segs:[{max:0.002,color:'#22c55e',lbl:'강력매수'},{max:0.005,color:'#84cc16',lbl:'매수'},{max:0.010,color:'#eab308',lbl:'중립'},{max:0.020,color:'#f97316',lbl:'주의'},{max:0.025,color:'#e03535',lbl:'분배'}] },
+  etfflow:     { desc:'비트코인 현물 ETF 일일 순유입(USD). 양수=기관 매수(강세), 음수=기관 매도(약세)',
+                 min:-600e6, max:800e6,
+                 segs:[{max:-300e6,color:'#e03535',lbl:'강유출'},{max:0,color:'#f97316',lbl:'순유출'},{max:100e6,color:'#eab308',lbl:'중립'},{max:300e6,color:'#84cc16',lbl:'유입'},{max:800e6,color:'#22c55e',lbl:'강유입'}] }
 };
 
 function makeZoneBar(id, val){
@@ -809,7 +821,7 @@ function checkAlerts(){
   const al=[];
   const {fearGreed:fg,stableMcap:st,coinbasePremium:cp}=LIVE;
   const {mvrvZ:z,nupl:n,sopr:s,netflow:nf,funding:fr,puell:pu,
-         utxo1m:u1m,utxo7yr:u7yr,nrpl:nrl,lthSopr:lth,reserveRisk:rr}=MANUAL;
+         utxo1m:u1m,utxo7yr:u7yr,nrpl:nrl,lthSopr:lth,reserveRisk:rr,etfFlow:etf}=MANUAL;
 
   // ── 매도 경고 (bear / neu) ──────────────────────────────────
   if(fg!=null&&fg>=76)   al.push({t:'bear',m:`F&G ${fg} — 극도탐욕. 사이클 고점 신호, 즉시 익절`});
@@ -832,6 +844,8 @@ function checkAlerts(){
   else if(u7yr!=null&&u7yr<=25) al.push({t:'neu', m:`UTXO 7yr+ ${u7yr}% — LTH 분배 시작(<25%). 주의`});
   if(nrl!=null&&nrl>=80000) al.push({t:'bear',m:`NRPL +${fmt(nrl)} BTC — 극대 이익실현(>80k). 분배 경고`});
   if(cp!=null&&cp<-0.2) al.push({t:'neu', m:`Coinbase 디스카운트 ${cp}% — 미국 기관 매도 우세. 주의`});
+  if(etf!=null&&etf<-300e6) al.push({t:'bear',m:`ETF 순유출 ${fmtEtfFlow(etf)} — 기관 강한 매도. 약세 신호`});
+  else if(etf!=null&&etf<0) al.push({t:'neu', m:`ETF 순유출 ${fmtEtfFlow(etf)} — 기관 매도 우세. 주의`});
 
   // ── 역발상 매수 신호 (entry) ────────────────────────────────
   if(fg!=null&&fg<=24&&z<1.5) al.push({t:'entry',m:`📍 역발상 구간 — 극도공포+저평가 동시 발생. 분할 매수`});
@@ -846,6 +860,7 @@ function checkAlerts(){
   if(nrl!=null&&nrl<-30000) al.push({t:'entry',m:`📍 NRPL ${fmt(nrl)} BTC — 극도 손실 패닉(<-30k). 바닥 신호`});
   if(u7yr!=null&&u7yr>35) al.push({t:'entry',m:`📍 UTXO 7yr+ ${u7yr}% — 공급 쇼크 극대(>35%). 강력 매수`});
   if(cp!=null&&cp>0.5)  al.push({t:'entry',m:`📍 Coinbase +${cp}% — 미국 기관 FOMO(>0.5%). 강력 매수 신호`});
+  if(etf!=null&&etf>300e6) al.push({t:'entry',m:`📍 ETF 순유입 ${fmtEtfFlow(etf)} — 기관 강한 매수(>$300M). 강력 강세`});
   if(st!=null&&st>300)  al.push({t:'entry',m:`📍 스테이블코인 $${st.toFixed(0)}B — 대기 매수력 최대`});
   return al;
 }
@@ -1048,6 +1063,7 @@ function renderMetrics(){
         {id:'funding',     nm:'Funding Rate',        val:funding,             disp:`${funding>=0?'+':''}${funding}%`, field:'funding', step:'0.001'},
         {id:'puell',       nm:'Puell Multiple',      val:puell,               disp:`${puell}`,           field:'puell',    step:'0.01'},
         {id:'tvl',         nm:'DeFi TVL',            val:tvl!=null?Math.round(tvl):null, auto:true, disp:tvl!=null?`$${tvl.toFixed(1)}B`:'—'},
+        {id:'etfflow',     nm:'Spot ETF 순유입 (일일)', val:MANUAL.etfFlow,        disp:fmtEtfFlow(MANUAL.etfFlow), field:'etfFlow', step:'1000000'},
       ]
     }
   ];
@@ -1186,7 +1202,7 @@ function recalc(){
   renderGauge(cy,en); renderBreakdown(bd); renderAlerts(checkAlerts()); renderStrategy(cy,co); updateConUI();
   // update metric badges only
   ['fg','mvrv','nupl','sopr','netflow','funding','puell','tvl','coinbasepremium','utxo1m','utxo7yr',
-   'nrpl','exchreserve','hodlwave','lthsopr','reserverisk'].forEach(id=>{
+   'nrpl','exchreserve','hodlwave','lthsopr','reserverisk','etfflow'].forEach(id=>{
     let v; switch(id){
       case'fg':v=LIVE.fearGreed;break; case'mvrv':v=MANUAL.mvrvZ;break;
       case'nupl':v=MANUAL.nupl;break; case'sopr':v=MANUAL.sopr;break;
@@ -1194,6 +1210,7 @@ function recalc(){
       case'puell':v=MANUAL.puell;break;
       case'tvl':v=LIVE.defiTvl!=null?Math.round(LIVE.defiTvl):null;break;
       case'coinbasepremium':v=LIVE.coinbasePremium;break;
+      case'etfflow':v=MANUAL.etfFlow;break;
       case'utxo1m':v=MANUAL.utxo1m;break; case'utxo7yr':v=MANUAL.utxo7yr;break;
       case'nrpl':v=MANUAL.nrpl;break; case'exchreserve':v=MANUAL.exchReserve;break;
       case'hodlwave':v=MANUAL.hodlWave1y2y;break; case'lthsopr':v=MANUAL.lthSopr;break;
@@ -1221,7 +1238,7 @@ function updateManual(field,val){
   const idMap={mvrvZ:'mvrv',nupl:'nupl',sopr:'sopr',netflow:'netflow',funding:'funding',puell:'puell',
                utxo1m:'utxo1m',utxo7yr:'utxo7yr',
                nrpl:'nrpl',exchReserve:'exchreserve',hodlWave1y2y:'hodlwave',
-               lthSopr:'lthsopr',sthSopr:'lthsopr',reserveRisk:'reserverisk'};
+               lthSopr:'lthsopr',sthSopr:'lthsopr',reserveRisk:'reserverisk',etfFlow:'etfflow'};
   const mid=idMap[field]; if(!mid) return;
   const mc=document.getElementById(`mc-${mid}`); if(!mc) return;
   const zw=mc.querySelector('.zbar-wrap');

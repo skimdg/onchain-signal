@@ -120,6 +120,15 @@ const EVENING_METRICS = [
     fieldCandidates:['sevenYearsPlus', 'moreThan7y', '7yPlus', 'over7Years'],
     decimals:       2,
   },
+  {
+    // 현물 ETF 일일 순유입(USD). 양수=기관매수, 음수=기관매도
+    // ※ 첫 실행 로그에서 필드명/단위(USD vs BTC) 확인 필요
+    key:            'etfFlow',
+    label:          'Spot ETF 순유입 (일일)',
+    urlCandidates:  ['/v1/etfFlows', '/v1/etfBtcTotals'],
+    fieldCandidates:['etfFlow', 'netFlow', 'flow', 'etfBtcTotal', 'total', 'value'],
+    decimals:       0,
+  },
 ];
 
 const METRICS = BATCH === 'evening' ? EVENING_METRICS : MORNING_METRICS;
