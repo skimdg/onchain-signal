@@ -5,16 +5,16 @@
   "netflow": -5000,
   "funding": -0.00005,
   "puell": 0.835,
-  "utxo1m": 0,
-  "utxo7yr": 160144.53,
+  "utxo1m": 2.9,
+  "utxo7yr": 25.9,
   "nrpl": null,
   "exchReserve": null,
   "hodlWave1y2y": null,
   "lthSopr": 0.9667,
   "sthSopr": 1,
   "reserveRisk": 0.000636,
-  "updatedAt": "2026-04-20T14:56:24.799Z",
-  "updatedAtKST": "2026. 4. 20. PM 11:56:24",
+  "updatedAt": "2026-04-20T15:02:23.245Z",
+  "updatedAtKST": "2026. 4. 21. AM 12:02:23",
   "source": "bitcoin-data.com (BGeometrics)",
-  "etfFlow": -53
+  "etfFlow": -53.3
 }
