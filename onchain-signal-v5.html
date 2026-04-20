@@ -482,25 +482,20 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 //  ★ 애널리스트 수정 구역 — 추가/삭제/수정 가능 ★
 //  bullPct: 현재 강세 확률 (0~100), 0~39=약세, 40~59=중립, 60~100=강세
 // ═══════════════════════════════════════════════════════════════
-// ★ 연구 기반 데이터 (2026.04 조사) — AI 재분석 버튼으로 최신화 가능
+// ★ foredex.io TOP 10 (2026.04.19 교체) — AI 재분석 버튼으로 최신화 가능
 let ANALYSTS = [
   // ── 온체인 장기 ──────────────────────────────────────────────
-  { id:'capriole',    name:'Charles Edwards', handle:'@caprioleio',      specialty:'해시 리본 · 온체인 정량 모델', rank:'#1',  bullPct:45, summary:'가치 구간 진입, 딥밸류 미도달. 기관 순매수 재개',      lastScan:'2026.04 조사', scanning:false, category:'onchain' },
-  { id:'checkmate',   name:'Checkmate',        handle:'@_Checkmatey_',    specialty:'UTXO · 사이클 온체인 분석',   rank:'#2',  bullPct:30, summary:'공급 절반 손실권. 시간+가격 고통 공존, LTH 버팀',      lastScan:'2026.04 조사', scanning:false, category:'onchain' },
-  { id:'kiyoungju',   name:'Ki Young Ju',      handle:'@ki_young_ju',     specialty:'거래소 플로우 · 고래 추적',   rank:'#3',  bullPct:25, summary:'명백한 약세장. $55k 실현가 하락 후 회복 가능',          lastScan:'2026.04 조사', scanning:false, category:'onchain' },
-  { id:'willclemente',name:'Will Clemente',    handle:'@WClementeIII',    specialty:'기관 온체인 · 수요 분석',     rank:'#4',  bullPct:40, summary:'기관 주도 구조 변화. 온체인 지표 바닥권 탐색 중',        lastScan:'2026.04 조사', scanning:false, category:'onchain' },
-  { id:'bencowen',    name:'Ben Cowen',        handle:'@intocryptoverse', specialty:'수학 사이클 · 확률 기반 모델',rank:'#5',  bullPct:20, summary:'200주 SMA $60-70k 목표. 다음 하락 임박 경고',          lastScan:'2026.04 조사', scanning:false, category:'onchain' },
-  { id:'maartunn',    name:'Maartunn',          handle:'@JA_Maartun',      specialty:'OI · 레버리지 분석',         rank:'#6',  bullPct:28, summary:'OG 고래 숏 유지. 관세 충격 후 약세 신호 다수',          lastScan:'2026.04 조사', scanning:false, category:'onchain' },
-  { id:'axeladler',   name:'Axel Adler Jr',    handle:'@AxelAdlerJr',     specialty:'거시 경제 + 온체인 통합',     rank:'#7',  bullPct:32, summary:'방어 국면. 자본 순유출·스테이블 축적 없음',              lastScan:'2026.04 조사', scanning:false, category:'onchain' },
-  { id:'cryptoviz',   name:'CryptoVizArt',     handle:'@CryptovizArt',    specialty:'알트코인 · 네트워크 지표',    rank:'#8',  bullPct:38, summary:'실현 손실 $3억/일. 과도한 이익실현 소화 중',            lastScan:'2026.04 조사', scanning:false, category:'onchain' },
-  { id:'skew',        name:'Skew',              handle:'@52kskew',         specialty:'파생상품 · OI 심층 분석',    rank:'#9',  bullPct:30, summary:'코인베이스 프리미엄 음수. 현물 수요 지속 약세',          lastScan:'2026.04 조사', scanning:false, category:'onchain' },
-  { id:'carpenoctom', name:'CarpeNoctom',       handle:'@CarpeNoctom',     specialty:'포지션 트레이딩 · 거시 전략',rank:'#10', bullPct:42, summary:'매크로 변동성 지속. ETF·기관 수요가 구조적 하단 지지',  lastScan:'2026.04 조사', scanning:false, category:'onchain' },
-  // ── 단기 전문 ──────────────────────────────────────────────
-  { id:'route2fi',    name:'Route 2 Fi',        handle:'@Route2FI',        specialty:'단기 가격 예측 · TA 사이클', rank:'#1',  bullPct:30, summary:'단기 약세 구간. 지지선 붕괴 시 추가 하락 경고',          lastScan:'2026.04 조사', scanning:false, category:'shortterm' },
-  { id:'alexkruger',  name:'Alex Kruger',       handle:'@krugermacro',     specialty:'거시 경제 · 단기 트레이딩',  rank:'#2',  bullPct:65, summary:'관세 리스크 완화 기대. 단기 반등 가능성 주목',            lastScan:'2026.04 조사', scanning:false, category:'shortterm' },
-  { id:'crypnuevo',   name:'CrypNuevo',          handle:'@CrypNuevo',       specialty:'기술적 분석 · 단기 차트',   rank:'#3',  bullPct:30, summary:'주요 지지선 하회. 단기 추가 하락 구조 형성 중',          lastScan:'2026.04 조사', scanning:false, category:'shortterm' },
-  { id:'ecoinometrics',name:'ecoinometrics',    handle:'@ecoinometrics',   specialty:'계량 경제 · 단기 사이클',    rank:'#4',  bullPct:30, summary:'사이클 지표 약세 전환. 단기 회복까지 시간 필요',          lastScan:'2026.04 조사', scanning:false, category:'shortterm' },
-  { id:'rektcapital', name:'Rekt Capital',      handle:'@rektcapital',     specialty:'차트 패턴 · 지지/저항 분석', rank:'#5',  bullPct:30, summary:'반감기 후 조정 패턴 진행 중. 핵심 레벨 주시',            lastScan:'2026.04 조사', scanning:false, category:'shortterm' },
+  { id:'dancoininvestor', name:'Crypto Dan',      handle:'@dancoininvestor', specialty:'온체인 장기 · 사이클 분석', rank:'#1',  bullPct:50, summary:'(최근 뉴스 없음)', lastScan:null, scanning:false, category:'onchain' },
+  { id:'gaah_im',         name:'Gaah',            handle:'@gaah_im',         specialty:'온체인 장기 분석',          rank:'#2',  bullPct:50, summary:'(최근 뉴스 없음)', lastScan:null, scanning:false, category:'onchain' },
+  { id:'crypto_glass',    name:'Zizcrypto',       handle:'@_crypto_glass',   specialty:'온체인 장기 · UTXO 분석',  rank:'#3',  bullPct:50, summary:'(최근 뉴스 없음)', lastScan:null, scanning:false, category:'onchain' },
+  { id:'abramchart',      name:'AbramChart',      handle:'@abramchart',      specialty:'온체인 장기 · 차트 패턴',  rank:'#4',  bullPct:50, summary:'(최근 뉴스 없음)', lastScan:null, scanning:false, category:'onchain' },
+  { id:'defioasis',       name:'defioasis.eth',   handle:'@defioasis',       specialty:'온체인 장기 · DeFi 분석',  rank:'#5',  bullPct:50, summary:'(최근 뉴스 없음)', lastScan:null, scanning:false, category:'onchain' },
+  { id:'satoureireal',    name:'Rei Researcher',  handle:'@satoureireal',    specialty:'온체인 장기 연구',          rank:'#6',  bullPct:50, summary:'(최근 뉴스 없음)', lastScan:null, scanning:false, category:'onchain' },
+  // ── 트레이딩 단기 ────────────────────────────────────────────
+  { id:'whitepeach',        name:'백도',       handle:'@whitepeach',        specialty:'트레이딩 · 단기 가격 예측', rank:'#1',  bullPct:50, summary:'(최근 뉴스 없음)', lastScan:null, scanning:false, category:'shortterm' },
+  { id:'colu_farmer',       name:'코루',       handle:'@colu_farmer',       specialty:'트레이딩 · 단기 전략',      rank:'#2',  bullPct:50, summary:'(최근 뉴스 없음)', lastScan:null, scanning:false, category:'shortterm' },
+  { id:'fivedragontigger',  name:'오룡타이거', handle:'@fivedragontigger',  specialty:'트레이딩 · 포지션 관리',    rank:'#3',  bullPct:50, summary:'(최근 뉴스 없음)', lastScan:null, scanning:false, category:'shortterm' },
+  { id:'simplspark',        name:'심플',       handle:'@simplspark',        specialty:'트레이딩 · 단기 분석',      rank:'#4',  bullPct:50, summary:'(최근 뉴스 없음)', lastScan:null, scanning:false, category:'shortterm' },
 ];
 
 // ═══════════════════════════════════════════════════════════════

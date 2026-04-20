@@ -79,54 +79,52 @@ const MORNING_METRICS = [
   },
 ];
 
-// ── 저녁 배치 (5개, BGeometrics camelCase 엔드포인트) ──────────
-// ※ 엔드포인트명: kebab-case ❌ → camelCase 복수형 ✅
-// ※ 첫 실행 후 로그의 "최신 레코드" 에서 정확한 필드명 확인 가능
+// ── 저녁 배치 (6개) ────────────────────────────────────────────
+// ※ 엔드포인트명: portal.bitcoin-data.com/bguser/free-features.html 에서 확인
 const EVENING_METRICS = [
   {
     key:            'netflow',
     label:          'Exchange Netflow (BTC)',
-    urlCandidates:  ['/v1/exchangeNetflowBtcs'],
-    fieldCandidates:['exchangeNetflowBtc', 'netflowBtc', 'netflow', 'value'],
+    urlCandidates:  ['/v1/exchange-netflow', '/v1/exchange-net-flow'],
+    fieldCandidates:['netflow', 'exchangeNetflow', 'exchange_netflow', 'value'],
     decimals:       0,
   },
   {
     key:            'nrpl',
     label:          'NRPL (BTC)',
-    urlCandidates:  ['/v1/nrplBtcs'],
-    fieldCandidates:['nrplBtc', 'nrpl', 'value'],
+    urlCandidates:  ['/v1/nrpl-btc', '/v1/nrpl'],
+    fieldCandidates:['nrplBtc', 'nrpl_btc', 'nrpl', 'value'],
     decimals:       0,
   },
   {
     key:            'exchReserve',
     label:          'Exchange Reserves (BTC)',
-    urlCandidates:  ['/v1/exchangeReserveBtcs'],
-    fieldCandidates:['exchangeReserveBtc', 'reserveBtc', 'reserve', 'value'],
+    urlCandidates:  ['/v1/exchange-reserve', '/v1/exchange-balance'],
+    fieldCandidates:['reserve', 'exchangeReserve', 'exchange_reserve', 'balance', 'value'],
     decimals:       0,
   },
   {
-    // ※ 실현시가 HODL waves — 1주~1개월 밴드 필드명은 첫 실행 로그 확인 후 수정
+    // ※ 실현시가 HODL waves — 1주~1개월 밴드. 첫 실행 "최신 레코드" 로그에서 정확한 필드명 확인
     key:            'utxo1m',
     label:          'UTXO 1W~1M (%)',
-    urlCandidates:  ['/v1/realizedCapHodlWaveses'],
-    fieldCandidates:['oneWeekToOneMonth', '1wTo1m', 'week1month1', '1w1m', 'w1m'],
+    urlCandidates:  ['/v1/realized-cap-hodl-waves', '/v1/hodl-waves-realized-cap'],
+    fieldCandidates:['1w_1m', 'oneWeekToOneMonth', 'wk1_mo1', '1wTo1m', 'week1month1', 'band_1w_1m'],
     decimals:       1,
   },
   {
-    // ※ 공급량 기준 HODL waves — 7년+ 밴드 필드명은 첫 실행 로그 확인 후 수정
+    // ※ 공급량 기준 HODL waves — 7년+ 밴드. 첫 실행 "최신 레코드" 로그에서 정확한 필드명 확인
     key:            'utxo7yr',
     label:          'UTXO 7yr+ (%)',
-    urlCandidates:  ['/v1/hodlWavesSupplies'],
-    fieldCandidates:['sevenYearsPlus', 'moreThan7y', '7yPlus', 'over7Years'],
+    urlCandidates:  ['/v1/hodl-waves-supply', '/v1/hodl-waves'],
+    fieldCandidates:['7y_plus', 'sevenYearsPlus', 'gt7y', 'moreThan7y', '7yPlus', 'over7Years', 'band_7y_plus'],
     decimals:       2,
   },
   {
     // 현물 ETF 일일 순유입(USD). 양수=기관매수, 음수=기관매도
-    // ※ 첫 실행 로그에서 필드명/단위(USD vs BTC) 확인 필요
     key:            'etfFlow',
     label:          'Spot ETF 순유입 (일일)',
-    urlCandidates:  ['/v1/etfFlows', '/v1/etfBtcTotals'],
-    fieldCandidates:['etfFlow', 'netFlow', 'flow', 'etfBtcTotal', 'total', 'value'],
+    urlCandidates:  ['/v1/etf-flow-btc', '/v1/etf-flow', '/v1/etf-inflow'],
+    fieldCandidates:['flow', 'etfFlow', 'netFlow', 'net_flow', 'inflow', 'value'],
     decimals:       0,
   },
 ];
