@@ -3,10 +3,17 @@
  *
  * BGeometrics (bitcoin-data.com) — 무료, API 키 불필요
  *   BATCH=morning (07:20 KST): mvrvZ, nupl, sopr, puell, funding, lthSopr, sthSopr, reserveRisk (8개)
- *   BATCH=evening (18:20 KST): netflow, nrpl, exchReserve, utxo1m, utxo7yr (5개)
+ *   BATCH=evening (18:20 KST): utxo1m, utxo7yr, etfFlow (3개)
  *
- * 제한: 시간당 8회, 하루 15회 (IP 기준)
+ * 제한: 시간당 8회, 하루 15회 (IP 기준, GitHub Actions 공유 IP 주의)
  * 출력: onchain-data.json (루트, GitHub Actions이 commit)
+ *
+ * 확인된 무료 엔드포인트:
+ *   realized-cap-hodl-waves → {age_1w_1m, age_7y_10y, age_10y, ...} (비율, 0~1)
+ *   hodl-waves-supply       → 동일 age_* 필드, 단위=절대 BTC
+ *   etf-flow-btc            → {etfFlow} 단위=BTC
+ *
+ * exchange-netflow, nrpl, exchange-reserve → 유료 전용 (404)
  */
 
 const fs   = require('fs');
@@ -15,115 +22,64 @@ const path = require('path');
 const OUTPUT_PATH = path.join(__dirname, '..', 'onchain-data.json');
 const BASE_URL    = 'https://bitcoin-data.com/v1';
 
-// BATCH=morning(기본): 8개 수집 | BATCH=evening: 5개 추가 수집
 const BATCH = process.env.BATCH || 'morning';
 console.log(`🕐 실행 배치: ${BATCH}`);
 
 // ── 아침 배치 (8개) ───────────────────────────────────────────
 const MORNING_METRICS = [
-  {
-    key:            'mvrvZ',
-    label:          'MVRV Z-Score',
-    urlCandidates:  ['/v1/mvrv'],
-    fieldCandidates:['mvrv', 'value'],
-    decimals:       2,
-  },
-  {
-    key:            'nupl',
-    label:          'NUPL',
-    urlCandidates:  ['/v1/nupl'],
-    fieldCandidates:['nupl', 'value'],
-    decimals:       3,
-  },
-  {
-    key:            'sopr',
-    label:          'SOPR',
-    urlCandidates:  ['/v1/sopr'],
-    fieldCandidates:['sopr', 'value'],
-    decimals:       4,
-  },
-  {
-    key:            'puell',
-    label:          'Puell Multiple',
-    urlCandidates:  ['/v1/puell-multiple'],
-    fieldCandidates:['puellMultiple', 'puell_multiple', 'puell', 'value'],
-    decimals:       3,
-  },
-  {
-    key:            'funding',
-    label:          'Funding Rate (%)',
-    urlCandidates:  ['/v1/funding-rate'],
-    fieldCandidates:['fundingRate', 'funding_rate', 'funding', 'value'],
-    decimals:       5,
-  },
-  {
-    key:            'lthSopr',
-    label:          'LTH SOPR (장기보유자)',
-    urlCandidates:  ['/v1/lth-sopr'],
-    fieldCandidates:['lthSopr', 'lth_sopr', 'value'],
-    decimals:       4,
-  },
-  {
-    key:            'sthSopr',
-    label:          'STH SOPR (단기보유자)',
-    urlCandidates:  ['/v1/sth-sopr'],
-    fieldCandidates:['sthSopr', 'sth_sopr', 'value'],
-    decimals:       4,
-  },
-  {
-    key:            'reserveRisk',
-    label:          'Reserve Risk',
-    urlCandidates:  ['/v1/reserve-risk'],
-    fieldCandidates:['reserveRisk', 'reserve_risk', 'value'],
-    decimals:       6,
-  },
+  { key:'mvrvZ',       label:'MVRV Z-Score',         urlCandidates:['/v1/mvrv'],          fieldCandidates:['mvrv','value'],                             decimals:2 },
+  { key:'nupl',        label:'NUPL',                  urlCandidates:['/v1/nupl'],          fieldCandidates:['nupl','value'],                             decimals:3 },
+  { key:'sopr',        label:'SOPR',                  urlCandidates:['/v1/sopr'],          fieldCandidates:['sopr','value'],                             decimals:4 },
+  { key:'puell',       label:'Puell Multiple',        urlCandidates:['/v1/puell-multiple'],fieldCandidates:['puellMultiple','puell_multiple','puell','value'], decimals:3 },
+  { key:'funding',     label:'Funding Rate (%)',      urlCandidates:['/v1/funding-rate'],  fieldCandidates:['fundingRate','funding_rate','funding','value'], decimals:5 },
+  { key:'lthSopr',     label:'LTH SOPR (장기보유자)', urlCandidates:['/v1/lth-sopr'],      fieldCandidates:['lthSopr','lth_sopr','value'],                decimals:4 },
+  { key:'sthSopr',     label:'STH SOPR (단기보유자)', urlCandidates:['/v1/sth-sopr'],      fieldCandidates:['sthSopr','sth_sopr','value'],                decimals:4 },
+  { key:'reserveRisk', label:'Reserve Risk',          urlCandidates:['/v1/reserve-risk'],  fieldCandidates:['reserveRisk','reserve_risk','value'],         decimals:6 },
 ];
 
 // ── 저녁 배치 (3개) ────────────────────────────────────────────
-// ※ exchange-netflow, nrpl, exchange-reserve 는 유료 전용 (404) → 제거
-// ※ 아래 3개는 무료 플랜에서 동작 확인된 엔드포인트
+// realized-cap-hodl-waves 응답 필드: age_0d_1d, age_1d_1w, age_1w_1m, ... age_7y_10y, age_10y (비율 0~1)
+// etf-flow-btc 응답 필드: etfFlow (단위: BTC)
 const EVENING_METRICS = [
   {
-    // 실현시가 HODL waves — 1주~1개월 밴드
-    // 첫 실행 "최신 레코드" 로그에서 정확한 필드명 확인 후 1순위로 올릴 것
     key:            'utxo1m',
     label:          'UTXO 1W~1M (%)',
     urlCandidates:  ['/v1/realized-cap-hodl-waves'],
-    fieldCandidates:['1w_1m', 'oneWeekToOneMonth', 'wk1_mo1', '1wTo1m', 'week1month1', 'band_1w_1m'],
+    fieldCandidates:['age_1w_1m'],          // 비율(0~1) → multiplier로 ×100
+    multiplier:     100,
     decimals:       1,
   },
   {
-    // 공급량 기준 HODL waves — 7년+ 밴드
     key:            'utxo7yr',
     label:          'UTXO 7yr+ (%)',
-    urlCandidates:  ['/v1/hodl-waves-supply'],
-    fieldCandidates:['7y_plus', 'sevenYearsPlus', 'gt7y', 'moreThan7y', '7yPlus', 'over7Years', 'band_7y_plus'],
-    decimals:       2,
+    urlCandidates:  ['/v1/realized-cap-hodl-waves'],
+    sumFields:      ['age_7y_10y', 'age_10y'], // 7~10yr + 10yr+ 합산 → ×100
+    multiplier:     100,
+    decimals:       1,
   },
   {
-    // 현물 ETF 일일 순유입(USD). 양수=기관매수, 음수=기관매도
+    // 단위: BTC. 임계값 → check-once.js etfFlowZone / HTML metricSt('etfflow') 참조
+    // 강유입 >5000 BTC/day | 유입 1500~5000 | 중립 0~1500 | 순유출 <0 | 강유출 <-5000
     key:            'etfFlow',
-    label:          'Spot ETF 순유입 (일일)',
+    label:          'Spot ETF 순유입 (BTC/일)',
     urlCandidates:  ['/v1/etf-flow-btc'],
-    fieldCandidates:['flow', 'etfFlow', 'netFlow', 'net_flow', 'inflow', 'value'],
-    decimals:       0,
+    fieldCandidates:['etfFlow', 'flow', 'netFlow', 'net_flow', 'value'],
+    decimals:       1,
   },
 ];
 
 const METRICS = BATCH === 'evening' ? EVENING_METRICS : MORNING_METRICS;
 
-// ── 응답 배열(또는 단일 객체)에서 최신 값 추출 ───────────────
-function extractLatest(data, fieldCandidates) {
-  // 단일 객체 응답 처리 (일부 엔드포인트가 배열 대신 단일 객체 반환)
+// ── 응답에서 최신 값 추출 ─────────────────────────────────────
+// opts.sumFields: 지정 필드 합산 후 반환 (fieldCandidates 무시)
+function extractLatest(data, fieldCandidates, sumFields) {
   if (data && !Array.isArray(data) && typeof data === 'object' && !data.error) {
     data = [data];
   }
   if (!Array.isArray(data) || data.length === 0) return null;
 
-  // 날짜/메타 필드 (숫자 자동탐색 제외 대상)
   const DATE_KEYS = new Set(['t', 'date', 'day', 'timestamp', 'time', 'd', 'unixTs', 'id']);
 
-  // 날짜 필드 기준으로 내림차순 정렬 ('d' 우선)
   const sorted = [...data].sort((a, b) => {
     const da = [...DATE_KEYS].map(k => a[k]).find(v => v != null) ?? '';
     const db = [...DATE_KEYS].map(k => b[k]).find(v => v != null) ?? '';
@@ -132,9 +88,22 @@ function extractLatest(data, fieldCandidates) {
 
   console.log(`   최신 레코드:`, JSON.stringify(sorted[0]));
 
-  // 날짜 최신순으로 순회 — null 값 레코드는 건너뛰고 이전 레코드 fallback
   for (const record of sorted) {
-    // 후보 필드명으로 값 탐색 — 숫자형 또는 숫자 문자열 모두 허용
+    // sumFields 모드: 지정 필드 합산 (utxo7yr 등)
+    if (sumFields && sumFields.length > 0) {
+      let sum = 0, found = 0;
+      for (const f of sumFields) {
+        const raw = record[f];
+        if (raw != null) {
+          const n = parseFloat(raw);
+          if (!isNaN(n)) { sum += n; found++; }
+        }
+      }
+      if (found > 0) return sum;
+      continue; // 이 레코드에 sumFields 없으면 다음 레코드로
+    }
+
+    // fieldCandidates 탐색
     for (const f of fieldCandidates) {
       const raw = record[f];
       if (raw != null) {
@@ -142,24 +111,19 @@ function extractLatest(data, fieldCandidates) {
         if (!isNaN(n)) return n;
       }
     }
-    // 후보 실패 시 첫 번째 숫자형 필드 자동 탐색 (날짜·ID 제외)
+    // 후보 실패 시 첫 번째 숫자형 필드 자동 탐색
     for (const [k, v] of Object.entries(record)) {
       if (!DATE_KEYS.has(k)) {
         const n = parseFloat(v);
         if (!isNaN(n) && isFinite(n)) return n;
       }
     }
-    // 이 레코드에서 값 없으면 이전 날짜 레코드로 fallback
   }
   return null;
 }
 
 // ── 단일 지표 수집 ────────────────────────────────────────────
 async function fetchMetric(metric) {
-  // 날짜 필터 없이 최신 5개 레코드 요청
-  // ※ 일부 엔드포인트(lth-sopr 등)는 무료 티어 데이터가 2026까지 없어
-  //   startday/endday 필터 시 빈 배열 반환 → extractLatest가 null 리턴함
-  //   날짜 필터 제거 후 extractLatest의 날짜 내림차순 정렬로 최신값 추출
   const params = `?size=5`;
 
   for (const ep of metric.urlCandidates) {
@@ -183,36 +147,33 @@ async function fetchMetric(metric) {
         console.error(`   API 오류: ${JSON.stringify(data.error)}`);
         continue;
       }
-      const value = extractLatest(data, metric.fieldCandidates);
-      if (value == null) {
+      const raw = extractLatest(data, metric.fieldCandidates, metric.sumFields);
+      if (raw == null) {
         console.log(`   데이터 없음 (빈 배열 또는 필드 불일치) — ${ep}`);
         continue;
       }
-      const rounded = parseFloat(value.toFixed(metric.decimals));
-      console.log(`   ✅ ${ep} → ${rounded}`);
-      return { value: rounded, endpoint: ep };
+      const value = parseFloat((raw * (metric.multiplier || 1)).toFixed(metric.decimals));
+      console.log(`   ✅ ${ep} → ${value}`);
+      return { value, endpoint: ep };
     } catch (e) {
       console.error(`   오류: ${e.message} — ${url}`);
     }
-    // 요청 간 간격 (시간당 8회 한도 준수)
     await new Promise(r => setTimeout(r, 1200));
   }
   return null;
 }
 
-// ── 이전 데이터 로드 (실패 시 빈 객체) ──────────────────────
 function loadPrev() {
   try { return JSON.parse(fs.readFileSync(OUTPUT_PATH, 'utf8')); }
   catch { return {}; }
 }
 
-// ── MAIN ──────────────────────────────────────────────────────
 async function main() {
   console.log('🚀 BGeometrics 온체인 지표 수집 시작');
   console.log(`   API: ${BASE_URL} | 하루 최대 15회 | BATCH=${BATCH}\n`);
 
   const prev   = loadPrev();
-  const result = { ...prev }; // 수집 실패한 지표는 이전 값 유지
+  const result = { ...prev };
   const log    = [];
 
   for (const metric of METRICS) {
@@ -224,7 +185,7 @@ async function main() {
     } else {
       log.push(`  ⚠️  ${metric.label}: 수집 실패 → 이전값 ${prev[metric.key] ?? '없음'} 유지`);
     }
-    await new Promise(r => setTimeout(r, 1500)); // 요청 간 간격
+    await new Promise(r => setTimeout(r, 1500));
   }
 
   result.updatedAt    = new Date().toISOString();

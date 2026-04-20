@@ -115,8 +115,8 @@ function exchReserveZone(v) { return v<2e6?'강한축적':v<2.3e6?'축적중':v<
 function utxo1mZone(v)      { return v<5?'강HODL':v<8?'건전':v<12?'보통':v<18?'과열':'분배'; }
 function utxo7yrZone(v)     { return v>35?'극강홀딩':v>30?'강한홀딩':v>25?'정상':v>20?'감소':'대규모이동'; }
 function sthSoprZone(v)     { return v<0.95?'STH패닉':v<1.0?'손익분기':v<1.05?'건전':'과잉'; }
-// ETF 일일 순유입(USD): 양수=기관매수, 음수=기관매도
-function etfFlowZone(v)     { return v<-300e6?'강유출(기관매도)':v<0?'순유출':v<100e6?'중립':v<300e6?'유입(기관매수)':'강유입(기관매수)'; }
+// ETF flow 단위: BTC/일 (bitcoin-data.com /v1/etf-flow-btc)
+function etfFlowZone(v)     { return v<-5000?'강유출(기관매도)':v<0?'순유출':v<1500?'중립':v<5000?'유입(기관매수)':'강유입(기관매수)'; }
 
 // ══════════════════════════════════════════════════════════════
 //  STATE 읽기/쓰기

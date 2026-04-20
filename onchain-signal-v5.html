@@ -553,7 +553,7 @@ function fmt(n){ return (n==null||isNaN(n))?'—':n.toLocaleString('en-US',{maxi
 function fmtP(n){ if(!n)return'—'; if(n>=1000)return'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); return'$'+n.toFixed(4); }
 function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
 function fmtNRPL(v){ if(v==null||isNaN(v)) return'—'; const s=v>=0?'+':'-'; const a=Math.abs(v); return `${s}${a.toLocaleString('en-US',{maximumFractionDigits:0})}`; }
-function fmtEtfFlow(v){ if(v==null||isNaN(v)) return'—'; const s=v>=0?'+':'-'; const a=Math.abs(v); return a>=1e9?`${s}$${(a/1e9).toFixed(2)}B`:a>=1e6?`${s}$${(a/1e6).toFixed(0)}M`:`${s}$${a.toLocaleString('en-US',{maximumFractionDigits:0})}`; }
+function fmtEtfFlow(v){ if(v==null||isNaN(v)) return'—'; const s=v>=0?'+':'-'; const a=Math.abs(v); return `${s}${a>=1000?(a/1000).toFixed(1)+'K':a.toFixed(1)} BTC`; }
 function fmtReserve(v){ if(v==null||isNaN(v)) return'—'; return v>=1e6?`${(v/1e6).toFixed(3)}M BTC`:v>=1e3?`${(v/1e3).toFixed(0)}K BTC`:`${v.toFixed(0)} BTC`; }
 
 // ═══════════════════════════════════════════════════════════════
@@ -702,11 +702,12 @@ function metricSt(id,v){
       if(v<0.02)  return{cls:'b-neu', lbl:'주의',    itp:`Reserve Risk ${v} — 위험 증가, 신규 매수 자제`};
       return            {cls:'b-bear',lbl:'분배',    itp:`Reserve Risk ${v} — 극단 위험 구간, 분배·익절`};
     case'etfflow':
-      if(v<-300e6) return{cls:'b-bear',lbl:'강유출',  itp:`ETF 일일 ${fmtEtfFlow(v)} — 기관 강한 매도, 약세 신호`};
-      if(v<0)      return{cls:'b-neu', lbl:'순유출',  itp:`ETF 일일 ${fmtEtfFlow(v)} — 기관 매도 우세`};
-      if(v<100e6)  return{cls:'b-neu', lbl:'중립',   itp:`ETF 일일 ${fmtEtfFlow(v)} — 소폭 유입, 관망`};
-      if(v<300e6)  return{cls:'b-bull',lbl:'유입',   itp:`ETF 일일 ${fmtEtfFlow(v)} — 기관 매수 우세, 강세`};
-      return            {cls:'b-bull',lbl:'강유입',  itp:`ETF 일일 ${fmtEtfFlow(v)} — 기관 강한 매수, 강력 강세`};
+      // 단위: BTC/일 (etf-flow-btc). 강유출<-5000, 순유출<0, 중립<1500, 유입<5000, 강유입≥5000
+      if(v<-5000) return{cls:'b-bear',lbl:'강유출',  itp:`ETF 일일 ${fmtEtfFlow(v)} BTC — 기관 강한 매도, 약세 신호`};
+      if(v<0)     return{cls:'b-neu', lbl:'순유출',  itp:`ETF 일일 ${fmtEtfFlow(v)} BTC — 기관 매도 우세`};
+      if(v<1500)  return{cls:'b-neu', lbl:'중립',   itp:`ETF 일일 ${fmtEtfFlow(v)} BTC — 소폭 유입, 관망`};
+      if(v<5000)  return{cls:'b-bull',lbl:'유입',   itp:`ETF 일일 ${fmtEtfFlow(v)} BTC — 기관 매수 우세, 강세`};
+      return           {cls:'b-bull',lbl:'강유입',  itp:`ETF 일일 ${fmtEtfFlow(v)} BTC — 기관 강한 매수, 강력 강세`};
     case'coinbasepremium':
       if(v<-0.2) return{cls:'b-bear',lbl:'디스카운트',itp:`코인베이스 디스카운트 ${v}% — 미국 기관 매도 우세, 주의`};
       if(v<0)    return{cls:'b-neu', lbl:'약매도',   itp:`코인베이스 프리미엄 ${v}% — US 수요 약함, 매수`};
@@ -781,9 +782,9 @@ const ZONES = {
   reserverisk: { desc:'장기 보유자 기회비용 대비 리스크. 낮을수록 매수 적기(보유자 확신 극대), 높을수록 분배 구간',
                  min:0, max:0.025,
                  segs:[{max:0.002,color:'#22c55e',lbl:'강력매수'},{max:0.005,color:'#84cc16',lbl:'매수'},{max:0.010,color:'#eab308',lbl:'중립'},{max:0.020,color:'#f97316',lbl:'주의'},{max:0.025,color:'#e03535',lbl:'분배'}] },
-  etfflow:     { desc:'비트코인 현물 ETF 일일 순유입(USD). 양수=기관 매수(강세), 음수=기관 매도(약세)',
-                 min:-600e6, max:800e6,
-                 segs:[{max:-300e6,color:'#e03535',lbl:'강유출'},{max:0,color:'#f97316',lbl:'순유출'},{max:100e6,color:'#eab308',lbl:'중립'},{max:300e6,color:'#84cc16',lbl:'유입'},{max:800e6,color:'#22c55e',lbl:'강유입'}] }
+  etfflow:     { desc:'비트코인 현물 ETF 일일 순유입(BTC). 양수=기관 매수(강세), 음수=기관 매도(약세)',
+                 min:-8000, max:8000,
+                 segs:[{max:-5000,color:'#e03535',lbl:'강유출'},{max:0,color:'#f97316',lbl:'순유출'},{max:1500,color:'#eab308',lbl:'중립'},{max:5000,color:'#84cc16',lbl:'유입'},{max:8000,color:'#22c55e',lbl:'강유입'}] }
 };
 
 function makeZoneBar(id, val){
@@ -839,8 +840,8 @@ function checkAlerts(){
   else if(u7yr!=null&&u7yr<=25) al.push({t:'neu', m:`UTXO 7yr+ ${u7yr}% — LTH 분배 시작(<25%). 주의`});
   if(nrl!=null&&nrl>=80000) al.push({t:'bear',m:`NRPL +${fmt(nrl)} BTC — 극대 이익실현(>80k). 분배 경고`});
   if(cp!=null&&cp<-0.2) al.push({t:'neu', m:`Coinbase 디스카운트 ${cp}% — 미국 기관 매도 우세. 주의`});
-  if(etf!=null&&etf<-300e6) al.push({t:'bear',m:`ETF 순유출 ${fmtEtfFlow(etf)} — 기관 강한 매도. 약세 신호`});
-  else if(etf!=null&&etf<0) al.push({t:'neu', m:`ETF 순유출 ${fmtEtfFlow(etf)} — 기관 매도 우세. 주의`});
+  if(etf!=null&&etf<-5000) al.push({t:'bear',m:`ETF 순유출 ${fmtEtfFlow(etf)} BTC — 기관 강한 매도. 약세 신호`});
+  else if(etf!=null&&etf<0) al.push({t:'neu', m:`ETF 순유출 ${fmtEtfFlow(etf)} BTC — 기관 매도 우세. 주의`});
 
   // ── 역발상 매수 신호 (entry) ────────────────────────────────
   if(fg!=null&&fg<=24&&z<1.5) al.push({t:'entry',m:`📍 역발상 구간 — 극도공포+저평가 동시 발생. 분할 매수`});
@@ -855,7 +856,7 @@ function checkAlerts(){
   if(nrl!=null&&nrl<-30000) al.push({t:'entry',m:`📍 NRPL ${fmt(nrl)} BTC — 극도 손실 패닉(<-30k). 바닥 신호`});
   if(u7yr!=null&&u7yr>35) al.push({t:'entry',m:`📍 UTXO 7yr+ ${u7yr}% — 공급 쇼크 극대(>35%). 강력 매수`});
   if(cp!=null&&cp>0.5)  al.push({t:'entry',m:`📍 Coinbase +${cp}% — 미국 기관 FOMO(>0.5%). 강력 매수 신호`});
-  if(etf!=null&&etf>300e6) al.push({t:'entry',m:`📍 ETF 순유입 ${fmtEtfFlow(etf)} — 기관 강한 매수(>$300M). 강력 강세`});
+  if(etf!=null&&etf>5000) al.push({t:'entry',m:`📍 ETF 순유입 ${fmtEtfFlow(etf)} BTC — 기관 강한 매수(>5000 BTC). 강력 강세`});
   if(st!=null&&st>300)  al.push({t:'entry',m:`📍 스테이블코인 $${st.toFixed(0)}B — 대기 매수력 최대`});
   return al;
 }
@@ -1058,7 +1059,7 @@ function renderMetrics(){
         {id:'funding',     nm:'Funding Rate',        val:funding,             disp:`${funding>=0?'+':''}${funding}%`, field:'funding', step:'0.001'},
         {id:'puell',       nm:'Puell Multiple',      val:puell,               disp:`${puell}`,           field:'puell',    step:'0.01'},
         {id:'tvl',         nm:'DeFi TVL',            val:tvl!=null?Math.round(tvl):null, auto:true, disp:tvl!=null?`$${tvl.toFixed(1)}B`:'—'},
-        {id:'etfflow',     nm:'Spot ETF 순유입 (일일)', val:MANUAL.etfFlow,        disp:fmtEtfFlow(MANUAL.etfFlow), field:'etfFlow', step:'1000000'},
+        {id:'etfflow',     nm:'Spot ETF 순유입 (일일)', val:MANUAL.etfFlow,        disp:fmtEtfFlow(MANUAL.etfFlow), field:'etfFlow', step:'10'},
       ]
     }
   ];
