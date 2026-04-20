@@ -79,43 +79,24 @@ const MORNING_METRICS = [
   },
 ];
 
-// ── 저녁 배치 (6개) ────────────────────────────────────────────
-// ※ 엔드포인트명: portal.bitcoin-data.com/bguser/free-features.html 에서 확인
+// ── 저녁 배치 (3개) ────────────────────────────────────────────
+// ※ exchange-netflow, nrpl, exchange-reserve 는 유료 전용 (404) → 제거
+// ※ 아래 3개는 무료 플랜에서 동작 확인된 엔드포인트
 const EVENING_METRICS = [
   {
-    key:            'netflow',
-    label:          'Exchange Netflow (BTC)',
-    urlCandidates:  ['/v1/exchange-netflow', '/v1/exchange-net-flow'],
-    fieldCandidates:['netflow', 'exchangeNetflow', 'exchange_netflow', 'value'],
-    decimals:       0,
-  },
-  {
-    key:            'nrpl',
-    label:          'NRPL (BTC)',
-    urlCandidates:  ['/v1/nrpl-btc', '/v1/nrpl'],
-    fieldCandidates:['nrplBtc', 'nrpl_btc', 'nrpl', 'value'],
-    decimals:       0,
-  },
-  {
-    key:            'exchReserve',
-    label:          'Exchange Reserves (BTC)',
-    urlCandidates:  ['/v1/exchange-reserve', '/v1/exchange-balance'],
-    fieldCandidates:['reserve', 'exchangeReserve', 'exchange_reserve', 'balance', 'value'],
-    decimals:       0,
-  },
-  {
-    // ※ 실현시가 HODL waves — 1주~1개월 밴드. 첫 실행 "최신 레코드" 로그에서 정확한 필드명 확인
+    // 실현시가 HODL waves — 1주~1개월 밴드
+    // 첫 실행 "최신 레코드" 로그에서 정확한 필드명 확인 후 1순위로 올릴 것
     key:            'utxo1m',
     label:          'UTXO 1W~1M (%)',
-    urlCandidates:  ['/v1/realized-cap-hodl-waves', '/v1/hodl-waves-realized-cap'],
+    urlCandidates:  ['/v1/realized-cap-hodl-waves'],
     fieldCandidates:['1w_1m', 'oneWeekToOneMonth', 'wk1_mo1', '1wTo1m', 'week1month1', 'band_1w_1m'],
     decimals:       1,
   },
   {
-    // ※ 공급량 기준 HODL waves — 7년+ 밴드. 첫 실행 "최신 레코드" 로그에서 정확한 필드명 확인
+    // 공급량 기준 HODL waves — 7년+ 밴드
     key:            'utxo7yr',
     label:          'UTXO 7yr+ (%)',
-    urlCandidates:  ['/v1/hodl-waves-supply', '/v1/hodl-waves'],
+    urlCandidates:  ['/v1/hodl-waves-supply'],
     fieldCandidates:['7y_plus', 'sevenYearsPlus', 'gt7y', 'moreThan7y', '7yPlus', 'over7Years', 'band_7y_plus'],
     decimals:       2,
   },
@@ -123,7 +104,7 @@ const EVENING_METRICS = [
     // 현물 ETF 일일 순유입(USD). 양수=기관매수, 음수=기관매도
     key:            'etfFlow',
     label:          'Spot ETF 순유입 (일일)',
-    urlCandidates:  ['/v1/etf-flow-btc', '/v1/etf-flow', '/v1/etf-inflow'],
+    urlCandidates:  ['/v1/etf-flow-btc'],
     fieldCandidates:['flow', 'etfFlow', 'netFlow', 'net_flow', 'inflow', 'value'],
     decimals:       0,
   },
