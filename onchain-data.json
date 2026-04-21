@@ -9,8 +9,9 @@
   "lthSopr": 0.901,
   "sthSopr": 0.9979,
   "reserveRisk": 0.000621,
+  "etfFlow": -53.3,
+  "etfFlowDate": "2026-04-16",
   "updatedAt": "2026-04-20T23:05:58.791Z",
   "updatedAtKST": "2026. 4. 21. AM 8:05:58",
-  "source": "bitcoin-data.com (BGeometrics)",
-  "etfFlow": -53.3
+  "source": "bitcoin-data.com (BGeometrics)"
 }

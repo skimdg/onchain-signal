@@ -1,12 +1,11 @@
 /**
- * update-analysts.js — API 키 없이 Google News 웹검색으로 애널리스트 포지션 수집
+ * update-analysts.js — Nitter RSS로 트위터 게시물 수집 후 포지션 분석
  *
- * 개선 사항:
- *  - 90일 이상 오래된 기사 제외, 최신(30일) 기사 3배 가중
- *  - 부정 표현 감지: "not bullish", "before recovery" 등 → 약세 처리
- *  - 애널리스트 직접 발언 구문 우선 (warns/says/predicts + 감성)
- *  - 신호 부족 시 이전 데이터 유지 (50% 기본값 남용 방지)
- *  - 출처 URL 저장 (대시보드 링크 아이콘, 텔레그램 포함)
+ * 1차: Nitter RSS (Twitter 대체) — 해당 애널리스트의 실제 트윗 직접 파싱
+ * 2차: Google News RSS 폴백 (Nitter 실패 시)
+ *
+ * Nitter instances (순서대로 시도):
+ *   nitter.poast.org / nitter.privacydev.net / nitter.1d4.us / nitter.unixfox.eu
  */
 
 const fs   = require('fs');
@@ -14,52 +13,67 @@ const path = require('path');
 
 const OUTPUT_PATH = path.join(__dirname, '..', 'analyst-data.json');
 
-// foredex.io 분석가 순위 TOP 10
-// korean:true — 한국어 뉴스 검색 병행, 한국어 감성 구문 적용
+// 전체 애널리스트 목록 (foredex TOP 10 + 단기 전문 5명)
 const ANALYSTS = [
-  { id:'dancoininvestor',  name:'Crypto Dan',       handle:'dancoininvestor',  specialty:'온체인 장기 · 사이클 분석' },
-  { id:'whitepeach',       name:'백도',              handle:'whitepeach',       specialty:'트레이딩 · 단기 가격 예측', korean:true },
-  { id:'gaah_im',          name:'Gaah',              handle:'gaah_im',          specialty:'온체인 장기 분석' },
-  { id:'crypto_glass',     name:'Zizcrypto',         handle:'_crypto_glass',    specialty:'온체인 장기 · UTXO 분석' },
-  { id:'abramchart',       name:'AbramChart',        handle:'abramchart',       specialty:'온체인 장기 · 차트 패턴' },
-  { id:'colu_farmer',      name:'코루',              handle:'colu_farmer',      specialty:'트레이딩 · 단기 전략', korean:true },
-  { id:'defioasis',        name:'defioasis.eth',     handle:'defioasis',        specialty:'온체인 장기 · DeFi 분석' },
-  { id:'fivedragontigger', name:'오룡타이거',         handle:'fivedragontigger', specialty:'트레이딩 · 포지션 관리', korean:true },
-  { id:'satoureireal',     name:'Rei Researcher',    handle:'satoureireal',     specialty:'온체인 장기 연구' },
-  { id:'simplspark',       name:'심플',              handle:'simplspark',       specialty:'트레이딩 · 단기 분석', korean:true },
+  // ── 온체인 데이터 (foredex.io TOP 10) ─────────────────────────
+  { id:'dancoininvestor',  name:'Crypto Dan',      handle:'dancoininvestor',  specialty:'온체인 장기 · 사이클 분석' },
+  { id:'gaah_im',          name:'Gaah',            handle:'gaah_im',          specialty:'온체인 장기 분석' },
+  { id:'crypto_glass',     name:'Zizcrypto',       handle:'_crypto_glass',    specialty:'온체인 장기 · UTXO 분석' },
+  { id:'abramchart',       name:'AbramChart',       handle:'abramchart',       specialty:'온체인 장기 · 차트 패턴' },
+  { id:'defioasis',        name:'defioasis.eth',    handle:'defioasis',        specialty:'온체인 장기 · DeFi 분석' },
+  { id:'satoureireal',     name:'Rei Researcher',   handle:'satoureireal',     specialty:'온체인 장기 연구' },
+  { id:'whitepeach',       name:'백도',              handle:'whitepeach',       specialty:'온체인 · 트레이딩 분석', korean:true },
+  { id:'colu_farmer',      name:'코루',              handle:'colu_farmer',      specialty:'온체인 · 포지션 전략', korean:true },
+  { id:'fivedragontigger', name:'오룡타이거',         handle:'fivedragontigger', specialty:'온체인 · 포지션 관리', korean:true },
+  { id:'simplspark',       name:'심플',              handle:'simplspark',       specialty:'온체인 · 단기 분석', korean:true },
+  // ── 단기 전문 5명 ───────────────────────────────────────────────
+  { id:'route2fi',         name:'Route 2 Fi',       handle:'Route2FI',         specialty:'단기 가격 예측 · TA 사이클' },
+  { id:'alexkruger',       name:'Alex Kruger',      handle:'krugermacro',      specialty:'거시 경제 · 단기 트레이딩' },
+  { id:'crypnuevo',        name:'CrypNuevo',         handle:'CrypNuevo',        specialty:'기술적 분석 · 단기 차트' },
+  { id:'ecoinometrics',    name:'ecoinometrics',    handle:'ecoinometrics',    specialty:'계량 경제 · 단기 사이클' },
+  { id:'rektcapital',      name:'Rekt Capital',     handle:'rektcapital',      specialty:'차트 패턴 · 지지/저항 분석' },
 ];
 
-// ── 감성 구문 (문맥 포함 — 단일 단어 의존 탈피) ──────────────
+// Nitter 인스턴스 (순서대로 시도)
+const NITTER_INSTANCES = [
+  'nitter.poast.org',
+  'nitter.privacydev.net',
+  'nitter.1d4.us',
+  'nitter.unixfox.eu',
+  'nitter.esmailelbob.xyz',
+];
+
+// ── 감성 구문 ──────────────────────────────────────────────────
 const BEAR_PHRASES = [
-  'warns', 'warning', 'caution', 'cautious', 'bearish', 'bear market',
-  'sell', 'short', 'crash', 'collapse', 'correction needed', 'more downside',
-  'could fall', 'could drop', 'will fall', 'fall below', 'drop to',
-  'before recovery', 'before real recovery', 'not yet', 'not bullish',
-  'not pumpable', 'not ready', 'too early', 'capitulation',
-  'lower target', 'lower price', 'pain ahead', 'risk',
+  'bearish', 'bear market', 'sell', 'short', 'crash', 'collapse',
+  'correction', 'more downside', 'could fall', 'could drop', 'will fall',
+  'fall below', 'drop to', 'before recovery', 'not yet', 'not bullish',
+  'too early', 'capitulation', 'lower target', 'lower price', 'pain ahead',
   'overvalued', 'overbought', 'bubble', 'break down', 'sell off',
-  'needs to drop', 'needs to fall', 'below support',
+  'below support', 'resistance', 'rejected', 'fakeout', 'dump',
+  'caution', 'warning', 'careful', 'risk', 'danger', 'be careful',
 ];
 const BULL_PHRASES = [
-  'bullish', 'buy', 'accumulate', 'long',
-  'bottom is in', 'bottomed', 'found bottom',
-  'breakout confirmed', 'rally to', 'surge to', 'target of $',
-  'undervalued', 'oversold', 'dip buy', 'strong buy',
-  'upside ahead', 'sees upside', 'higher highs',
-  'recovery confirmed', 'trend reversal', 'bull run',
-  'institutional buying', 'accumulation zone',
+  'bullish', 'buy', 'accumulate', 'long', 'bottom is in', 'bottomed',
+  'found bottom', 'breakout', 'rally', 'surge', 'target of $',
+  'undervalued', 'oversold', 'dip buy', 'strong buy', 'upside',
+  'higher highs', 'recovery', 'trend reversal', 'bull run',
+  'institutional buying', 'accumulation', 'support', 'hold',
+  'buying the dip', 'add here', 'great entry', 'loading',
+  'moon', 'pump', 'going up', 'going higher', 'above',
 ];
-
-// 한국어 감성 구문 (korean:true 애널리스트 기사에 적용)
 const KO_BEAR_PHRASES = [
   '하락', '매도', '조정', '약세', '폭락', '경고', '주의', '손절',
-  '저항', '고점', '단기 고점', '돌파 실패', '리스크', '위험',
+  '저항', '고점', '단기 고점', '돌파 실패', '위험', '반등 실패',
+  '숏', '공매도', '떨어질', '내려갈', '추가 하락', '조심',
 ];
 const KO_BULL_PHRASES = [
   '상승', '매수', '강세', '돌파', '목표가', '바닥', '반등', '축적',
-  '롱', '불런', '저점 매수', '지지', '상방', '급등',
+  '롱', '불런', '저점', '지지', '상방', '급등', '올라갈', '살거',
+  '담을', '분할 매수', '추가 매수', '올라오면', '갈 것 같',
 ];
 
+// ── 이전 데이터 로드 ───────────────────────────────────────────
 let prevData = {};
 try {
   const raw = JSON.parse(fs.readFileSync(OUTPUT_PATH, 'utf8'));
@@ -71,20 +85,19 @@ function parseRSS(xml) {
   const items = [];
   const itemRe = /<item>([\s\S]*?)<\/item>/g;
   let m;
-  while ((m = itemRe.exec(xml)) !== null && items.length < 8) {
+  while ((m = itemRe.exec(xml)) !== null && items.length < 20) {
     const block = m[1];
     const get = (tag) => {
       const r = block.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`));
       return r ? r[1].replace(/<!\[CDATA\[|\]\]>/g, '').replace(/<[^>]+>/g, '').trim() : '';
     };
-    // <link> 태그는 특수 처리
     const linkMatch = block.match(/<link>([\s\S]*?)<\/link>/) ||
                       block.match(/href="([^"]+)"/);
     const title = get('title');
     if (!title) continue;
     items.push({
       title,
-      desc:    get('description').substring(0, 150),
+      desc:    get('description').substring(0, 300),
       url:     linkMatch ? linkMatch[1].trim() : '',
       pubDate: get('pubDate'),
     });
@@ -92,16 +105,37 @@ function parseRSS(xml) {
   return items;
 }
 
-// ── Google News RSS 검색 ───────────────────────────────────────
-async function fetchNews(analyst) {
-  // korean:true 애널리스트 — 한국어 Google News 병행 검색
+// ── Nitter RSS로 트윗 수집 ──────────────────────────────────────
+async function fetchNitterTweets(handle) {
+  for (const instance of NITTER_INSTANCES) {
+    const url = `https://${instance}/${handle}/rss`;
+    try {
+      const res = await fetch(url, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; OnchainSignal/1.0)' },
+        signal:  AbortSignal.timeout(10000),
+      });
+      if (!res.ok) continue;
+      const xml  = await res.text();
+      const items = parseRSS(xml);
+      if (items.length > 0) {
+        console.log(`   ✅ Nitter [${instance}] → ${items.length}개 트윗`);
+        return { items, source: 'nitter' };
+      }
+    } catch (e) {
+      console.log(`   Nitter [${instance}] 실패: ${e.message}`);
+    }
+    await new Promise(r => setTimeout(r, 500));
+  }
+  return null;
+}
+
+// ── Google News RSS 폴백 ───────────────────────────────────────
+async function fetchGoogleNews(analyst) {
   const queries = analyst.korean ? [
     `${analyst.handle} 비트코인`,
-    `"${analyst.name}" 비트코인 상승 OR 하락 OR 전망`,
-    `${analyst.handle} bitcoin`,
+    `"${analyst.name}" 비트코인`,
   ] : [
-    `"${analyst.name}" bitcoin says OR warns OR predicts OR expects`,
-    `"${analyst.name}" bitcoin bullish OR bearish`,
+    `"${analyst.name}" bitcoin`,
     `${analyst.handle} bitcoin`,
   ];
 
@@ -119,44 +153,40 @@ async function fetchNews(analyst) {
       items.forEach(it => {
         if (!allItems.some(x => x.title === it.title)) allItems.push(it);
       });
-    } catch { /* 검색 실패 무시 */ }
+    } catch { /* 무시 */ }
     await new Promise(r => setTimeout(r, 600));
     if (allItems.length >= 6) break;
   }
-  return allItems;
+  return allItems.length > 0 ? { items: allItems, source: 'gnews' } : null;
 }
 
-// ── 스탠스 계산 — 직접 발언(제목에 이름 포함) + BTC 언급 기사만 채점 ──
-// ★ 핵심 원칙:
-//   1. 제목에 애널리스트 이름 또는 핸들이 없으면 무시 (간접 기사 제외)
-//   2. 제목+본문에 bitcoin/btc/비트코인 언급 없으면 무시 (XRP·ETH·HYPE 등 제외)
-//   3. 위 두 조건을 모두 만족하는 기사가 60일 내 없으면 null 반환 (이전값 유지)
-function calcStance(items, analystFirstName, analystHandle, isKorean = false) {
-  const now    = Date.now();
-  const handle = (analystHandle || '').replace('@', '').toLowerCase();
-  let bull = 0, bear = 0, directRecent = 0;
+// ── 포지션 계산 ────────────────────────────────────────────────
+function calcStance(items, isNitter, isKorean) {
+  const now = Date.now();
+  let bull = 0, bear = 0, validCount = 0;
 
   items.forEach(({ title, desc, pubDate }) => {
     const ageMs   = pubDate ? now - new Date(pubDate).getTime() : Infinity;
     const ageDays = ageMs / 86400000;
-    if (ageDays > 90) return;                               // 3개월 이상 제외
+    if (ageDays > 60) return; // 60일 이상 제외
 
-    const titleLow = title.toLowerCase();
-    const fullTxt  = (title + ' ' + desc).toLowerCase();
+    const fullTxt = (title + ' ' + desc).toLowerCase();
 
-    // ① BTC/Bitcoin 또는 비트코인 언급 필수 (다른 코인 단독 기사 차단)
-    if (!/\b(bitcoin|btc)\b/.test(fullTxt) && !/비트코인/.test(fullTxt)) return;
+    // Nitter(트윗)인 경우: BTC 언급 여부만 확인 (모든 트윗이 해당 애널리스트 것)
+    // Google News인 경우: BTC 언급 필수 + 내용에 신호가 있어야 함
+    const hasBtc = /\b(bitcoin|btc)\b/.test(fullTxt) || /비트코인|비트/.test(fullTxt);
+    if (!hasBtc && !isNitter) return;
+    // Nitter의 경우 BTC 언급 없어도 시장 관련 트윗 포함 (가격, 시장, 전망 등)
+    if (!hasBtc && isNitter) {
+      const hasMarket = /price|market|bull|bear|pump|dump|long|short|chart|target|support|resistance|상승|하락|시장|가격|차트|목표/.test(fullTxt);
+      if (!hasMarket) return;
+    }
 
-    // ② 제목에 애널리스트 이름 또는 핸들 필수 (직접 발언 기사만 인정)
-    const isDirect = titleLow.includes(analystFirstName.toLowerCase())
-                  || titleLow.includes(handle);
-    if (!isDirect) return;
+    validCount++;
+    const weight = ageDays < 7 ? 4 : ageDays < 14 ? 3 : ageDays < 30 ? 2 : 1;
 
-    if (ageDays < 60) directRecent++;                       // 60일 내 직접 발언 카운트
-
-    const weight   = ageDays < 14 ? 3 : ageDays < 30 ? 2 : ageDays < 60 ? 1 : 0.5;
-    const negBull  = /\b(not|no|never|unlikely|won't|cannot|can't|before|until)\b/.test(fullTxt);
-    const negBear  = /\b(not|no|never|unlikely|won't|cannot|can't)\b/.test(fullTxt);
+    const negBull = /\b(not|no|never|unlikely|won't|cannot|can't|before|until)\b/.test(fullTxt);
+    const negBear = /\b(not|no|never|unlikely|won't|cannot|can't)\b/.test(fullTxt);
 
     const matchPhrase = (t, p) => p.length <= 6
       ? new RegExp('\\b' + p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b').test(t)
@@ -168,116 +198,128 @@ function calcStance(items, analystFirstName, analystHandle, isKorean = false) {
     BULL_PHRASES.forEach(p => {
       if (matchPhrase(fullTxt, p)) negBull ? (bear += weight * 0.5) : (bull += weight);
     });
-    // 한국어 감성 구문 (korean 애널리스트)
     if (isKorean) {
       KO_BEAR_PHRASES.forEach(p => { if (fullTxt.includes(p)) bear += weight; });
       KO_BULL_PHRASES.forEach(p => { if (fullTxt.includes(p)) bull += weight; });
     }
   });
 
-  // 60일 내 직접 발언 기사 없으면 신호 없음 → 이전값 유지
-  if (directRecent === 0 || (bull === 0 && bear === 0)) return null;
+  if (validCount === 0 || (bull === 0 && bear === 0)) return null;
 
-  const raw   = (bull / (bull + bear)) * 100;
-  const score = Math.round(raw * 0.6 + 50 * 0.4);  // 중립 방향 40% 회귀
-  return Math.max(10, Math.min(90, score));
+  const total = bull + bear;
+  const raw   = Math.round((bull / total) * 100);
+  // 40~60 중립, 60~75 강세, 75+ 강한강세, 25~40 약세, <25 강한약세
+  return Math.max(10, Math.min(90, raw));
+}
+
+// ── 헤드라인 생성 ──────────────────────────────────────────────
+function buildHeadlines(items, isNitter) {
+  const now = Date.now();
+  return items
+    .filter(it => {
+      const ageMs = it.pubDate ? now - new Date(it.pubDate).getTime() : Infinity;
+      return ageMs < 60 * 86400000; // 60일 이내
+    })
+    .slice(0, 5)
+    .map(it => {
+      const d = it.pubDate ? new Date(it.pubDate) : null;
+      const dateStr = d ? `${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}. — ` : '';
+      const text = isNitter
+        ? it.title.replace(/^R to @\w+:\s*/i, '').substring(0, 80)
+        : it.title.substring(0, 80);
+      return dateStr + text;
+    });
+}
+
+// ── 요약 생성 ──────────────────────────────────────────────────
+function buildSummary(bullPct, items, isNitter) {
+  if (!items || items.length === 0) return '(데이터 없음)';
+  const recent = items.slice(0, 3).map(it => it.title.substring(0, 60)).join(' / ');
+  const stance = bullPct >= 65 ? '강세' : bullPct >= 55 ? '약강세' : bullPct >= 45 ? '중립' : bullPct >= 35 ? '약약세' : '약세';
+  return `${stance} 포지션. 최근: ${recent.substring(0, 100)}`;
 }
 
 // ── 단일 애널리스트 처리 ───────────────────────────────────────
-async function scanOne(analyst) {
-  console.log(`\n🔍 ${analyst.name}`);
-  const items    = await fetchNews(analyst);
-  const firstName = analyst.name.split(' ')[0];
-  const bullPct   = calcStance(items, firstName, analyst.handle, analyst.korean || false);
+async function processAnalyst(analyst) {
+  console.log(`\n📊 ${analyst.name} (@${analyst.handle})`);
+  const prev = prevData[analyst.id];
 
-  if (bullPct === null) {
-    const prev = prevData[analyst.id];
-    if (!prev) {
-      return { id: analyst.id, bullPct: 50, summary: '(최근 뉴스 없음)', headlines: [], sourceUrls: [], lastScan: '—', scanning: false };
-    }
-    // 저장된 헤드라인으로 재분석 — 이전 (잘못된) 점수 수정
-    const storedItems = (prev.headlines || []).map(h => {
-      const dateMatch = h.match(/(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})/);
-      const pubDate = dateMatch
-        ? new Date(`${dateMatch[1]}-${dateMatch[2].padStart(2,'0')}-${dateMatch[3].padStart(2,'0')}`).toUTCString()
-        : null;
-      const title = h.replace(/^\d.*?—\s*/, '').trim();
-      return { title, desc: '', pubDate };
-    });
-    const reScore = calcStance(storedItems, firstName);
-    if (reScore !== null) {
-      console.log(`  ♻️  저장 헤드라인 재분석 → ${reScore >= 60 ? '강세' : reScore >= 40 ? '중립' : '약세'} ${reScore}%`);
-      return { ...prev, bullPct: reScore, scanning: false };
-    }
-    console.log(`  ⚠️ 최신 신호 없음 → 이전 데이터 유지`);
-    return { ...prev, scanning: false };
+  // 1차: Nitter RSS (트위터)
+  let result = await fetchNitterTweets(analyst.handle);
+  let isNitter = true;
+
+  // 2차: Google News 폴백
+  if (!result || result.items.length === 0) {
+    console.log(`   → Google News 폴백`);
+    result = await fetchGoogleNews(analyst);
+    isNitter = false;
   }
 
-  const today = new Date().toLocaleDateString('ko-KR',
-    { year: 'numeric', month: '2-digit', day: '2-digit' }
-  ).replace(/\.\s*/g, '.').replace(/\.$/, '');
+  if (!result || result.items.length === 0) {
+    console.log(`   ⚠️  데이터 없음 → 이전값 유지`);
+    return prev ? { ...prev } : {
+      id: analyst.id, bullPct: 50, summary: '(데이터 수집 실패)', headlines: [], sourceUrls: [], lastScan: null, scanning: false,
+    };
+  }
 
-  // 최신 기사 3개 추출 — calcStance와 동일 조건 (직접 발언 + BTC 언급)
-  const handle2 = analyst.handle.replace('@', '').toLowerCase();
-  const recentItems = items
-    .filter(it => {
-      if (!it.pubDate) return false;
-      if ((Date.now() - new Date(it.pubDate).getTime()) > 90 * 86400000) return false;
-      const tl  = it.title.toLowerCase();
-      const txt = (it.title + ' ' + (it.desc || '')).toLowerCase();
-      if (!/\b(bitcoin|btc)\b/.test(txt)) return false;    // BTC 언급 필수
-      return tl.includes(firstName.toLowerCase()) || tl.includes(handle2); // 직접 발언 필수
-    })
-    .slice(0, 3);
+  const { items } = result;
+  console.log(`   [${result.source}] ${items.length}개 항목 수집`);
 
-  const headlines  = recentItems.map(it => {
-    const d = it.pubDate ? new Date(it.pubDate).toLocaleDateString('ko-KR', { year:'numeric', month:'2-digit', day:'2-digit' }) : '';
-    return `${d} — ${it.title.substring(0, 70)}`;
-  });
-  const sourceUrls = recentItems.map(it => it.url).filter(Boolean);
-  const summary    = recentItems[0]?.title.substring(0, 75) || prevData[analyst.id]?.summary || '(업데이트됨)';
+  const newBullPct = calcStance(items, isNitter, analyst.korean || false);
+  const bullPct    = newBullPct !== null ? newBullPct : (prev?.bullPct ?? 50);
 
-  const stance = bullPct >= 60 ? '강세' : bullPct >= 40 ? '중립' : '약세';
-  console.log(`  → ${stance} ${bullPct}%  (기사 ${recentItems.length}건)`);
-  recentItems.slice(0, 2).forEach(it =>
-    console.log(`     • ${it.pubDate ? new Date(it.pubDate).toLocaleDateString('ko-KR') : '?'}  ${it.title.substring(0, 70)}`)
-  );
+  if (newBullPct === null) {
+    console.log(`   → 감성 신호 없음 → 이전값(${prev?.bullPct ?? 50}%) 유지`);
+  } else {
+    console.log(`   → bullPct: ${bullPct}% (bull=${newBullPct !== null ? '계산됨' : '없음'})`);
+  }
 
-  // 이전 값 저장 — 변화가 있으면 항상 prevBullPct 보존 (대시보드 히스토리용)
-  // ※ 15% 이상 변화 = check-once.js에서 텔레그램 알림 발송 기준 (별도)
-  //   여기서는 ANY 변화 시 prev 저장, 이전 prev가 있으면 그것도 유지
-  const oldData = prevData[analyst.id];
-  const anyChange    = oldData && oldData.bullPct !== bullPct;
-  const prevBullPct  = anyChange ? oldData.bullPct  : (oldData?.prevBullPct  ?? null);
-  const prevSummary  = anyChange ? oldData.summary  : (oldData?.prevSummary  ?? null);
+  const headlines = buildHeadlines(items, isNitter);
+  const sourceUrls = items.filter(it => it.url).slice(0, 3).map(it => it.url);
 
-  return { id: analyst.id, bullPct, summary, headlines, sourceUrls, lastScan: today, scanning: false,
-           ...(prevBullPct !== null ? { prevBullPct } : {}),
-           ...(prevSummary ? { prevSummary } : {}) };
+  return {
+    id:          analyst.id,
+    bullPct,
+    prevBullPct: prev?.bullPct ?? null,
+    summary:     buildSummary(bullPct, items, isNitter),
+    headlines,
+    sourceUrls,
+    lastScan:    new Date().toISOString(),
+    scanning:    false,
+    dataSource:  result.source,
+  };
 }
 
+// ── MAIN ──────────────────────────────────────────────────────
 async function main() {
-  console.log('🚀 애널리스트 웹검색 업데이트 (API 키 불필요)');
+  console.log('🔍 애널리스트 포지션 수집 시작 (Nitter RSS + Google News 폴백)');
+  console.log(`   대상: ${ANALYSTS.length}명\n`);
 
   const results = [];
   for (const analyst of ANALYSTS) {
-    const result = await scanOne(analyst);
-    if (result) results.push(result);
-    await new Promise(r => setTimeout(r, 1500));
+    const r = await processAnalyst(analyst);
+    results.push(r);
+    await new Promise(re => setTimeout(re, 1500)); // rate limit 방지
   }
 
   const avgBull = Math.round(results.reduce((s, a) => s + a.bullPct, 0) / results.length);
-  const output  = {
-    analysts:     results,
+
+  const output = {
+    analysts:      results,
     avgBull,
-    updatedAt:    new Date().toISOString(),
-    updatedAtKST: new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
-    method:       'web-search',
+    updatedAt:     new Date().toISOString(),
+    updatedAtKST:  new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
   };
 
   fs.writeFileSync(OUTPUT_PATH, JSON.stringify(output, null, 2));
-  console.log(`\n✅ ${results.length}명 완료  |  평균 강세: ${avgBull}%`);
+
+  console.log('\n─────────────────────────────────');
+  results.forEach(r => {
+    const stance = r.bullPct >= 60 ? '🟢강세' : r.bullPct >= 40 ? '🟡중립' : '🔴약세';
+    console.log(`  ${stance} ${r.id}: ${r.bullPct}% [${r.dataSource||'?'}] ${r.headlines[0]?.substring(0,50)||'뉴스 없음'}`);
+  });
+  console.log(`\n✅ 완료 — 평균 ${avgBull}% | ${output.updatedAtKST}`);
   process.exit(0);
 }
 
-main().catch(e => { console.error('오류:', e); process.exit(1); });
+main().catch(e => { console.error('치명적 오류:', e); process.exit(1); });

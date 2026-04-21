@@ -72,6 +72,7 @@ const METRICS = BATCH === 'evening' ? EVENING_METRICS : MORNING_METRICS;
 
 // ── 응답에서 최신 값 추출 ─────────────────────────────────────
 // opts.sumFields: 지정 필드 합산 후 반환 (fieldCandidates 무시)
+// returns { value, date } or null
 function extractLatest(data, fieldCandidates, sumFields) {
   if (data && !Array.isArray(data) && typeof data === 'object' && !data.error) {
     data = [data];
@@ -88,7 +89,17 @@ function extractLatest(data, fieldCandidates, sumFields) {
 
   console.log(`   최신 레코드:`, JSON.stringify(sorted[0]));
 
+  // 레코드 날짜 추출 헬퍼
+  const getDate = (record) => {
+    for (const k of DATE_KEYS) {
+      if (record[k] != null) return String(record[k]);
+    }
+    return null;
+  };
+
   for (const record of sorted) {
+    const recordDate = getDate(record);
+
     // sumFields 모드: 지정 필드 합산 (utxo7yr 등)
     if (sumFields && sumFields.length > 0) {
       let sum = 0, found = 0;
@@ -99,8 +110,8 @@ function extractLatest(data, fieldCandidates, sumFields) {
           if (!isNaN(n)) { sum += n; found++; }
         }
       }
-      if (found > 0) return sum;
-      continue; // 이 레코드에 sumFields 없으면 다음 레코드로
+      if (found > 0) return { value: sum, date: recordDate };
+      continue;
     }
 
     // fieldCandidates 탐색
@@ -108,14 +119,14 @@ function extractLatest(data, fieldCandidates, sumFields) {
       const raw = record[f];
       if (raw != null) {
         const n = parseFloat(raw);
-        if (!isNaN(n)) return n;
+        if (!isNaN(n)) return { value: n, date: recordDate };
       }
     }
     // 후보 실패 시 첫 번째 숫자형 필드 자동 탐색
     for (const [k, v] of Object.entries(record)) {
       if (!DATE_KEYS.has(k)) {
         const n = parseFloat(v);
-        if (!isNaN(n) && isFinite(n)) return n;
+        if (!isNaN(n) && isFinite(n)) return { value: n, date: recordDate };
       }
     }
   }
@@ -147,14 +158,14 @@ async function fetchMetric(metric) {
         console.error(`   API 오류: ${JSON.stringify(data.error)}`);
         continue;
       }
-      const raw = extractLatest(data, metric.fieldCandidates, metric.sumFields);
-      if (raw == null) {
+      const extracted = extractLatest(data, metric.fieldCandidates, metric.sumFields);
+      if (extracted == null) {
         console.log(`   데이터 없음 (빈 배열 또는 필드 불일치) — ${ep}`);
         continue;
       }
-      const value = parseFloat((raw * (metric.multiplier || 1)).toFixed(metric.decimals));
-      console.log(`   ✅ ${ep} → ${value}`);
-      return { value, endpoint: ep };
+      const value = parseFloat((extracted.value * (metric.multiplier || 1)).toFixed(metric.decimals));
+      console.log(`   ✅ ${ep} → ${value} (날짜: ${extracted.date})`);
+      return { value, date: extracted.date, endpoint: ep };
     } catch (e) {
       console.error(`   오류: ${e.message} — ${url}`);
     }
@@ -181,6 +192,7 @@ async function main() {
     const res = await fetchMetric(metric);
     if (res) {
       result[metric.key] = res.value;
+      if (metric.key === 'etfFlow' && res.date) result.etfFlowDate = res.date;
       log.push(`  ✅ ${metric.label}: ${res.value}  (${res.endpoint})`);
     } else {
       log.push(`  ⚠️  ${metric.label}: 수집 실패 → 이전값 ${prev[metric.key] ?? '없음'} 유지`);
