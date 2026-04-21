@@ -564,9 +564,15 @@ function fmtDataDate(dateStr){
   try {
     const d = new Date(dateStr);
     if (isNaN(d)) return '';
-    const today = new Date();
-    const diffDays = Math.floor((today - d) / 86400000);
-    const label = `${d.getMonth()+1}/${d.getDate()} 기준`;
+    // KST(UTC+9) 기준 날짜 추출
+    const kstOffset = 9 * 60 * 60000;
+    const dKST = new Date(d.getTime() + kstOffset);
+    const todayKST = new Date(Date.now() + kstOffset);
+    // 날짜만 비교 (시간 제거)
+    const dDay = new Date(dKST.toISOString().slice(0,10));
+    const tDay = new Date(todayKST.toISOString().slice(0,10));
+    const diffDays = Math.round((tDay - dDay) / 86400000);
+    const label = `${dKST.getUTCMonth()+1}/${dKST.getUTCDate()} 기준`;
     return diffDays >= 3 ? label + ' ⚠️' : label;
   } catch { return ''; }
 }
