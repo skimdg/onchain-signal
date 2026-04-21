@@ -8,14 +8,16 @@
   "funding": -0.00012,
   "fundingDate": "2026-04-20",
   "puell": 0.85,
-  "utxo1m": 2.9,
+  "utxo1m": 2.8,
   "utxo7yr": 25.9,
   "lthSopr": 0.901,
   "sthSopr": 0.9979,
   "reserveRisk": 0.000621,
   "etfFlow": -53.3,
   "etfFlowDate": "2026-04-16",
-  "updatedAt": "2026-04-20T23:05:58.791Z",
-  "updatedAtKST": "2026. 4. 21. AM 8:05:58",
-  "source": "bitcoin-data.com (BGeometrics)"
+  "updatedAt": "2026-04-21T10:45:37.435Z",
+  "updatedAtKST": "2026. 4. 21. PM 7:45:37",
+  "source": "bitcoin-data.com (BGeometrics)",
+  "utxo1mDate": "2026-04-20",
+  "utxo7yrDate": "2026-04-20"
 }
