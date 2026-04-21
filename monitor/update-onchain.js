@@ -192,8 +192,8 @@ async function main() {
     const res = await fetchMetric(metric);
     if (res) {
       result[metric.key] = res.value;
-      if (metric.key === 'etfFlow' && res.date) result.etfFlowDate = res.date;
-      log.push(`  ✅ ${metric.label}: ${res.value}  (${res.endpoint})`);
+      if (res.date) result[metric.key + 'Date'] = res.date; // 모든 지표 날짜 저장
+      log.push(`  ✅ ${metric.label}: ${res.value} [${res.date||'?'}]  (${res.endpoint})`);
     } else {
       log.push(`  ⚠️  ${metric.label}: 수집 실패 → 이전값 ${prev[metric.key] ?? '없음'} 유지`);
     }

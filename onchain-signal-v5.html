@@ -509,8 +509,11 @@ let ANALYSTS = [
 // ═══════════════════════════════════════════════════════════════
 let MANUAL = { mvrvZ:0.43, nupl:0.15, sopr:0.98, funding:0.008, puell:0.62,
                utxo1m:8.5, utxo7yr:27.5,
-               lthSopr:null, sthSopr:null, reserveRisk:null,
-               etfFlow:null, etfFlowDate:null };
+               lthSopr:null, sthSopr:null, reserveRisk:null, etfFlow:null,
+               // 데이터 기준 날짜
+               mvrvZDate:null, nuplDate:null, soprDate:null, fundingDate:null,
+               puellDate:null, utxo1mDate:null, utxo7yrDate:null,
+               lthSoprDate:null, sthSoprDate:null, reserveRiskDate:null, etfFlowDate:null };
 // 수동갱신 필요 지표 목록 (배지 표시용)
 const MANUAL_ONLY = new Set([]);
 let ONCHAIN_UPDATED = null; // 마지막 자동 업데이트 시각
@@ -531,7 +534,9 @@ async function loadOnchainData() {
     if (d.sthSopr     != null) MANUAL.sthSopr     = d.sthSopr;
     if (d.reserveRisk != null) MANUAL.reserveRisk = d.reserveRisk;
     if (d.etfFlow     != null) MANUAL.etfFlow     = d.etfFlow;
-    if (d.etfFlowDate != null) MANUAL.etfFlowDate = d.etfFlowDate;
+    // 날짜 필드 로드
+    const dateKeys = ['mvrvZ','nupl','sopr','funding','puell','utxo1m','utxo7yr','lthSopr','sthSopr','reserveRisk','etfFlow'];
+    dateKeys.forEach(k => { if (d[k+'Date'] != null) MANUAL[k+'Date'] = d[k+'Date']; });
     ONCHAIN_UPDATED = d.updatedAtKST || d.updatedAt || null;
     console.log('📊 온체인 데이터 로드:', ONCHAIN_UPDATED);
   } catch(e) {
@@ -553,6 +558,18 @@ function fmt(n){ return (n==null||isNaN(n))?'—':n.toLocaleString('en-US',{maxi
 function fmtP(n){ if(!n)return'—'; if(n>=1000)return'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); return'$'+n.toFixed(4); }
 function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
 function fmtEtfFlow(v){ if(v==null||isNaN(v)) return'—'; const s=v>=0?'+':'-'; const a=Math.abs(v); return `${s}${a>=1000?(a/1000).toFixed(1)+'K':a.toFixed(1)} BTC`; }
+// 날짜 문자열 → "M/D 기준" (지연 경고 포함)
+function fmtDataDate(dateStr){
+  if(!dateStr) return '';
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d)) return '';
+    const today = new Date();
+    const diffDays = Math.floor((today - d) / 86400000);
+    const label = `${d.getMonth()+1}/${d.getDate()} 기준`;
+    return diffDays >= 3 ? label + ' ⚠️' : label;
+  } catch { return ''; }
+}
 
 // ═══════════════════════════════════════════════════════════════
 //  SCORE 1: 사이클 위치 (낮음=하락장  높음=과열)
@@ -981,30 +998,31 @@ function renderAlerts(als){
 function renderMetrics(){
   const {fearGreed:fg,fearGreedLabel:fgl,defiTvl:tvl,coinbasePremium:cp}=LIVE;
   const {mvrvZ,nupl,sopr,funding,puell,utxo1m,utxo7yr,lthSopr,sthSopr,reserveRisk}=MANUAL;
+  const D = k => fmtDataDate(MANUAL[k+'Date']); // 날짜 헬퍼
   const SECTIONS = [
     {
       title: '사이클 심리 · 수급 핵심',
       sub: 'Fear&Greed · MVRV Z · NUPL · SOPR · Coinbase Premium · UTXO',
       metrics: [
         {id:'fg',          nm:'Fear & Greed Index',  val:fg,       auto:true, disp:fg!=null?`${fg}`:'—', sub:fgl||''},
-        {id:'mvrv',        nm:'MVRV Z-Score',        val:mvrvZ,               disp:`${mvrvZ}`,           field:'mvrvZ',    step:'0.01'},
-        {id:'nupl',        nm:'NUPL',                val:nupl,                disp:`${nupl}`,            field:'nupl',     step:'0.01'},
-        {id:'sopr',        nm:'SOPR',                val:sopr,                disp:`${sopr}`,            field:'sopr',     step:'0.001'},
+        {id:'mvrv',        nm:'MVRV Z-Score',        val:mvrvZ,               disp:`${mvrvZ}`,           sub:D('mvrvZ')},
+        {id:'nupl',        nm:'NUPL',                val:nupl,                disp:`${nupl}`,            sub:D('nupl')},
+        {id:'sopr',        nm:'SOPR',                val:sopr,                disp:`${sopr}`,            sub:D('sopr')},
         {id:'coinbasepremium',nm:'Coinbase Premium', val:cp,       auto:true, disp:cp!=null?`${cp>=0?'+':''}${cp}%`:'—', sub:cp!=null?(cp>0.5?'기관FOMO↑':cp>0.2?'기관매수↑':cp<-0.2?'매도압력↑':cp<0?'US수요약':'중립'):''},
-        {id:'utxo1m',      nm:'UTXO 1w~1m (실현시가)',val:utxo1m,             disp:utxo1m!=null?`${utxo1m}%`:'—',  field:'utxo1m',  step:'0.1'},
-        {id:'utxo7yr',     nm:'UTXO 7yr+ (공급량)',  val:utxo7yr,             disp:utxo7yr!=null?`${utxo7yr}%`:'—', field:'utxo7yr', step:'0.01'},
+        {id:'utxo1m',      nm:'UTXO 1w~1m (실현시가)',val:utxo1m,             disp:utxo1m!=null?`${utxo1m}%`:'—',  sub:D('utxo1m')},
+        {id:'utxo7yr',     nm:'UTXO 7yr+ (공급량)',  val:utxo7yr,             disp:utxo7yr!=null?`${utxo7yr}%`:'—', sub:D('utxo7yr')},
       ]
     },
     {
       title: '홀더 행동 · 파생 지표',
       sub: 'LTH/STH SOPR · Reserve Risk · Funding · Puell · DeFi TVL',
       metrics: [
-        {id:'lthsopr',     nm:'LTH / STH SOPR',      val:lthSopr,             disp:lthSopr!=null?`${lthSopr}`:'—', sub:sthSopr!=null?`STH ${sthSopr}`:'', field:'lthSopr', step:'0.001'},
-        {id:'reserverisk', nm:'Reserve Risk',        val:reserveRisk,         disp:reserveRisk!=null?`${reserveRisk}`:'—', field:'reserveRisk', step:'0.0001'},
-        {id:'funding',     nm:'Funding Rate',        val:funding,             disp:`${funding>=0?'+':''}${funding}%`, field:'funding', step:'0.001'},
-        {id:'puell',       nm:'Puell Multiple',      val:puell,               disp:`${puell}`,           field:'puell',    step:'0.01'},
+        {id:'lthsopr',     nm:'LTH / STH SOPR',      val:lthSopr,             disp:lthSopr!=null?`${lthSopr}`:'—', sub:[sthSopr!=null?`STH ${sthSopr}`:'',D('lthSopr')].filter(Boolean).join(' · ')},
+        {id:'reserverisk', nm:'Reserve Risk',        val:reserveRisk,         disp:reserveRisk!=null?`${reserveRisk}`:'—', sub:D('reserveRisk')},
+        {id:'funding',     nm:'Funding Rate',        val:funding,             disp:`${funding>=0?'+':''}${funding}%`, sub:D('funding')},
+        {id:'puell',       nm:'Puell Multiple',      val:puell,               disp:`${puell}`,           sub:D('puell')},
         {id:'tvl',         nm:'DeFi TVL',            val:tvl!=null?Math.round(tvl):null, auto:true, disp:tvl!=null?`$${tvl.toFixed(1)}B`:'—'},
-        {id:'etfflow',     nm:'Spot ETF 순유입 (일일)', val:MANUAL.etfFlow,        disp:fmtEtfFlow(MANUAL.etfFlow), sub:MANUAL.etfFlowDate?`${MANUAL.etfFlowDate} 기준 ⚠️데이터 지연 가능`:''},
+        {id:'etfflow',     nm:'Spot ETF 순유입 (일일)', val:MANUAL.etfFlow,    disp:fmtEtfFlow(MANUAL.etfFlow), sub:D('etfFlow')},
       ]
     }
   ];
