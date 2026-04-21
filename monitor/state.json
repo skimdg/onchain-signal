@@ -1,78 +1,65 @@
 {
   "cycleZone": "하락장(20~40)",
-  "cycleScore": 21,
+  "cycleScore": 36,
   "zones": {
     "fg": "공포",
     "mvrv": "저평가",
-    "nupl": "희망",
+    "nupl": "낙관(Optimism)",
     "sopr": "손익분기",
-    "netflow": "순유출",
-    "funding": "중립",
-    "puell": "저평가"
+    "funding": "약베어",
+    "puell": "저평가",
+    "lthSopr": "LTH손실",
+    "sthSopr": "손익분기",
+    "reserveRisk": "강력매수",
+    "utxo1m": "강HODL",
+    "utxo7yr": "정상",
+    "etfFlow": "순유출"
   },
   "analysts": {
-    "capriole": {
-      "bullPct": 38,
-      "stance": "약세"
-    },
-    "checkmate": {
-      "bullPct": 20,
-      "stance": "약세"
-    },
-    "kiyoungju": {
-      "bullPct": 20,
-      "stance": "약세"
-    },
-    "willclemente": {
-      "bullPct": 80,
-      "stance": "강세"
-    },
-    "bencowen": {
-      "bullPct": 38,
-      "stance": "약세"
-    },
-    "maartunn": {
-      "bullPct": 80,
-      "stance": "강세"
-    },
-    "axeladler": {
-      "bullPct": 58,
+    "dancoininvestor": {
+      "bullPct": 50,
       "stance": "중립"
     },
-    "cryptoviz": {
-      "bullPct": 38,
-      "stance": "약세"
+    "whitepeach": {
+      "bullPct": 50,
+      "stance": "중립"
     },
-    "skew": {
-      "bullPct": 20,
-      "stance": "약세"
+    "gaah_im": {
+      "bullPct": 50,
+      "stance": "중립"
     },
-    "carpenoctom": {
-      "bullPct": 80,
-      "stance": "강세"
+    "crypto_glass": {
+      "bullPct": 50,
+      "stance": "중립"
     },
-    "route2fi": {
-      "bullPct": 30,
-      "stance": "약세"
+    "abramchart": {
+      "bullPct": 50,
+      "stance": "중립"
     },
-    "alexkruger": {
-      "bullPct": 65,
-      "stance": "강세"
+    "colu_farmer": {
+      "bullPct": 50,
+      "stance": "중립"
     },
-    "crypnuevo": {
-      "bullPct": 30,
-      "stance": "약세"
+    "defioasis": {
+      "bullPct": 50,
+      "stance": "중립"
     },
-    "ecoinometrics": {
-      "bullPct": 22,
-      "stance": "약세"
+    "fivedragontigger": {
+      "bullPct": 50,
+      "stance": "중립"
     },
-    "rektcapital": {
-      "bullPct": 20,
-      "stance": "약세"
+    "satoureireal": {
+      "bullPct": 50,
+      "stance": "중립"
+    },
+    "simplspark": {
+      "bullPct": 50,
+      "stance": "중립"
     }
   },
-  "btcPrice": 71659,
-  "fg": 16,
-  "updatedAt": "2026-04-12T05:28:12.467Z"
+  "btcPrice": 75768,
+  "fg": 33,
+  "lastMorningDate": null,
+  "lastEveningDate": null,
+  "updatedAt": "2026-04-21T06:22:50.446Z"
 }
