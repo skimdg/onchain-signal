@@ -9,6 +9,8 @@ jobs:
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
@@ -17,24 +19,16 @@ jobs:
         with:
           node-version: '20'
 
-      # 이전 실행의 state.json 복원 (구간 변경 감지용)
-      - name: Restore state cache
-        uses: actions/cache/restore@v4
-        with:
-          path: monitor/state.json
-          key: monitor-state-${{ github.run_id }}
-          restore-keys: |
-            monitor-state-
-
       - name: Run alert check
         env:
           TG_TOKEN:   ${{ secrets.TG_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
         run: node monitor/check-once.js
 
-      # 이번 실행 상태 저장 (다음 실행에서 비교용)
-      - name: Save state cache
-        uses: actions/cache/save@v4
-        with:
-          path: monitor/state.json
-          key: monitor-state-${{ github.run_id }}
+      # state.json을 repo에 직접 커밋 (Cache 7일 만료 문제 해결)
+      - name: Commit state
+        run: |
+          git config user.name "Onchain Signal Bot"
+          git config user.email "action@github.com"
+          git add monitor/state.json
+          git diff --staged --quiet || (git commit -m "state: 상태 업데이트 $(TZ=Asia/Seoul date +'%Y.%m.%d %H:%M')" && git push)

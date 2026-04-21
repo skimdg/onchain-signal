@@ -223,9 +223,20 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 
 /* responsive */
 @media(max-width:1400px){.m-section-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:1100px){.s1{grid-template-columns:1fr 1fr 1fr}}
-@media(max-width:900px){.s1{grid-template-columns:1fr 1fr}.m-section-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:600px){.s1{grid-template-columns:1fr}.m-section-grid{grid-template-columns:1fr}.hd{flex-direction:column;align-items:flex-start}}
+@media(max-width:1100px){.s1{grid-template-columns:1fr 1fr 1fr}.ag{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:900px){.s1{grid-template-columns:1fr 1fr}.m-section-grid{grid-template-columns:repeat(2,1fr)}.ag{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){
+  .s1{grid-template-columns:1fr}
+  .m-section-grid{grid-template-columns:1fr}
+  .ag{grid-template-columns:repeat(2,1fr)}
+  .wrap{padding:10px 12px}
+  .hd{flex-wrap:wrap;gap:6px}
+  .hd-left{flex:1 1 auto}
+  .hd-center{flex:1 1 100%;order:3;justify-content:center}
+  .hd-right{flex:1 1 auto;justify-content:flex-end}
+  .api-inp{width:100px}
+  .cd{display:none}
+}
 </style>
 </head>
 <body>
