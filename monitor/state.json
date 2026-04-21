@@ -20,13 +20,9 @@
       "bullPct": 50,
       "stance": "중립"
     },
-    "whitepeach": {
-      "bullPct": 50,
-      "stance": "중립"
-    },
     "gaah_im": {
-      "bullPct": 50,
-      "stance": "중립"
+      "bullPct": 90,
+      "stance": "강세"
     },
     "crypto_glass": {
       "bullPct": 50,
@@ -36,11 +32,19 @@
       "bullPct": 50,
       "stance": "중립"
     },
-    "colu_farmer": {
+    "defioasis": {
       "bullPct": 50,
       "stance": "중립"
     },
-    "defioasis": {
+    "satoureireal": {
+      "bullPct": 90,
+      "stance": "강세"
+    },
+    "whitepeach": {
+      "bullPct": 50,
+      "stance": "중립"
+    },
+    "colu_farmer": {
       "bullPct": 50,
       "stance": "중립"
     },
@@ -48,18 +52,34 @@
       "bullPct": 50,
       "stance": "중립"
     },
-    "satoureireal": {
-      "bullPct": 50,
-      "stance": "중립"
-    },
     "simplspark": {
       "bullPct": 50,
       "stance": "중립"
+    },
+    "route2fi": {
+      "bullPct": 50,
+      "stance": "중립"
+    },
+    "alexkruger": {
+      "bullPct": 50,
+      "stance": "중립"
+    },
+    "crypnuevo": {
+      "bullPct": 50,
+      "stance": "중립"
+    },
+    "ecoinometrics": {
+      "bullPct": 75,
+      "stance": "강세"
+    },
+    "rektcapital": {
+      "bullPct": 90,
+      "stance": "강세"
     }
   },
-  "btcPrice": 75548,
+  "btcPrice": 75561,
   "fg": 33,
   "lastMorningDate": null,
   "lastEveningDate": null,
-  "updatedAt": "2026-04-21T22:07:44.683Z"
+  "updatedAt": "2026-04-21T22:56:39.945Z"
 }
