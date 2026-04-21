@@ -29,9 +29,8 @@ const ONCHAIN_PATH  = path.join(__dirname, '..', 'onchain-data.json');
 // ══════════════════════════════════════════════════════════════
 const FALLBACK = {
   mvrvZ: 1.32, nupl: 0.266, sopr: 0.9978,
-  netflow: -5000, funding: 0.008, puell: 0.79,
-  utxo1m: null, utxo7yr: null, nrpl: null,
-  exchReserve: null, hodlWave1y2y: null,
+  funding: 0.008, puell: 0.79,
+  utxo1m: null, utxo7yr: null,
   lthSopr: null, sthSopr: null, reserveRisk: null,
   etfFlow: null,
 };
@@ -44,14 +43,10 @@ function loadOnchainData() {
       mvrvZ:       d.mvrvZ       ?? FALLBACK.mvrvZ,
       nupl:        d.nupl        ?? FALLBACK.nupl,
       sopr:        d.sopr        ?? FALLBACK.sopr,
-      netflow:     d.netflow     ?? FALLBACK.netflow,
       funding:     d.funding     ?? FALLBACK.funding,
       puell:       d.puell       ?? FALLBACK.puell,
       utxo1m:      d.utxo1m      ?? null,
       utxo7yr:     d.utxo7yr     ?? null,
-      nrpl:        d.nrpl        ?? null,
-      exchReserve: d.exchReserve ?? null,
-      hodlWave1y2y:d.hodlWave1y2y?? null,
       lthSopr:     d.lthSopr     ?? null,
       sthSopr:     d.sthSopr     ?? null,
       reserveRisk: d.reserveRisk ?? null,
@@ -65,18 +60,23 @@ function loadOnchainData() {
 
 const MANUAL = loadOnchainData();
 
-// 애널리스트 이름 맵 (foredex.io TOP 10)
+// 애널리스트 이름 맵 (foredex.io TOP 10 + 단기 전문 5명)
 const NAME_MAP = {
   dancoininvestor:  'Crypto Dan',
-  whitepeach:       '백도',
   gaah_im:          'Gaah',
   crypto_glass:     'Zizcrypto',
   abramchart:       'AbramChart',
-  colu_farmer:      '코루',
   defioasis:        'defioasis.eth',
-  fivedragontigger: '오룡타이거',
   satoureireal:     'Rei Researcher',
+  whitepeach:       '백도',
+  colu_farmer:      '코루',
+  fivedragontigger: '오룡타이거',
   simplspark:       '심플',
+  route2fi:         'Route 2 Fi',
+  alexkruger:       'Alex Kruger',
+  crypnuevo:        'CrypNuevo',
+  ecoinometrics:    'ecoinometrics',
+  rektcapital:      'Rekt Capital',
 };
 
 // ══════════════════════════════════════════════════════════════
@@ -105,13 +105,10 @@ function fgZone(v)          { return v<=24?'극도공포':v<=49?'공포':v<=54?'
 function mvrvZone(v)        { return v<0?'극저평가':v<2?'저평가':v<4?'공정가치':v<7?'고평가':'극과열'; }
 function nuplZone(v)        { return v<0?'항복(Capitulation)':v<0.25?'희망(Hope)':v<0.5?'낙관(Optimism)':v<0.75?'믿음(Belief)':'행복(Euphoria)'; }
 function soprZone(v)        { return v<0.95?'패닉매도':v<1.0?'손익분기':v<1.05?'건전이익실현':'이익실현과잉'; }
-function netflowZone(v)     { return v<-15000?'강유출':v<-3000?'유출':v<=3000?'중립':v<=15000?'유입':'강유입'; }
 function fundingZone(v)     { return v<-0.05?'숏과다':v<0?'약베어':v<=0.03?'중립':v<=0.1?'롱주의':'극과열'; }
 function puellZone(v)       { return v<0.5?'채굴자항복':v<1.0?'저평가':v<3.0?'중립':v<4.0?'과열주의':'극과열'; }
 function lthSoprZone(v)     { return v<0.9?'LTH항복':v<1.0?'LTH손실':v<1.5?'초기상승':v<2.5?'중기':v<4.0?'후기경고':'분배'; }
 function reserveRiskZone(v) { return v<0.002?'강력매수':v<0.005?'매수':v<0.01?'중립':v<0.02?'주의':'분배'; }
-function nrplZone(v)        { return v<-30000?'극도패닉':v<0?'손실실현':v<=20000?'중립':v<=80000?'이익실현':'강한분배'; }
-function exchReserveZone(v) { return v<2e6?'강한축적':v<2.3e6?'축적중':v<2.6e6?'중립':v<2.9e6?'증가주의':'분배압력'; }
 function utxo1mZone(v)      { return v<5?'강HODL':v<8?'건전':v<12?'보통':v<18?'과열':'분배'; }
 function utxo7yrZone(v)     { return v>35?'극강홀딩':v>30?'강한홀딩':v>25?'정상':v>20?'감소':'대규모이동'; }
 function sthSoprZone(v)     { return v<0.95?'STH패닉':v<1.0?'손익분기':v<1.05?'건전':'과잉'; }
@@ -205,14 +202,11 @@ async function main() {
     { key: 'mvrv',        label: 'MVRV Z-Score',        val: MANUAL.mvrvZ,          zoneFn: mvrvZone        },
     { key: 'nupl',        label: 'NUPL',                val: MANUAL.nupl,           zoneFn: nuplZone        },
     { key: 'sopr',        label: 'SOPR',                val: MANUAL.sopr,           zoneFn: soprZone        },
-    { key: 'netflow',     label: 'Exchange Netflow',    val: MANUAL.netflow,        zoneFn: netflowZone     },
     { key: 'funding',     label: 'Funding Rate',        val: MANUAL.funding,        zoneFn: fundingZone     },
     { key: 'puell',       label: 'Puell Multiple',      val: MANUAL.puell,          zoneFn: puellZone       },
     { key: 'lthSopr',     label: 'LTH SOPR',            val: MANUAL.lthSopr,        zoneFn: lthSoprZone     },
     { key: 'sthSopr',     label: 'STH SOPR',            val: MANUAL.sthSopr,        zoneFn: sthSoprZone     },
     { key: 'reserveRisk', label: 'Reserve Risk',        val: MANUAL.reserveRisk,    zoneFn: reserveRiskZone },
-    { key: 'nrpl',        label: 'NRPL',                val: MANUAL.nrpl,           zoneFn: nrplZone        },
-    { key: 'exchReserve', label: 'Exchange Reserves',   val: MANUAL.exchReserve,    zoneFn: exchReserveZone },
     { key: 'utxo1m',      label: 'UTXO 1w~1m',          val: MANUAL.utxo1m,         zoneFn: utxo1mZone      },
     { key: 'utxo7yr',     label: 'UTXO 7yr+',           val: MANUAL.utxo7yr,        zoneFn: utxo7yrZone     },
     { key: 'etfFlow',     label: 'Spot ETF 순유입',      val: MANUAL.etfFlow,        zoneFn: etfFlowZone     },
@@ -283,10 +277,10 @@ async function main() {
     const neuts    = analysts.filter(a => a.bullPct >= 40 && a.bullPct < 60);
     const bears    = analysts.filter(a => a.bullPct < 40);
 
-    // 온체인 장기: Crypto Dan, Gaah, Zizcrypto, AbramChart, defioasis.eth, Rei Researcher
-    const onchainIds   = ['dancoininvestor','gaah_im','crypto_glass','abramchart','defioasis','satoureireal'];
-    // 트레이딩 단기: 백도, 코루, 오룡타이거, 심플
-    const shorttermIds = ['whitepeach','colu_farmer','fivedragontigger','simplspark'];
+    // 온체인 데이터 애널리스트 (foredex.io TOP 10)
+    const onchainIds   = ['dancoininvestor','gaah_im','crypto_glass','abramchart','defioasis','satoureireal','whitepeach','colu_farmer','fivedragontigger','simplspark'];
+    // 단기 전문 5명
+    const shorttermIds = ['route2fi','alexkruger','crypnuevo','ecoinometrics','rektcapital'];
 
     const makeLines = ids => ids
       .map(id => analysts.find(a => a.id === id))
