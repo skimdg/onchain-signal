@@ -23,6 +23,16 @@ const REPORT_TYPE   = process.env.REPORT_TYPE  || ''; // 'morning' | 'evening'
 const STATE_PATH    = path.join(__dirname, 'state.json');
 const ANALYST_PATH  = path.join(__dirname, '..', 'analyst-data.json');
 const ONCHAIN_PATH  = path.join(__dirname, '..', 'onchain-data.json');
+const ALERT_CFG_PATH = path.join(__dirname, 'alert-config.json');
+
+// ── 알림 조건 설정 로드 ─────────────────────────────────────────
+function loadAlertConfig() {
+  try { return JSON.parse(fs.readFileSync(ALERT_CFG_PATH, 'utf8')); }
+  catch { return {}; } // 파일 없으면 전체 ON
+}
+const ALERT_CFG = loadAlertConfig();
+// 키 없거나 true면 ON, 명시적 false만 OFF
+const cfg = key => ALERT_CFG[key] !== false;
 
 // ══════════════════════════════════════════════════════════════
 //  온체인 지표 로드 — onchain-data.json (update-onchain.js가 BGeometrics API로 자동 수집)
@@ -175,12 +185,12 @@ async function main() {
   //  1. 즉시 경보
   // ────────────────────────────────────────────────────────────
   if (fg !== null) {
-    if (fg <= 15) immediateAlerts.push(`🔴 <b>극도 공포</b> F&amp;G ${fg} — 패닉 구간, 역발상 매수 타이밍`);
-    if (fg >= 85) immediateAlerts.push(`🔴 <b>극도 탐욕</b> F&amp;G ${fg} — 고점 신호, 즉시 익절 고려`);
+    if (cfg('immediateAlert_fgFear')  && fg <= 15) immediateAlerts.push(`🔴 <b>극도 공포</b> F&amp;G ${fg} — 패닉 구간, 역발상 매수 타이밍`);
+    if (cfg('immediateAlert_fgGreed') && fg >= 85) immediateAlerts.push(`🔴 <b>극도 탐욕</b> F&amp;G ${fg} — 고점 신호, 즉시 익절 고려`);
   }
   if (btcChange !== null) {
-    if (btcChange <= -10) immediateAlerts.push(`📉 <b>BTC 급락</b> 24h ${btcChange.toFixed(1)}%`);
-    if (btcChange >=  10) immediateAlerts.push(`📈 <b>BTC 급등</b> 24h +${btcChange.toFixed(1)}%`);
+    if (cfg('immediateAlert_btcDrop') && btcChange <= -10) immediateAlerts.push(`📉 <b>BTC 급락</b> 24h ${btcChange.toFixed(1)}%`);
+    if (cfg('immediateAlert_btcRise') && btcChange >=  10) immediateAlerts.push(`📈 <b>BTC 급등</b> 24h +${btcChange.toFixed(1)}%`);
   }
 
   // ────────────────────────────────────────────────────────────
@@ -189,7 +199,7 @@ async function main() {
   const cycleScore   = calcCycleScore(MANUAL.mvrvZ, MANUAL.nupl, fg ?? 50);
   const curCycleZone = cycleZone(cycleScore);
   console.log(`사이클 점수: ${cycleScore} → ${curCycleZone}`);
-  if (prev.cycleZone && prev.cycleZone !== curCycleZone) {
+  if (cfg('changeAlert_cycleZone') && prev.cycleZone && prev.cycleZone !== curCycleZone) {
     changes.push(`🔄 <b>사이클 구간 변경</b>\n  ${prev.cycleZone} → <b>${curCycleZone}</b>  (점수 ${cycleScore})`);
   }
 
@@ -214,6 +224,7 @@ async function main() {
 
   for (const m of metricChecks) {
     if (!m.cur) continue;
+    if (!cfg('changeAlert_metrics')) continue;
     const prevZone = prev.zones?.[m.key];
     if (prevZone && prevZone !== m.cur) {
       const valStr = typeof m.val === 'number'
@@ -228,13 +239,14 @@ async function main() {
   //  4. 애널리스트 스탠스 변경 감지 (15% 이상)
   //     → 이름, 이전%, 현재%, 최근 헤드라인 포함
   // ────────────────────────────────────────────────────────────
-  if (analystData?.analysts?.length) {
+  if (cfg('changeAlert_analysts') && analystData?.analysts?.length) {
+    const analystThreshold = ALERT_CFG.analystChangeThreshold ?? 15;
     for (const a of analystData.analysts) {
       const curStance  = a.bullPct >= 60 ? '강세' : a.bullPct >= 40 ? '중립' : '약세';
       const prevA      = prev.analysts?.[a.id];
       if (!prevA) continue;
       const diff = Math.abs(prevA.bullPct - a.bullPct);
-      if (diff < 15) continue;
+      if (diff < analystThreshold) continue;
 
       const dir  = curStance === '강세' ? '📈' : curStance === '약세' ? '📉' : '➡️';
       const name = NAME_MAP[a.id] || a.id;

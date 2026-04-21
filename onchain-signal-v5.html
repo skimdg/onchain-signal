@@ -472,6 +472,46 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 
       <div style="border-top:1px solid var(--border)"></div>
 
+      <!-- 알림 조건 설정 섹션 -->
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--txt);margin-bottom:4px">🔔 텔레그램 알림 조건</div>
+        <div style="font-size:11px;color:var(--txt3);margin-bottom:10px">GitHub에 저장하면 다음 알림 실행(15분 내)부터 반영됩니다.</div>
+
+        <!-- GitHub PAT -->
+        <div style="margin-bottom:10px">
+          <div style="font-size:11px;font-weight:600;color:var(--txt2);margin-bottom:4px">
+            GitHub PAT <span style="font-weight:400;color:var(--txt3)">(repo 권한 · 탭 세션 유지)</span>
+          </div>
+          <div style="display:flex;gap:6px">
+            <input id="alert-pat-inp" type="password" placeholder="ghp_xxxxxxxxxxxx"
+              style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:12px;color:var(--txt);outline:none;font-family:monospace"
+              onkeydown="if(event.key==='Enter')alertSavePat()">
+            <button onclick="alertSavePat()" class="scan-mini" style="margin-top:0;font-size:12px;padding:0 14px">저장</button>
+          </div>
+          <div id="alert-pat-status" style="font-size:11px;color:var(--txt3);margin-top:4px;min-height:14px"></div>
+        </div>
+
+        <!-- 알림 조건 토글 -->
+        <div id="alert-toggles" style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px"></div>
+
+        <!-- 애널리스트 임계값 -->
+        <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;margin-bottom:10px">
+          <span style="flex:1;font-size:12px;font-weight:600;color:var(--txt)">애널리스트 변화 임계값</span>
+          <input id="alert-threshold" type="number" min="5" max="50" value="15"
+            style="width:52px;background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:4px 6px;font-size:12px;color:var(--txt);outline:none;text-align:center">
+          <span style="font-size:12px;color:var(--txt3)">% 이상 변화 시</span>
+        </div>
+
+        <!-- 버튼 -->
+        <div style="display:flex;gap:6px">
+          <button onclick="alertLoadFromGithub()" class="scan-mini" style="flex:1;margin-top:0;font-size:11px;background:var(--bg3);color:var(--txt2);border:1px solid var(--border)">☁ 서버 설정 불러오기</button>
+          <button onclick="alertSaveToGithub()" class="scan-mini" style="flex:1;margin-top:0;font-size:12px">💾 GitHub에 저장</button>
+        </div>
+        <div id="alert-save-status" style="font-size:11px;color:var(--txt2);text-align:center;margin-top:6px;min-height:14px"></div>
+      </div>
+
+      <div style="border-top:1px solid var(--border)"></div>
+
       <!-- 하단 컨트롤 -->
       <div style="display:flex;gap:6px">
         <button onclick="tgChangePinFlow()" class="scan-mini" style="margin-top:0;font-size:11px;background:var(--bg3);color:var(--txt2);border:1px solid var(--border)">🔑 PIN 변경</button>
@@ -1319,6 +1359,7 @@ function tgShowSettingsPanel(){
   document.getElementById('tg-pin-panel').style.display='none';
   document.getElementById('tg-settings-panel').style.display='flex';
   renderTgRecipients();
+  alertInitPanel();
 }
 
 function tgShowPinPanel(){
@@ -1491,6 +1532,111 @@ async function checkAndNotify(){
     await sendTelegram(txt);
   }
   _lastAlertKeys=new Set(als.map(a=>a.m));
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  ALERT CONFIG (알림 조건 설정)
+// ═══════════════════════════════════════════════════════════════
+const ALERT_TOGGLE_DEFS = [
+  { key:'immediateAlert_fgFear',  label:'즉시경보 — F&G 극도공포 (≤15)',      desc:'극도 공포 구간 진입 시 즉시 발송' },
+  { key:'immediateAlert_fgGreed', label:'즉시경보 — F&G 극도탐욕 (≥85)',      desc:'극도 탐욕 구간 진입 시 즉시 발송' },
+  { key:'immediateAlert_btcDrop', label:'즉시경보 — BTC 24h -10% 이상 급락', desc:'급락 발생 시 즉시 발송' },
+  { key:'immediateAlert_btcRise', label:'즉시경보 — BTC 24h +10% 이상 급등', desc:'급등 발생 시 즉시 발송' },
+  { key:'changeAlert_cycleZone',  label:'구간변경 — 사이클 점수 구간 이동',   desc:'바닥권/하락장/회복/상승/과열 구간 전환 시' },
+  { key:'changeAlert_metrics',    label:'구간변경 — 온체인 지표 12개',         desc:'MVRV/NUPL/SOPR 등 지표 구간 전환 시' },
+  { key:'changeAlert_analysts',   label:'구간변경 — 애널리스트 스탠스',        desc:'임계값 이상 포지션 변화 감지 시' },
+];
+
+let _alertCfg = {};
+let _alertGithubPat = sessionStorage.getItem('oc_alert_pat') || '';
+const ALERT_REPO = 'skimdg/onchain-signal';
+const ALERT_FILE = 'monitor/alert-config.json';
+
+function setAlertPatStatus(msg, color='var(--txt3)'){
+  const e=document.getElementById('alert-pat-status'); if(e){e.textContent=msg;e.style.color=color;}
+}
+function setAlertSaveStatus(msg, color='var(--txt2)'){
+  const e=document.getElementById('alert-save-status'); if(e){e.textContent=msg;e.style.color=color;}
+}
+
+function alertSavePat(){
+  const pat=document.getElementById('alert-pat-inp').value.trim(); if(!pat) return;
+  _alertGithubPat=pat; sessionStorage.setItem('oc_alert_pat',pat);
+  document.getElementById('alert-pat-inp').value='';
+  setAlertPatStatus('✅ PAT 저장됨 (탭 세션 유지)','var(--bull)');
+}
+
+function renderAlertToggles(cfg){
+  const wrap=document.getElementById('alert-toggles'); if(!wrap) return;
+  wrap.innerHTML=ALERT_TOGGLE_DEFS.map(d=>{
+    const on=cfg[d.key]!==false;
+    return `<label style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;cursor:pointer">
+      <input type="checkbox" ${on?'checked':''} onchange="alertToggle('${d.key}',this.checked)" style="cursor:pointer;accent-color:var(--acc);width:14px;height:14px;flex-shrink:0">
+      <span style="flex:1;min-width:0">
+        <span style="font-size:12px;font-weight:600;color:var(--txt);display:block">${d.label}</span>
+        <span style="font-size:10px;color:var(--txt3)">${d.desc}</span>
+      </span>
+      <span style="font-size:11px;font-weight:700;flex-shrink:0;color:${on?'var(--bull)':'var(--bear)'}">${on?'ON':'OFF'}</span>
+    </label>`;
+  }).join('');
+  const th=document.getElementById('alert-threshold');
+  if(th) th.value=cfg.analystChangeThreshold??15;
+}
+
+function alertToggle(key,val){
+  _alertCfg[key]=val; renderAlertToggles(_alertCfg);
+}
+
+function alertInitPanel(){
+  // PAT 이미 저장돼 있으면 상태 표시
+  if(_alertGithubPat) setAlertPatStatus('✅ PAT 저장됨 (탭 세션)','var(--bull)');
+  // 현재 설정 불러오기
+  alertLoadFromGithub();
+}
+
+async function alertLoadFromGithub(){
+  setAlertSaveStatus('서버 설정 불러오는 중...','var(--txt3)');
+  try{
+    const res=await fetch(`https://raw.githubusercontent.com/${ALERT_REPO}/master/${ALERT_FILE}?_=${Date.now()}`);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    _alertCfg=await res.json();
+    renderAlertToggles(_alertCfg);
+    setAlertSaveStatus('✅ 서버 설정 불러옴','var(--bull)');
+  }catch(e){
+    // 불러오기 실패 시 기본값으로 렌더
+    if(!Object.keys(_alertCfg).length) _alertCfg={};
+    renderAlertToggles(_alertCfg);
+    setAlertSaveStatus('⚠️ 불러오기 실패 — 기본값 표시','var(--neu)');
+  }
+}
+
+async function alertSaveToGithub(){
+  if(!_alertGithubPat){ setAlertSaveStatus('❌ PAT를 먼저 입력·저장하세요','var(--bear)'); return; }
+  _alertCfg.analystChangeThreshold=parseInt(document.getElementById('alert-threshold').value)||15;
+  _alertCfg.updatedAt=new Date().toISOString().slice(0,10);
+  setAlertSaveStatus('GitHub에 저장 중...','var(--txt3)');
+  try{
+    // 파일 SHA 조회 (PUT에 필요)
+    const infoRes=await fetch(`https://api.github.com/repos/${ALERT_REPO}/contents/${ALERT_FILE}`,{
+      headers:{Authorization:'token '+_alertGithubPat, Accept:'application/vnd.github.v3+json'}
+    });
+    const info=await infoRes.json();
+    if(!infoRes.ok) throw new Error(info.message||'GitHub API 오류 (PAT 권한 확인)');
+
+    const content=btoa(unescape(encodeURIComponent(JSON.stringify(_alertCfg,null,2))));
+    const putRes=await fetch(`https://api.github.com/repos/${ALERT_REPO}/contents/${ALERT_FILE}`,{
+      method:'PUT',
+      headers:{Authorization:'token '+_alertGithubPat,'Content-Type':'application/json'},
+      body:JSON.stringify({message:'config: 알림 조건 설정 업데이트 '+_alertCfg.updatedAt, content, sha:info.sha})
+    });
+    const putData=await putRes.json();
+    if(!putRes.ok) throw new Error(putData.message||'저장 실패');
+
+    setAlertSaveStatus('✅ GitHub에 저장됨 — 다음 알림 실행(15분 내)부터 반영','var(--bull)');
+    renderAlertToggles(_alertCfg);
+  }catch(e){
+    setAlertSaveStatus('❌ '+e.message,'var(--bear)');
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════

@@ -1,0 +1,11 @@
+{
+  "immediateAlert_fgFear": true,
+  "immediateAlert_fgGreed": true,
+  "immediateAlert_btcDrop": true,
+  "immediateAlert_btcRise": true,
+  "changeAlert_cycleZone": true,
+  "changeAlert_metrics": true,
+  "changeAlert_analysts": true,
+  "analystChangeThreshold": 15,
+  "updatedAt": "2026-04-21"
+}
