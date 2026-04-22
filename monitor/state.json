@@ -5,11 +5,11 @@
     "fg": "공포",
     "mvrv": "저평가",
     "nupl": "낙관(Optimism)",
-    "sopr": "손익분기",
+    "sopr": "건전이익실현",
     "funding": "약베어",
     "puell": "저평가",
-    "lthSopr": "LTH항복",
-    "sthSopr": "건전",
+    "lthSopr": "초기상승",
+    "sthSopr": "손익분기",
     "reserveRisk": "강력매수",
     "utxo1m": "강HODL",
     "utxo7yr": "정상",
@@ -41,8 +41,8 @@
       "stance": "강세"
     },
     "whitepeach": {
-      "bullPct": 50,
-      "stance": "중립"
+      "bullPct": 90,
+      "stance": "강세"
     },
     "colu_farmer": {
       "bullPct": 50,
@@ -69,7 +69,7 @@
       "stance": "중립"
     },
     "ecoinometrics": {
-      "bullPct": 75,
+      "bullPct": 86,
       "stance": "강세"
     },
     "rektcapital": {
@@ -77,9 +77,9 @@
       "stance": "강세"
     }
   },
-  "btcPrice": 78597,
+  "btcPrice": 78587,
   "fg": 32,
   "lastMorningDate": null,
   "lastEveningDate": null,
-  "updatedAt": "2026-04-22T22:28:31.582Z"
+  "updatedAt": "2026-04-22T23:13:01.949Z"
 }
