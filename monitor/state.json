@@ -6,7 +6,7 @@
     "mvrv": "저평가",
     "nupl": "낙관(Optimism)",
     "sopr": "손익분기",
-    "funding": "중립",
+    "funding": "약베어",
     "puell": "저평가",
     "lthSopr": "LTH항복",
     "sthSopr": "손익분기",
@@ -17,7 +17,7 @@
   },
   "analysts": {
     "dancoininvestor": {
-      "bullPct": 50,
+      "bullPct": 45,
       "stance": "중립"
     },
     "gaah_im": {
@@ -73,13 +73,13 @@
       "stance": "강세"
     },
     "rektcapital": {
-      "bullPct": 10,
-      "stance": "약세"
+      "bullPct": 90,
+      "stance": "강세"
     }
   },
-  "btcPrice": 78339,
+  "btcPrice": 78043,
   "fg": 26,
   "lastMorningDate": null,
   "lastEveningDate": null,
-  "updatedAt": "2026-05-01T22:31:46.767Z"
+  "updatedAt": "2026-05-01T23:34:00.336Z"
 }
