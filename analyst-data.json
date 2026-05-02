@@ -3,7 +3,7 @@
     {
       "id": "dancoininvestor",
       "bullPct": 45,
-      "prevBullPct": 50,
+      "prevBullPct": 45,
       "summary": "중립 포지션. 최근: Bitcoin Market Greed Surge Sparks Potential Reversal Warning / Bitcoin most 'undervalued' since Marc",
       "headlines": [
         "2026.4.27. — Bitcoin Market Greed Surge Sparks Potential Reversal Warning from On-Chain Analy",
@@ -16,7 +16,7 @@
         "https://news.google.com/rss/articles/CBMi0AFBVV95cUxNUUdBVk9XWFRVcE80bkJsZmFsdTZPZDZmZFFoWVNyZWEtMk83dDczZXZGUFNNTVhRZ1BIS0NuZ3JXWW5aSzU3OW5hVnNxVTFuNHVvRnRyUkNWTjZRelhZaVY0QllsbGEybU85Sk9VNXl5YW9PbVk3VnlacTNINEtidDVMTnd6QmV6ZkxqT2FwaHBQQzhOcG1zdHRRNV9GMVY4bk1MSnBIVU82ZkVXUnF4aHBuNU5xQWlRanhBeXRZZEpfaFJRNTREelNSeklBSFlr?oc=5",
         "https://news.google.com/rss/articles/CBMisgFBVV95cUxPNFZTaThSYnFkV0FKUl9uVXpreTNUTGFWRDdxYVlWaFpxbkhWLVlfbVZ5b2ZlbzB5dWY5TXpPd0tiblZSampLUV9UX1dkWGZlWVlCMnJFcEhEMHRRb004Tk1aNUwyZ0dIU0h4WEp4VUV3OVlUM2NydERwVmZ0S2NKME5iODQ3TmRiMlNUcWZHZ0pOMnEtQUhIQTd2OGgxVExNbDgxd1AtVTRRYzFfaUtGWEN3?oc=5"
       ],
-      "lastScan": "2026-05-01T22:56:36.372Z",
+      "lastScan": "2026-05-02T22:53:35.704Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -24,16 +24,16 @@
       "id": "gaah_im",
       "bullPct": 10,
       "prevBullPct": 10,
-      "summary": "약세 포지션. 최근: Bitcoin Funding Rate Enters Deep Negative Territory — What’s / Bitcoin traders say BTC price at ‘mak",
+      "summary": "약세 포지션. 최근: Bitcoin traders say BTC price at ‘make-or-break’ point at $1 / Bitcoin Holders Are Taking Profits—Bu",
       "headlines": [
-        "2026.4.11. — Bitcoin Funding Rate Enters Deep Negative Territory — What’s Next? - TradingView"
+        "2026.4.12. — Bitcoin Funding Rate Enters Deep Negative Territory — What's Next? - Bitget"
       ],
       "sourceUrls": [
-        "https://news.google.com/rss/articles/CBMivgFBVV95cUxNN0JFM3lydHBiVUpQVUo4WTZlb1lMNFJ5SnlJNWJIMDNBbVBYNW0tcVFzMzVjQzFsR1ZCd1N0TXk0RHV3MFk5cFc5Q2FpdGZIaTlidEozcW1xampEdEJmSzdlUzZudWJGUnp6TGdhRERac3BCTVpETDRYR1IxSGdWdWRZbGlZSnhTcDV4aExXNXNPYVVlU3NDbGFTaHdGQ3VUZkFJalNKT25CTi0zWl8yRFFpM0p2RE9pWkJNdmpR?oc=5",
         "https://news.google.com/rss/articles/CBMiwgFBVV95cUxQLUlDSWRVaV96bzRRcm9qazVZc0xwN21Nc1lJSVBDb1dWQWhTRVVDQkJMdGJlZF9VSXBURVdFUFlheHRfSHlDbjdZVGZaNUZsYng2ei1PS1ZRZ3hEQUJuQmxyeHpuZ01WZkZhczQ5aWM0ZFRvWW12SFNlZ1N6TE95V3djOUFSelAxWjhiV19razRQcXl1bUpZbjF2c2Vsb1c1SC1ILVhxVEt3RWstXzJ5NDVuZTVrRHAwOEotbElKcnJnZw?oc=5",
-        "https://news.google.com/rss/articles/CBMinAFBVV95cUxNRjcwSmEwZXRzY3cwdVRQcFNfWWZWdkREbVhEenlHOTlDNF9pYTAyNEN2NXZFOGdpUDlYd21ia0tWMmRSWloySXc0NjJuc3V1U1Zud20ta01xU19sNGN5bElDeUpUX3hQVEpwOERNWmItV2xrTk8tS19mV3RlR19zaHFOUF9lU2VfcExPbWsxTHM1TTNNTWVYLVZTXy0?oc=5"
+        "https://news.google.com/rss/articles/CBMipAFBVV95cUxOWjlWdkFiaVlyLS1uWDF1dU9aV29EYl9wNlpqelVFUWZPVHBIcl82UE02MWxEQjNzem5LdzIwZGJZZTBjeGY2Yjc1d1RIeS1sYkYwVlFodlJ3TUh5cWxFa0tJdV80bFJoM0NmdVN4SW5oX0tMSERoVER6T3FqekMyeVZJTzFDVTM3LUtoZDdEem9vV2tCMWRiVnRlOGJPNlNfUExORA?oc=5",
+        "https://news.google.com/rss/articles/CBMiZEFVX3lxTE8yaUJFaFptSkVMUXFodTkwMHBSeDhwY1p3cGlXVHUzMEFNc1FiQ0pWbFhBZVF1Zkt3a3hKaXhyUGo3b19YTFVUQ0Z5RjhZY0RVNTB5ellHS0VtTjFXdkZTYS04dWrSAWpBVV95cUxPaWxkQXhvQlVySTNSamRkZ2lIYUswNEFqWUFsVHZDR05UTVJROXhzQmNMOFdJZHRVWHhmUzNCbk43TGpkeDV3dG8wNVJydFV3M29PdF81VUhBQXN0T1VUaGVNdDMxZ3hadmV3?oc=5"
       ],
-      "lastScan": "2026-05-01T22:56:41.643Z",
+      "lastScan": "2026-05-02T22:53:40.609Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -41,18 +41,18 @@
       "id": "crypto_glass",
       "bullPct": 10,
       "prevBullPct": 10,
-      "summary": "약세 포지션. 최근: Bitcoin Bear Market Warning: Analyst Predicts Further Declin / Analysts Assess Bitcoin’s Potential f",
+      "summary": "약세 포지션. 최근: Bitcoin Bear Market Warning: Analyst Predicts Further Declin / Bitcoin Bear Market Warning: Analyst ",
       "headlines": [
         "2026.4.30. — Bitcoin Bear Market Warning: Analyst Predicts Further Decline as Correction Deep",
-        "2026.4.30. — Analysts Assess Bitcoin’s Potential for Further Decline - ForkLog",
+        "2026.4.30. — Bitcoin Bear Market Warning: Analyst Predicts Further Decline as Correction Deep",
         "2026.4.30. — Bitcoin Drawdown Nears 39% as Past Cycle Lows Remain Far Deeper - Analytics Insi"
       ],
       "sourceUrls": [
+        "https://news.google.com/rss/articles/CBMifkFVX3lxTFBJektaSGk1cnl3bWg4Y0tKZTlaZEdTbU5vczNVT2ZYcThMZ2dVcWtPYVhxcGJhVHBTcVdxRzllZi1lXzllejZ6aGtNMC1xSmxhNG1YVGtZLXdwQ0wzU0ltcW5qdGdNR21ZQVVSUHkxMldfMW1mMkM1bXRQUXdFZw?oc=5",
         "https://news.google.com/rss/articles/CBMiR0FVX3lxTE5SVGd6V2VUOTN3YmRGcUpGSlBIRGtHT2M3Nl8zWnBqM2Q2RFA3Q3pvLTZnSk5BMFk3cFlNUENNSFEzWnVlNEt3?oc=5",
-        "https://news.google.com/rss/articles/CBMihAFBVV95cUxPa0h4R3RxNzk2b3ZtOXdDT3RjTDlnZWdqNFRqVU00MDBwdmx5cE9uMVdSYUdEMnp3NVoxZGVYcjVWLTNocDZFNG9xdjRiSlFQOXcxMk5yUTcyd1pxTm5teHZ4ak02N1hXN1d5eHN0cFFRZW5hSlJpLUxHb29ZM1BmWlJMNTM?oc=5",
         "https://news.google.com/rss/articles/CBMiogFBVV95cUxNZ0tPT18tZFY3R18wMFJ3RWhMTU9KbU9HdGh1amI0MFU0cDhhSnVqVTlJT09KUVBDd0ZYLTNXU0VibTdSZkw4dW5lN3lKQUJUdlZ4Q3pXNFNhMEYtZHVTODVFaEtnNHFfSnY1bEdUZHVjN01HMUk2SGdTOThpTmo3WnlGSHVzNmJweUZLekp1UmNFUFIxanpmaGRFWTZMOW9NbEHSAa8BQVVfeXFMTmxPX3pRaUtONVNkWjBSNXBzS19ybnpzM1U1VWZCQWxwYUNBM0JVQTJpY2xIU0NLYjVZbXZuQXdHSE9Gb0FsRW1xQVdZbnhiYzZ2dDROdWFfc21NbnpYY09tY3dNMmZQYkEyYkpWVmE1R3JySnJ3T2NCYTEtRGZfZEo1MVdXX29kb2NFejdHT2JJelByX00wSzV4MlRqazhBemtBNFUyU0Q5MVRiQVJZMA?oc=5"
       ],
-      "lastScan": "2026-05-01T22:56:47.814Z",
+      "lastScan": "2026-05-02T22:53:46.253Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -67,7 +67,7 @@
         "https://news.google.com/rss/articles/CBMisAFBVV95cUxPLXQweURxdFUyalhrT3A1WVg5aHBRSkRERFhqUDJvcWhGMllZWk5KekpMdS1uREpQZS1xdXBaR2ZWdFQxX3RSZFBJU2dhbS00VFBrNTdQY3lrV3RBX0U0eVpLTXFWcmhVY2Q2ZXA5ZzdzdGxvR0dWc3F1WllPcmMteXRiUzJfMGo3bXFmWVh1d2Vfd3BVaFZJb3RqaGZkZlJQTlo0M1VSdWwzR0h2V0diTQ?oc=5",
         "https://news.google.com/rss/articles/CBMiWEFVX3lxTE1xYlpnS1pwellNSEZxMWhENGNWelFseDE2Q2cyY0trd2p2dnU1RDJJS2wydTBaankybWl2Q1UyZDJ5UEkxc3lWVmZCU1ZnbUlnRkRoS1ZhbGw?oc=5"
       ],
-      "lastScan": "2026-05-01T22:56:54.451Z",
+      "lastScan": "2026-05-02T22:53:51.087Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -82,9 +82,9 @@
       "sourceUrls": [
         "https://news.google.com/rss/articles/CBMirgFBVV95cUxNTkl2SFVGZFpveU9qVzhUeTg2YTY4eHV0RjNXQmluNTJUQ2ktY0x4dlBSdXZpSlppN0VkMjIwTmI0a0dJb3laUFZmQWVYaWJXSmRfaFp4bms2UVZteURVX3Z6RkRMTkpicGY4UGp0bThvS3Q4b0ZiMUlkY2hZcElWSUhoeFBGUGVHQ1ZTWmdFa2V3dEZzOU5aN0ZaYWxfbWdTSkpiRmZYRlU1VWRFYnc?oc=5",
         "https://news.google.com/rss/articles/CBMif0FVX3lxTE02ZEtxR1poSXpOQkJQV2x5dFdyZUM3WTFZVEg0SG5rMllLMzhvaGNwNkdsTGxHOHg0VExnUGpwbkhSSXdZcWIwaGstZFhNYWRISDN3SS1UQlBoQUhvaUpHeGIxT1pWWU42UlU2Tm53OGVCWUdVeGctSWFpLV92bmM?oc=5",
-        "https://news.google.com/rss/articles/CBMicEFVX3lxTE83MWFYTEhldlNtb3JYOEtxSENZT2RsM2ozbUQwNjBBQ1RaaE85MU1FcDBJaW1ONXhOY29na0ZWbzFpdy00OHpEa21xZmk5R3BUT3Jta1FpYTBTby1NcGM3VksxMi1TVWpKTmdJbjlfOW0?oc=5"
+        "https://news.google.com/rss/articles/CBMilgFBVV95cUxOY0hGaWNmVVlnNF9KOGxGSmNQODRnalVUM0hON2U2OGh1cXc1dmgtNHNLT3JDMGRFbVdWc0QzX3psTzg4SEgxOTUzZkMtYUoxVWlTSHNQNjVrLWpKVC1DR3VSN3BwclRWS3lmRXNOUHpmNEhEdC12V3lLSzllbGtod2FCbV85WFBBZ3I5ZkxpSFo1bFZXaFE?oc=5"
       ],
-      "lastScan": "2026-05-01T22:56:59.496Z",
+      "lastScan": "2026-05-02T22:53:55.816Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -97,15 +97,15 @@
         "2026.4.8. — Bitcoin Demand Surge: On-Chain Data Reveals Powerful Accumulation Trend Signalin",
         "2026.4.30. — Ethereum longs build on Binance as ETH battles $2.4K wall - crypto.news",
         "2026.4.28. — Small Amount of BTC Sent to Exchanges While Some Holders Realize Losses - Binanc",
-        "2026.4.13. — Bitcoin Price Stalls Near $70K as Fear Grips Market - MEXC",
-        "2026.4.30. — Ethereum Traders Lean Long on Binance Amid Resistance - Intellectia AI"
+        "2026.4.30. — Ethereum Traders Lean Long on Binance Amid Resistance - Intellectia AI",
+        "2026.5.1. — Ethereum Price Coils Below Resistance as Longs Quietly Build - MEXC"
       ],
       "sourceUrls": [
         "https://news.google.com/rss/articles/CBMiogJBVV95cUxNbmEwMkJuZjl2dmpQRVVXTUJQX0pBdDZfZzlDNlcteGJBSl8xdTJiMXRLYlExSXE5LUxUZ21WdC0tSDFJWlk1Mll6S21GZHBDQlp4dHg5d2FRb3BKMmJqcG10aHFyekVwNjBPbEdjRHJyYk9QUUFEd2xWTDRNR29PWW9yYm5UelFrVEM1Rk81QnJVRl84VC1EUkRXcEFja0tsODdXNUJSc3czWjJUMXB0NXpMc2lRNEh3RHZXc3FTSDBJNHFDY2UwX2Fvb1lUcFk3YjNMNEFUM0dNa3M2M04wR2ZueFpQUzhxZThRMnpZd0lXU1NiN2Q5QVlwV0VYdXFZaFNZNk5PTXc1LWlyQk5xRUM4WlRyY3NYVWtxZDB3UGpkQQ?oc=5",
         "https://news.google.com/rss/articles/CBMigwFBVV95cUxON1c0NWlhX0IxS29wS0FCYXFUdmV1SVdkQ2lYd3NoTmxaUWdHTlZXNS1oR1dpbzVpN0FjSHFoTEZlZ1dhV05PXzVSZ19XMmVhLUhFemthMFFoamV1RTNXVUhERGhCU3VZYVBOam80SnlFaFR1YmVOTk9Jd1l4ZVAyRW5OWQ?oc=5",
         "https://news.google.com/rss/articles/CBMiZEFVX3lxTE8tdlZHaGUyUzZMUm1ROVo3a2JmcWhySFN0Z0hmVWhTSUdrQkFYbTI2V2laYXZuZ3VteFhSUlZ3V2dzdk1hcHFoa09EQjUzQl9HNDZRU2FqYjhPQ1doVVFta19Bazc?oc=5"
       ],
-      "lastScan": "2026-05-01T22:57:04.478Z",
+      "lastScan": "2026-05-02T22:54:00.572Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -113,19 +113,18 @@
       "id": "whitepeach",
       "bullPct": 90,
       "prevBullPct": 90,
-      "summary": "강세 포지션. 최근: 차백도, TWS와 콜라보 프로모션…신메뉴·기념품·SNS 이벤트 선보인다 - 아주경제 / \"BTC장외거래 구글도배,구글찌라시텔탤 SEO921 OTC장외거래.tpo\" - Results",
+      "summary": "강세 포지션. 최근: \"BTC장외거래 구글도배,구글찌라시텔탤 SEO921 OTC장외거래.tpo\" - Results on X | L / [이승석의 IT산책] 뱅크시와 사토시 나카모토 - DealSite경",
       "headlines": [
-        "2026.4.30. — 차백도, TWS와 콜라보 프로모션…신메뉴·기념품·SNS 이벤트 선보인다 - 아주경제",
         "2026.4.28. — \"BTC장외거래 구글도배,구글찌라시텔탤 SEO921 OTC장외거래.tpo\" - Results on X | Live Posts &amp; Upda",
         "2026.4.17. — [이승석의 IT산책] 뱅크시와 사토시 나카모토 - DealSite경제TV",
         "2026.4.9. — 마이클 세일러 \"애덤 백, 비트코인 창시자 아냐\" - 지디넷코리아"
       ],
       "sourceUrls": [
-        "https://news.google.com/rss/articles/CBMiWEFVX3lxTE0wR3A4aDNWU3NNdzk0MF9WVm5US0kyNVFhYXFkRHIxTTdZOHJ2TVpLckt4eTNOcmZlckhKNUVZUndMekFyTFBnR2M2RzFwU25LdFpBRFVuaVDSAVhBVV95cUxNMEdwOGgzVlNzTXc5NDBfVlZuVEtJMjVRYWFxZERyMU03WThydk1aS3JLeHkzTnJmZXJISjVFWVJ3THpBckxQZ0djNkcxcFNuS3RaQURVbmlQ?oc=5",
         "https://news.google.com/rss/articles/CBMi4wJBVV95cUxOeUw5d0NqamlpVTRTVWtmRGcyVnJ6T0RCcVFrUkNHMkVSYXhuU2NyU2twdjJsZmQyV1JZREZxWGFIV1VXT2xUQW40V2NZTjI0LWdHaVl5RkphbU1yOHJMWXBBLWRsWVAzaXJMV1h4Q21keWRpaGEzOEh5NnkxWkpHR2w0YnJFSldGcTFXRHFNUGlNc00wSmpULURFSnk4V0VfOEpRZWpURU9hRUF4UDE4Nnh2a3g3QU9SSnNQZ3pGX3BlNjFidUJZS2wwenNCYnYxVkxrOFZWdHFZX18zSmMzejNlTDRBQlR4c2tBR2xHbklKVi1raHl6aG0wdkEyOEEzUTA1czRELTVGWVlfd2Fqdk9IOHo2eEZac1ZCNlVmT0Y2Q3dYaTRMQVh1cFlETU53YlVPRWNoN2xTUl85eS1pVlhVaVFQbEJraVljUTNkRFE4cUlOWnltU0tzNTZGcmhVNzNr?oc=5",
-        "https://news.google.com/rss/articles/CBMiVkFVX3lxTE8yNTN3dk5FVmVFdVR6QVI2Vlgwb29xOEZZOXFiY1UyMzJVSUpnT0tFLWpyaGw5cEpfZ25vMklwSzNBVzFHMElGT2JGa1JuOTdHdWRKVThR?oc=5"
+        "https://news.google.com/rss/articles/CBMiVkFVX3lxTE8yNTN3dk5FVmVFdVR6QVI2Vlgwb29xOEZZOXFiY1UyMzJVSUpnT0tFLWpyaGw5cEpfZ25vMklwSzNBVzFHMElGT2JGa1JuOTdHdWRKVThR?oc=5",
+        "https://news.google.com/rss/articles/CBMiVkFVX3lxTE84QzFlNjZwWWU3YzZhZnlQQW52Zmt0QkRsOWdsdlZILUhXcXZkUC13cUFzTFJWNGpwRFUwYmpKRUhQXzYwdlNSeDJMUkFXWENkVG9hOG5B?oc=5"
       ],
-      "lastScan": "2026-05-01T22:57:10.160Z",
+      "lastScan": "2026-05-02T22:54:06.142Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -141,7 +140,7 @@
         "https://news.google.com/rss/articles/CBMiUkFVX3lxTE0yYWhVc1d2S2o4VThGQ2tCd0RueHhtVEowTGNINGxfcTdDYzE3MGxqTnFDQWZiLXZBT3dLQ21HS0NabE5tZk4yVlpiSlUzS1dhV0HSAVNBVV95cUxPZDRqaGJVSDdGbDRCdlFpd0dVdUR0TFFWWndPbDdfUDZBVHZYZHA0VXVValpZVkgwRFNMekRlNHFIaG5UYjN2ZjM1U0NNZi1mVlRGQQ?oc=5",
         "https://news.google.com/rss/articles/CBMiSkFVX3lxTFBMSDhQaGVBMWRFU1FmTUVHRkZkczNMNWpaQk5TV3F2VHZFWTVfVzI5TGVPelVURThLeEdXUWswYVExVGtaTVRhcmd3?oc=5"
       ],
-      "lastScan": "2026-05-01T22:57:16.319Z",
+      "lastScan": "2026-05-02T22:54:11.852Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -156,7 +155,7 @@
       "sourceUrls": [
         "https://news.google.com/rss/articles/CBMi6gJBVV95cUxQUC11SUhPdGgwU0dDbFhVUGd6ZWFxN0Ftc1l2WF9WamltNUplT0tFSU8tclVnNGkzdXZ1QnRoZjZGN1FaU0ExQ2NaU2dXQ2hDUC1tdHRPR2RBaWJiWWVZdmJ4VDlqWm5jWjlqdEhObUQyYjlWSE5uT1g5US1lTkwzaVJqM18zR3piMEtqZlMwT3RHUkhXRFZPb3FyVG1STWVGVTA3TW9HVW5zRkdxRTNWWWNtSUxCY2gxT1FxcTJNOGpXeUtBNmtpNlc1SHI5d2ktVkVUVmMyXzVLVkFQMHdKVy0zOUUtMTRpU01jRHdGY3VDSkZhbEc4cnlnNFBiRjQxeG41dl8yYmtnb3JLdGM5NFU1MTY0QVJuQVlYZDNLbXhKV2VYSHU2MEdhZFBlTzh2M1NndEdoZXotQnFKOFVjeHBkNXVyV2ppMnRRYk05MTduZk1meElDLXBqT0JhekVlVkNqZl9Ud3I2Zw?oc=5"
       ],
-      "lastScan": "2026-05-01T22:57:23.792Z",
+      "lastScan": "2026-05-02T22:54:17.501Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -164,16 +163,17 @@
       "id": "simplspark",
       "bullPct": 50,
       "prevBullPct": 50,
-      "summary": "중립 포지션. 최근: 바이낸스, 기글펀드(GIGGLE)·신퓨처스(F) 심플언·마진·컨버트 등 지원 - 블루밍비트 / OKX 내 USDT 심플언 이자율 급등...\"불장 특징\" - 코인니스 / 비트코인 1",
+      "summary": "중립 포지션. 최근: 캐시 우드 \"비트코인 2030년 150만 달러 전망 유지\" - 블록미디어 / 바이낸스, 기글펀드(GIGGLE)·신퓨처스(F) 심플언·마진·컨버트 등 지원 - 블루밍비트 / 비트코인",
       "headlines": [
-        "2026.4.25. — ‘폴드(Fold)’가 고용주들에게 급여 연동형 보상 제도를 도입함에 따라 비트코인 보너스가 확대되고 있다 - Bitcoin News"
+        "2026.5.2. — 캐시 우드 \"비트코인 2030년 150만 달러 전망 유지\" - 블록미디어",
+        "2026.3.22. — 비트코인, 반등은 함정...\"8만 달러 찍어도 결국 하락\" - 코인리더스"
       ],
       "sourceUrls": [
+        "https://news.google.com/rss/articles/CBMiWEFVX3lxTE1OMzBOVlBaNWMzeDdYdWZwLXI5eF9PNnhtYnJmek1YcWZsTkdYc2k0Sko4ckdNc0xOazUzUUF0dGdUbmlDUmVYMTVyWEp0WC1IZjVpS3ZIcmg?oc=5",
         "https://news.google.com/rss/articles/CBMiT0FVX3lxTE04a1VUaXZJZ0hKMWtKeHBXOHFmVXdINmQ2MDJxWmZfbjVobDMzeUNkYXNxcFRpcmU1aWZ4TUpKeVViek01czBaSWVNd2Vhb28?oc=5",
-        "https://news.google.com/rss/articles/CBMiSEFVX3lxTE5sNGdaMEZrUHJNSHdXNTE4TDZEZFVleWMzZU4yc2xTTnlmUHdTOE9wT3VnNklNY3JJLXJDU2szZGtCSWZzZ0NTNw?oc=5",
-        "https://news.google.com/rss/articles/CBMic0FVX3lxTE4zLVh2ckY5cHltMDhFWXJoMk9RWHV6M3lWZDBDTVotZm5nU3AyLWNMbE1QMDRrRk84US16RUZ4X3JZRzNUZDdPejAxd2hSRGZWXzRlUFpXTjFnY2VrREk0MUpMOHVuQjduZGF6Uk9HZkN5V0E?oc=5"
+        "https://news.google.com/rss/articles/CBMiSkFVX3lxTFBVanBrRzhlNHVCTXJmWjBOZERJRm9KUTZyMEZBbFdfamxySU16UHBuUGFodTBiWnpkbnF1bTQ3Rzl4T3VCWE1YQUlR?oc=5"
       ],
-      "lastScan": "2026-05-01T22:57:29.786Z",
+      "lastScan": "2026-05-02T22:54:23.048Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -181,16 +181,16 @@
       "id": "route2fi",
       "bullPct": 50,
       "prevBullPct": 50,
-      "summary": "중립 포지션. 최근: AI Internet: Why TAO Might Be the Most Important Token You’r / Crypto 2025, why is it so difficult? ",
+      "summary": "중립 포지션. 최근: Crypto 2025, why is it so difficult? - Bitget / AI Internet: Why TAO Might Be the Most Important Tok",
       "headlines": [
-        "2026.3.26. — AI Internet: Why TAO Might Be the Most Important Token You’re Missing - TechFlow"
+        "2026.3.26. — AI Internet: Why TAO Might Be the Most Important Token You’re Missing - 深潮TechFl"
       ],
       "sourceUrls": [
-        "https://news.google.com/rss/articles/CBMiXEFVX3lxTE9VWnlWWnhUNG41WjF5MUU1bUVXenR0UHJKS21ycUhBZnh4cGdPbExZQmNFNjN1MEZGTi1UdVFDcFZJdExxU2t4MVNOZ3VVLXdKYUVwNEJlbk1uY2dT?oc=5",
         "https://news.google.com/rss/articles/CBMiXkFVX3lxTE40OThkeGxiRHRUTVVLRVQ2dFdOeWhMbHVqeHowdXZtV25HSnpUZW1xbmJxb0MyREtjRnVxcjBHYVJJWnJhdVdMUjBRNUZfV3FhRXVNMlRaejZGYzNWUHfSAWNBVV95cUxPUlJNTlFJQldydEszM2dIeVMtQVhVNjFJMk5HaWwyWkpLVWp0SnhmQkJJblo4N25hWHpnRXR1TnJ5NGphMkhLODM2UFFmal9icElBeDR3WkZpMm05VTNaYS1kbFk?oc=5",
+        "https://news.google.com/rss/articles/CBMiXEFVX3lxTE9VWnlWWnhUNG41WjF5MUU1bUVXenR0UHJKS21ycUhBZnh4cGdPbExZQmNFNjN1MEZGTi1UdVFDcFZJdExxU2t4MVNOZ3VVLXdKYUVwNEJlbk1uY2dT?oc=5",
         "https://news.google.com/rss/articles/CBMiigFBVV95cUxOYXUwLVZqYzQxZ3Z5WTlJNjNwQWt2MS05a1pZVDRFSkl1YVVyTkhyamMwYldGSUNpeUxYSGtZS1A3Y3hHU2dDc3FnMG5ybmhkbWs4Y25QbXJmRmhNTVA1UE5sODNJYWN0X09VUlFMUm1Wekh1Y1lZV0I3NWx5U3h2VHBONklDOGUzVFE?oc=5"
       ],
-      "lastScan": "2026-05-01T22:57:34.785Z",
+      "lastScan": "2026-05-02T22:54:27.693Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -198,16 +198,16 @@
       "id": "alexkruger",
       "bullPct": 50,
       "prevBullPct": 50,
-      "summary": "중립 포지션. 최근: Bitcoin And The 2026 Fed Shift: Expert Says Markets Aren’t R / Analyst who predicted ‘Liberation Day",
+      "summary": "중립 포지션. 최근: Bitcoin And The 2026 Fed Shift: Expert Says Markets Aren’t R / Capital moves from crypto into equiti",
       "headlines": [
         "2026.4.22. — Capital moves from crypto into equities, Alex Krüger argues - Traders Union"
       ],
       "sourceUrls": [
         "https://news.google.com/rss/articles/CBMivgFBVV95cUxNbWo3MFFYUWVfd2Faa19QLVVoWVQ4V3dJZ2VDMHRQZmtVSkxBTjVabDk0YWkxcEJXbEIwVmxxODM3cnBVMzRRN3pGUUFKd2c4b3JCU2V4NHRyMF9ScVotN2oyVVVpSzhyb0JqOHRTQjFWdmUxMW5XRGZpeHR2clBtbzdObTlZYU04bllxdWdsUmk3RFVrUVlDSnpWcy1nVzJ1VE95ZWJTenJpVjJRYWtJRkxSOVlkdjk4bGEyVTRR?oc=5",
-        "https://news.google.com/rss/articles/CBMijAFBVV95cUxOdEdKaC1uNXZHb0NpWWdtR29ZeXJSMFdONU5mREhZNWN4ZU5mdElUMW9DaklXUmE1ZWVHNUpkamFYczkwb1ZnVTZBaGV5T2dRdFVKNDhCWFhUSTNxRHpSOXlGVDFRRlFReXF6c3VLcXREU1U0SkthYlc1c3ZZMG44OWVnVjlGRWlNV3FRWg?oc=5",
-        "https://news.google.com/rss/articles/CBMilAFBVV95cUxPemtsdnBpcklnVGY4MHNHWEJ5VXlWRmxSUWgwVUVtN1FtbDBKcmt1NUYyZXVmdUNxMmd0V2FrRUQ1YVJDNS1JMk9VZnVjdS1nLVI1RmFWUUxRVGNhbHZqbzZ3Q3RiMTgtRmxERzZnOWh4d0hOWE1maTByLVNQTXlCZnBJTjJ2YzJzcU42bFJiMDhqcGZx?oc=5"
+        "https://news.google.com/rss/articles/CBMilAFBVV95cUxPemtsdnBpcklnVGY4MHNHWEJ5VXlWRmxSUWgwVUVtN1FtbDBKcmt1NUYyZXVmdUNxMmd0V2FrRUQ1YVJDNS1JMk9VZnVjdS1nLVI1RmFWUUxRVGNhbHZqbzZ3Q3RiMTgtRmxERzZnOWh4d0hOWE1maTByLVNQTXlCZnBJTjJ2YzJzcU42bFJiMDhqcGZx?oc=5",
+        "https://news.google.com/rss/articles/CBMirgFBVV95cUxQNVNUdGJob3Z5S0E0Z21zU2VRNUIxWE5OWWc4bkVFa2pYQjBIS0IyRVpMYl95TklhLVlibnNDUnZYUVA0WVpNX2NUeWFQblZWS2ZMQkNDMEwyYnZRRWQtaFVhSkwzT2xLblUzd1M4Sk94QlhvY3gzYlVDWlZLbGFYUUV1dlU5YnpPYjhvbzY2cjItS21BdzFwQWNyZ3BpTEpOYVpRTWxsM0xScG5pNEE?oc=5"
       ],
-      "lastScan": "2026-05-01T22:57:39.966Z",
+      "lastScan": "2026-05-02T22:54:32.612Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -215,17 +215,17 @@
       "id": "crypnuevo",
       "bullPct": 50,
       "prevBullPct": 50,
-      "summary": "중립 포지션. 최근: $75K or bearish ‘regime shift?’ Five things to know in Bitco / Bitcoin Analyst Warns of Potential BT",
+      "summary": "중립 포지션. 최근: How Low Can Bitcoin Price Go? - TradingView / Bitcoin Analyst Warns of Potential BTC Short Squeeze i",
       "headlines": [
         "2026.3.15. — CrypNuevo’s Bitcoin Swing Trade Strategy Highlights Wick Imbalance - blockchain.",
         "2026.4.26. — Bitcoin: Nears $80K Swing Trade Zone - blockchain.news"
       ],
       "sourceUrls": [
-        "https://news.google.com/rss/articles/CBMizAFBVV95cUxNY2NaR2MzTUdvM2ZBT2dxdGtNelZPWGhySVBxRXY0dE92UGFhajVlLUZSQUNvanB4QXhWMU5RWTlIQ3lDeVdBdXN3WVN3alZGT1lLM1BxS1dPZmlMdjA2Umk0SGdaU0lYN3BZaUN2WjREejB3Slg0SktDVDZOOENtQkxEdDg0TmM2anJTemNYNmczQzVJVVU4Z0VCRFJhaUMzR2hnVXJYVVpqQ3YydVZOcVoxbHMtRS1QTWdpVDgzUjU1eHB2MUo2VGJmWmI?oc=5",
+        "https://news.google.com/rss/articles/CBMikgFBVV95cUxPZmFES3AyS1hZNlJCR3pfM0lmTWg2bDFMMEIzRzkxLV9CcHBBdjhseHZGejQ1M3czazczT1pyTUFTSzZ6Tk03QUlYQ3BGamdsVEstUGdfMDFNTWQ5T3ZfTFVibHdCb0Jvc3BMNEFLR2IxSjQwS2lWY1N6YU4weEhjLW15WkloRXlCTXhSb0dOTXF1dw?oc=5",
         "https://news.google.com/rss/articles/CBMiY0FVX3lxTFBzcDNYZ0tLNlNxckZvNlkxSUZWSzBPMTZOd0Jxdllva1g5aG4zRjg1a0dxXzB0YXdua3VkM2pBSlEwOXlGNzlBYmViNXdLbFcxRWRrSXVDWWlncGdHSEtLSm1SYw?oc=5",
-        "https://news.google.com/rss/articles/CBMikgFBVV95cUxPZmFES3AyS1hZNlJCR3pfM0lmTWg2bDFMMEIzRzkxLV9CcHBBdjhseHZGejQ1M3czazczT1pyTUFTSzZ6Tk03QUlYQ3BGamdsVEstUGdfMDFNTWQ5T3ZfTFVibHdCb0Jvc3BMNEFLR2IxSjQwS2lWY1N6YU4weEhjLW15WkloRXlCTXhSb0dOTXF1dw?oc=5"
+        "https://news.google.com/rss/articles/CBMizAFBVV95cUxNY2NaR2MzTUdvM2ZBT2dxdGtNelZPWGhySVBxRXY0dE92UGFhajVlLUZSQUNvanB4QXhWMU5RWTlIQ3lDeVdBdXN3WVN3alZGT1lLM1BxS1dPZmlMdjA2Umk0SGdaU0lYN3BZaUN2WjREejB3Slg0SktDVDZOOENtQkxEdDg0TmM2anJTemNYNmczQzVJVVU4Z0VCRFJhaUMzR2hnVXJYVVpqQ3YydVZOcVoxbHMtRS1QTWdpVDgzUjU1eHB2MUo2VGJmWmI?oc=5"
       ],
-      "lastScan": "2026-05-01T22:57:44.948Z",
+      "lastScan": "2026-05-02T22:54:37.230Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -236,9 +236,8 @@
       "summary": "강세 포지션. 최근: Why Bitcoin Could Be Headed For Another Drop: Research Firm  / Ecoinometrics: 30-day flows in Bitcoi",
       "headlines": [
         "2026.3.30. — Bitcoin’s 48% Drawdown at $66K Signals 300-Day Recovery Cycle — What Historical ",
-        "2026.4.3. — Bitcoin Recovery Timeline: A Sobering 300-Day Path Back to Peak, Analysis Sugges",
         "2026.3.28. — Bitcoin may struggle to recover until 2027 if it breaks below $60,000, analysis ",
-        "2026.5.1. — Three Bitcoin data points suggest a rally to $80K is imminent - TradingView",
+        "2026.4.3. — Bitcoin Recovery Timeline: A Sobering 300-Day Path Back to Peak, Analysis Sugges",
         "2026.3.27. — Analysts Say It Could Take 300 Days for Bitcoin to Return to Its Previous Peak! "
       ],
       "sourceUrls": [
@@ -246,33 +245,33 @@
         "https://news.google.com/rss/articles/CBMiY0FVX3lxTE4zbXhtRUZhN1hyTW95UmNmY2t5TUthaW92akN2bzdGaml3aVg2R3M3T3hnWkF2eFhncFJiTFZ6YWJTeXhRX1dYYU1TcFhRSzBfS05IX2FqdmJXN3NTdjF6ZFRqUQ?oc=5",
         "https://news.google.com/rss/articles/CBMijAFBVV95cUxPOWY5NjJlQWFGVEVxSC1GZmlJeXNMbnd1TUNSSHhjcFJUcFR3dHpkZk5MX1BENndsSkxqYmNySmlqcFpVVFo1cmRFVVRsME5tVmlVem1qVmZUSnkwb1JyS3h1aEFfbGZzbXpySDF6OXc3WEx6WmlsY0RiRm0xdG9DcER4cmQ5RE02MTA0Zw?oc=5"
       ],
-      "lastScan": "2026-05-01T22:57:50.057Z",
+      "lastScan": "2026-05-02T22:54:42.121Z",
       "scanning": false,
       "dataSource": "gnews"
     },
     {
       "id": "rektcapital",
       "bullPct": 90,
-      "prevBullPct": 10,
+      "prevBullPct": 90,
       "summary": "강세 포지션. 최근: Rekt Capital Issues Bitcoin Price Warning As Top Crypto Asse / Bitcoin Double Bottom Formation Eyes ",
       "headlines": [
         "2026.4.16. — Bitcoin Double Bottom Formation Eyes $82,500 Rally – Breakout Or Rejection Next?",
         "2026.4.18. — Рост биткоина может оказаться кратковременным — Rekt Capital - CryptoRank",
         "2026.4.14. — Analyst Conducts Technical Analysis on Bitcoin: Current Situation Resembles 2014",
-        "2026.4.14. — Why Every Bitcoin Macro Triangle Breakdown Has Led To A Retracement Phase - Trad",
-        "2026.3.11. — Bitcoin ‘Sandwiched’ Between Two Key Zones As Price Tops $71,000 – Major Move Ah"
+        "2026.3.11. — Bitcoin ‘Sandwiched’ Between Two Key Zones As Price Tops $71,000 – Major Move Ah",
+        "2026.3.19. — Bitcoin nears 10% drop as traders flag ‘unreliable’ support - TradingView"
       ],
       "sourceUrls": [
         "https://news.google.com/rss/articles/CBMiwAFBVV95cUxNYXd1VmRtcFhSdnd2cjBrbXdnR1FTdVF5WWJOV2pOTm4wRTFaM2dKWXh1ZTFBUnR5N3REMXYxOF9NakVRUmJYclpsYWhFTGc1VkwycExfbHZnV3pOQ3h6UGxDMWw4YTB2eTk3LTNHVFFkM3RXMG9TM0ppRVFpVFAzZURvZ1UtajNqUndqc05ZRTE1RUFmNjlNQjE5d3RGRGkwMy1CSXZTOUpYdjB1Qi1mbWNFUFZRTEhISTAwNnhrcm3SAcYBQVVfeXFMTkFabG5rdFpxNy0wSnBPbWFsdGNTWFU0cVV0YjNZdDVnaHI1cUhfMzlHUWJ3RWpFbmJSYVBZVWpXZERTU0Z0Y1VWYXFfZ0pfWGJodkotODZjd0dPX1JEVFI0a0dWdmxqcEswWU44VkgtNzVVbVM1MG9Vc0ZwMEVURnl1eGVDNGd3UXZXc1F4eExSdzFmdDgwWXQ3bFBqMHB6WFFwY2EzOHRtZjFHeGlDdmc5SVVxbGgzYlhpcVBXd3FoLTBYR0p3?oc=5",
         "https://news.google.com/rss/articles/CBMizwFBVV95cUxOcDlycFVLbWI2Mk1vOXVfdElPMlZGUnJfSlZXdlptYnZqTWtZaEtVUTBtRnpvZjZvUTVlbHJHaHpnMGtUb0xZbm44TWMtbkNmN2F0YTk5NFA3QktHNGtaNGVsU0QyUUxkM29KOVRIdk1ITWNaWFVCcGFFNXY5WkU2M1luN3RUMUlIaG5IMUJMZVVrVVpxUENnQ09Uem03ZGt6WEhNVlhxSnlHN3czeGcwY1Y1MFZPTmc4ZTNRMlk5bEtzWVVNRnprOUVnZ2R6VG8?oc=5",
         "https://news.google.com/rss/articles/CBMingFBVV95cUxNMFc0anVzQ05kTVhPZk9zUmp1VU42a2NqblB4ZHlXQkcwczdTbHVRV0J6Vm9QUHc1Z1V0TXNpeDlhTkRuS2UwUUVRU2pEeHE0Z0JoZDhWUHVoMU5VbzNjMkFsbGJlVnUxZ3JMS2FvSEdoLWtYTlcweHVtQU9qaVNkUXRCcW92OXMwSkJOd3NiNlVibkw4Sko1cnRzNWplQQ?oc=5"
       ],
-      "lastScan": "2026-05-01T22:57:55.055Z",
+      "lastScan": "2026-05-02T22:54:47.163Z",
       "scanning": false,
       "dataSource": "gnews"
     }
   ],
   "avgBull": 55,
-  "updatedAt": "2026-05-01T22:57:56.555Z",
-  "updatedAtKST": "2026. 5. 2. AM 7:57:56"
+  "updatedAt": "2026-05-02T22:54:48.664Z",
+  "updatedAtKST": "2026. 5. 3. AM 7:54:48"
 }
