@@ -6,7 +6,7 @@
     "mvrv": "저평가",
     "nupl": "낙관(Optimism)",
     "sopr": "건전이익실현",
-    "funding": "중립",
+    "funding": "약베어",
     "puell": "저평가",
     "lthSopr": "중기",
     "sthSopr": "건전",
@@ -17,8 +17,8 @@
   },
   "analysts": {
     "dancoininvestor": {
-      "bullPct": 44,
-      "stance": "중립"
+      "bullPct": 33,
+      "stance": "약세"
     },
     "gaah_im": {
       "bullPct": 10,
@@ -77,9 +77,9 @@
       "stance": "강세"
     }
   },
-  "btcPrice": 81021,
+  "btcPrice": 80925,
   "fg": 50,
   "lastMorningDate": null,
   "lastEveningDate": null,
-  "updatedAt": "2026-05-05T22:42:26.761Z"
+  "updatedAt": "2026-05-05T23:31:01.170Z"
 }
