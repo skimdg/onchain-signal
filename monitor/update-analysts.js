@@ -248,17 +248,38 @@ async function processAnalyst(analyst) {
   let result = await fetchNitterTweets(analyst.handle);
   let isNitter = true;
 
-  // 2차: Google News 폴백
+  // 2차: Google News 폴백 (한국어 핸들 제외)
   if (!result || result.items.length === 0) {
-    console.log(`   → Google News 폴백`);
-    result = await fetchGoogleNews(analyst);
-    isNitter = false;
+    if (analyst.korean) {
+      // 한국어 핸들: Google News 검색 결과가 무관한 기사로 오염되므로 건너뜀
+      console.log(`   → 한국어 핸들: Google News 건너뜀 → 이전값 유지`);
+    } else {
+      console.log(`   → Google News 폴백`);
+      result = await fetchGoogleNews(analyst);
+      isNitter = false;
+
+      // 기사 제목/본문에 핸들명 또는 실명(첫 단어)이 포함된 것만 유효 처리
+      if (result && result.items.length > 0) {
+        const handle = analyst.handle.toLowerCase();
+        const firstName = analyst.name.split(' ')[0].toLowerCase();
+        const filtered = result.items.filter(it => {
+          const t = (it.title + ' ' + (it.desc || '')).toLowerCase();
+          return t.includes(handle) || t.includes(firstName);
+        });
+        if (filtered.length === 0) {
+          console.log(`   → 기사에 애널리스트 이름 없음 → 이전값 유지`);
+          result = null;
+        } else {
+          result.items = filtered;
+        }
+      }
+    }
   }
 
   if (!result || result.items.length === 0) {
     console.log(`   ⚠️  데이터 없음 → 이전값 유지`);
     return prev ? { ...prev } : {
-      id: analyst.id, bullPct: 50, summary: '(데이터 수집 실패)', headlines: [], sourceUrls: [], lastScan: null, scanning: false,
+      id: analyst.id, bullPct: 50, summary: '(데이터 없음)', headlines: [], sourceUrls: [], lastScan: null, scanning: false,
     };
   }
 
