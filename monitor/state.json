@@ -2,7 +2,7 @@
   "cycleZone": "하락장(20~40)",
   "cycleScore": 40,
   "zones": {
-    "fg": "중립",
+    "fg": "공포",
     "mvrv": "저평가",
     "nupl": "낙관(Optimism)",
     "sopr": "건전이익실현",
@@ -77,9 +77,9 @@
       "stance": "강세"
     }
   },
-  "btcPrice": 80925,
-  "fg": 50,
+  "btcPrice": 81122,
+  "fg": 46,
   "lastMorningDate": null,
   "lastEveningDate": null,
-  "updatedAt": "2026-05-05T23:31:01.170Z"
+  "updatedAt": "2026-05-06T01:14:47.287Z"
 }
