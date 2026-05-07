@@ -8,7 +8,7 @@
     "sopr": "건전이익실현",
     "funding": "약베어",
     "puell": "저평가",
-    "lthSopr": "LTH손실",
+    "lthSopr": "초기상승",
     "sthSopr": "건전",
     "reserveRisk": "강력매수",
     "utxo1m": "강HODL",
@@ -17,7 +17,7 @@
   },
   "analysts": {
     "dancoininvestor": {
-      "bullPct": 44,
+      "bullPct": 43,
       "stance": "중립"
     },
     "gaah_im": {
@@ -77,9 +77,9 @@
       "stance": "강세"
     }
   },
-  "btcPrice": 79823,
+  "btcPrice": 79949,
   "fg": 47,
   "lastMorningDate": null,
   "lastEveningDate": null,
-  "updatedAt": "2026-05-07T22:40:37.445Z"
+  "updatedAt": "2026-05-07T23:31:12.720Z"
 }
