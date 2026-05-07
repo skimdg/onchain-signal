@@ -2,20 +2,19 @@
   "analysts": [
     {
       "id": "dancoininvestor",
-      "bullPct": 44,
-      "prevBullPct": 33,
+      "bullPct": 43,
+      "prevBullPct": 44,
       "summary": "약약세 포지션. 최근: Bitcoin Market Greed Surge Sparks Potential Reversal Warning / Analyst: $100K Level Holds Fate of Bi",
       "headlines": [
         "2026.4.27. — Bitcoin Market Greed Surge Sparks Potential Reversal Warning from On-Chain Analy",
-        "2026.3.31. — Bitcoin Bottom Near? CryptoQuant Signals Bitcoin Capitulation as 92% Holders in ",
-        "2026.3.31. — BTC Long-Term Holders Selling at a Loss: Final Capitulation Phase May Be Here - "
+        "2026.3.31. — Bitcoin Bottom Near? CryptoQuant Signals Bitcoin Capitulation as 92% Holders in "
       ],
       "sourceUrls": [
         "https://news.google.com/rss/articles/CBMigAFBVV95cUxORDVfd0tTbnFZcUh1R1d2dHE3dkh4cU9xdVNHcm01S0xEU05NLU96eXRFdnlIbVRYWWJJSjJjdlZIUFBoOEloTUR0Y1J4RDBaZnlmQkNNTFNSdmhWRDB0YnIyVEJ0bkd4eG1Rb041Y19zQjVrcTlTQXZWaGpaZG1ORw?oc=5",
         "https://news.google.com/rss/articles/CBMifEFVX3lxTE9HVTVDbXVEdU5PRnE0V2p4ZWNIMklVSk83R21nWkk3V2Y1Wjhyd0FucEgyM0xJTDUzNk84YjcySzVnaVBwRGdJZFVCWXZ4d0JjMDhzRmF6czdlYV9pSVdiMTNQSTRiMC1QTUVPdS1ycWhranZhMzNpWmtGZVc?oc=5",
         "https://news.google.com/rss/articles/CBMiXkFVX3lxTFByTVFScHR2cXczWFdmc21HcTVWc1ltanQ2bGRXQW5uRlNVZEZ6MVBLcFg3cmVXeUpKRnAwRHh0Q29QaU1UeF9DX2Y5azhtWXRkXzYtOEdyZW1Nd2JxTVHSAWNBVV95cUxNczJvd3ZHUEVHYnlRbVZxaUQyeG1NTGM0RElZcTFaTUR4Rk9yOE9Ic3cwRUNmakMzRF91OHNBVnBpQUt5MTZiTDVPS2EzMjBVQlg4XzBWdTVZWTJlM2MyN1VJYlk?oc=5"
       ],
-      "lastScan": "2026-05-06T22:57:47.942Z",
+      "lastScan": "2026-05-07T23:04:39.251Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -210,7 +209,7 @@
         "https://news.google.com/rss/articles/CBMiiwFBVV95cUxOeDF5eGY1TXN6T3NET3hfQk1WaVA2VVRMS1VTZFpHaXN2OUJrNUpYcm5lT1kyN01wYVo4clR5d2lEYnVndHBaNVNEeHZ1b1FqMlA0UXlZNFhiSHNidm5YQUdObkcxNlViZTVJSVZIUzQyQU9vR0ViRG8yYllYVzFZc3hLX1dBZWM1MDJZ?oc=5",
         "https://news.google.com/rss/articles/CBMiY0FVX3lxTE5oZ2JfbXJSSlB6c2pjYzRtbWtHbjBtYmFYSWtwS3U1TDVYc3VLbGVPMWhOQmZNRDFLVGJ2UUhmMEdDdVJpZTQ5UVB2blJPWmlfdTlSekthMjdjaEdqZVBkYTlDMA?oc=5"
       ],
-      "lastScan": "2026-05-06T22:58:39.791Z",
+      "lastScan": "2026-05-07T23:05:31.476Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -218,14 +217,12 @@
       "id": "crypnuevo",
       "bullPct": 50,
       "prevBullPct": 50,
-      "summary": "중립 포지션. 최근: CrypNuevo’s Bitcoin Swing Trade Strategy Highlights Wick Imb",
-      "headlines": [
-        "2026.3.15. — CrypNuevo’s Bitcoin Swing Trade Strategy Highlights Wick Imbalance - blockchain."
-      ],
+      "summary": "중립 포지션. 최근: Trader SZ, Trader XO, Hsaka, CrypNuevo And Tree of Alpha: A ",
+      "headlines": [],
       "sourceUrls": [
-        "https://news.google.com/rss/articles/CBMiogFBVV95cUxPWVlIOXpZMVctM1BNZ21VQklmc3NDVmVoUjFFMWhXVzVnUWFWeENQUG45NkRaSUpTRWRydFhka29Ic3lXUjFPNDZkNEEzU0l3OGJ6NkROUUROUjN6S0VQN3NVVnV4aVcyV2JCRWRES0VDZ2RJenRNS1BjSS1tanJTaVRXdXd3VHEtanRERmktTGVWSlcwVUdjNUhkTlo1ZVpDaXc?oc=5"
+        "https://news.google.com/rss/articles/CBMiWEFVX3lxTE9XYTZ3V2ZGRjZRVnh1LTFqLU1wTkNhUzJKYVFtS3RmYjNaMGR3QTIySG9RRjl2ekd6X3lOODJFWThORWlXOXM0bWRJMlRfcHh2ZFhYZHIwUl8?oc=5"
       ],
-      "lastScan": "2026-05-06T22:58:44.641Z",
+      "lastScan": "2026-05-07T23:05:36.351Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -238,7 +235,7 @@
       "sourceUrls": [
         "https://news.google.com/rss/articles/CBMiY0FVX3lxTE4zbXhtRUZhN1hyTW95UmNmY2t5TUthaW92akN2bzdGaml3aVg2R3M3T3hnWkF2eFhncFJiTFZ6YWJTeXhRX1dYYU1TcFhRSzBfS05IX2FqdmJXN3NTdjF6ZFRqUQ?oc=5"
       ],
-      "lastScan": "2026-05-06T22:58:49.325Z",
+      "lastScan": "2026-05-07T23:05:41.050Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -252,12 +249,12 @@
         "https://news.google.com/rss/articles/CBMiwAFBVV95cUxNYXd1VmRtcFhSdnd2cjBrbXdnR1FTdVF5WWJOV2pOTm4wRTFaM2dKWXh1ZTFBUnR5N3REMXYxOF9NakVRUmJYclpsYWhFTGc1VkwycExfbHZnV3pOQ3h6UGxDMWw4YTB2eTk3LTNHVFFkM3RXMG9TM0ppRVFpVFAzZURvZ1UtajNqUndqc05ZRTE1RUFmNjlNQjE5d3RGRGkwMy1CSXZTOUpYdjB1Qi1mbWNFUFZRTEhISTAwNnhrcm3SAcYBQVVfeXFMTkFabG5rdFpxNy0wSnBPbWFsdGNTWFU0cVV0YjNZdDVnaHI1cUhfMzlHUWJ3RWpFbmJSYVBZVWpXZERTU0Z0Y1VWYXFfZ0pfWGJodkotODZjd0dPX1JEVFI0a0dWdmxqcEswWU44VkgtNzVVbVM1MG9Vc0ZwMEVURnl1eGVDNGd3UXZXc1F4eExSdzFmdDgwWXQ3bFBqMHB6WFFwY2EzOHRtZjFHeGlDdmc5SVVxbGgzYlhpcVBXd3FoLTBYR0p3?oc=5",
         "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQWWR5T3hHQnd5QVZQNU9DdFFycXJZRG9XTGMwUzA1Zk5UaHBabDVzRjJmcWl6X1VJQjhkdzdKcUVMQXB5Z1ozNldNTFFld0tiNGV1Z2lIRnA1a05ERzZNR2dTMmhWLVdTeDFhMlJxVklDT1FLdkFZUm8wTEpieGdIODBuS25IY0dMM3lhd1lSRHU0Ynh1UmgzZUpWc1N4MTJxRUxjY2JaM3RLNEtGbEctNDhQdlduQzVFQlFR0gHAAUFVX3lxTFBUWmVrTTF0b3pITEJfUmhfVGF4bENtb1BDSTZVUWVieXJ3ZWdVSkZNQy1XSDc5V0tHa3J1UWRZM0tYaG9GSjBlWHVVQ0tQQzdoNVdyTVFYdnA3OWRObU9XVlFLUW43emNwMHpmUWhndE9mSkJzN3VFRWxqMXZZZkl4RmQwRnBJbk9kc2RGeEFWWlJPdVVHRWJRWFVPWG9ETVJ5MXcyM21ZQmJGVWJKQTV1V1dTSHpMZWVqUFZlYU5Wcg?oc=5"
       ],
-      "lastScan": "2026-05-06T22:58:54.352Z",
+      "lastScan": "2026-05-07T23:05:45.872Z",
       "scanning": false,
       "dataSource": "gnews"
     }
   ],
   "avgBull": 55,
-  "updatedAt": "2026-05-06T22:58:55.852Z",
-  "updatedAtKST": "2026. 5. 7. AM 7:58:55"
+  "updatedAt": "2026-05-07T23:05:47.373Z",
+  "updatedAtKST": "2026. 5. 8. AM 8:05:47"
 }
