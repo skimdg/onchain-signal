@@ -1,6 +1,6 @@
 {
   "cycleZone": "회복(40~60)",
-  "cycleScore": 45,
+  "cycleScore": 43,
   "zones": {
     "fg": "공포",
     "mvrv": "저평가",
@@ -77,9 +77,9 @@
       "stance": "강세"
     }
   },
-  "btcPrice": 79949,
-  "fg": 47,
+  "btcPrice": 79730,
+  "fg": 38,
   "lastMorningDate": null,
   "lastEveningDate": null,
-  "updatedAt": "2026-05-07T23:31:12.720Z"
+  "updatedAt": "2026-05-08T01:22:52.984Z"
 }
