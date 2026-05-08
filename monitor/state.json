@@ -1,6 +1,6 @@
 {
-  "cycleZone": "회복(40~60)",
-  "cycleScore": 43,
+  "cycleZone": "하락장(20~40)",
+  "cycleScore": 38,
   "zones": {
     "fg": "공포",
     "mvrv": "저평가",
@@ -8,7 +8,7 @@
     "sopr": "건전이익실현",
     "funding": "약베어",
     "puell": "저평가",
-    "lthSopr": "초기상승",
+    "lthSopr": "LTH손실",
     "sthSopr": "건전",
     "reserveRisk": "강력매수",
     "utxo1m": "강HODL",
@@ -17,7 +17,7 @@
   },
   "analysts": {
     "dancoininvestor": {
-      "bullPct": 43,
+      "bullPct": 45,
       "stance": "중립"
     },
     "gaah_im": {
@@ -77,9 +77,9 @@
       "stance": "강세"
     }
   },
-  "btcPrice": 80328,
+  "btcPrice": 80161,
   "fg": 38,
   "lastMorningDate": null,
   "lastEveningDate": null,
-  "updatedAt": "2026-05-08T22:34:20.067Z"
+  "updatedAt": "2026-05-08T23:34:56.163Z"
 }
