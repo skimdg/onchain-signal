@@ -8,7 +8,7 @@
     "sopr": "건전이익실현",
     "funding": "약베어",
     "puell": "저평가",
-    "lthSopr": "LTH손실",
+    "lthSopr": "LTH항복",
     "sthSopr": "건전",
     "reserveRisk": "강력매수",
     "utxo1m": "강HODL",
@@ -77,9 +77,9 @@
       "stance": "강세"
     }
   },
-  "btcPrice": 80748,
+  "btcPrice": 80707,
   "fg": 38,
   "lastMorningDate": null,
   "lastEveningDate": null,
-  "updatedAt": "2026-05-09T22:25:08.977Z"
+  "updatedAt": "2026-05-09T23:09:30.000Z"
 }
