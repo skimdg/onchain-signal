@@ -268,7 +268,6 @@ async function main() {
     `💰 BTC <b>$${btcPrice?.toLocaleString() || '—'}</b>  ${btcChange != null ? (btcChange>=0?'+':'')+btcChange.toFixed(2)+'%' : '—'}`,
     `😨 Fear&amp;Greed <b>${fg ?? '—'}</b>  (${fgl})`,
     `🔄 사이클 점수  <b>${cycleScore}</b>  <i>${curCycleZone}</i>`,
-    `👥 애널 컨센서스  <b>${avgBull}% 강세</b>`,
     dashLink,
   ].join('\n');
 
@@ -308,12 +307,7 @@ async function main() {
         return `${icon} <b>${NAME_MAP[a.id] || a.id}</b> ${prevTxt} ${a.bullPct}% ${stance}${headline}`;
       }).join('\n\n');
 
-    const analystSection = analysts.length
-      ? `\n\n──── 👥 애널리스트 현황 ────\n강세 ${bulls.length}명 · 중립 ${neuts.length}명 · 약세 ${bears.length}명  (평균 ${analystData?.avgBull ?? '?'}%)\n`
-        + `업데이트: ${analystData?.updatedAtKST?.split(' ')[0] || '—'} 웹검색\n\n`
-        + `<b>📊 온체인 장기</b>\n${makeLines(onchainIds)}\n\n`
-        + `<b>⚡ 단기 전문</b>\n${makeLines(shorttermIds)}`
-      : '';
+    const analystSection = ''; // 애널리스트 포지션 AI 분석 도입 전까지 비활성화
 
     // 지표 현황: 변경된 지표는 "이전구간 → 현재구간" 표시
     const metricLines = metricChecks

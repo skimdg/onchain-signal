@@ -5,7 +5,7 @@
   "immediateAlert_btcRise": true,
   "changeAlert_cycleZone": true,
   "changeAlert_metrics": true,
-  "changeAlert_analysts": true,
+  "changeAlert_analysts": false,
   "analystChangeThreshold": 15,
-  "updatedAt": "2026-04-21"
+  "updatedAt": "2026-05-10"
 }
