@@ -8,7 +8,7 @@
     "sopr": "건전이익실현",
     "funding": "중립",
     "puell": "저평가",
-    "lthSopr": "초기상승",
+    "lthSopr": "중기",
     "sthSopr": "건전",
     "reserveRisk": "강력매수",
     "utxo1m": "강HODL",
@@ -77,9 +77,9 @@
       "stance": "강세"
     }
   },
-  "btcPrice": 81729,
+  "btcPrice": 81710,
   "fg": 48,
   "lastMorningDate": null,
   "lastEveningDate": null,
-  "updatedAt": "2026-05-11T22:36:26.951Z"
+  "updatedAt": "2026-05-11T23:36:57.146Z"
 }
