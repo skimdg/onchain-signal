@@ -11,9 +11,9 @@
     "lthSopr": "초기상승",
     "sthSopr": "건전",
     "reserveRisk": "강력매수",
-    "utxo1m": "강HODL",
+    "utxo1m": "건전",
     "utxo7yr": "정상",
-    "etfFlow": "중립"
+    "etfFlow": "순유출"
   },
   "analysts": {
     "dancoininvestor": {
@@ -77,9 +77,9 @@
       "stance": "강세"
     }
   },
-  "btcPrice": 79616,
+  "btcPrice": 79309,
   "fg": 34,
   "lastMorningDate": null,
   "lastEveningDate": null,
-  "updatedAt": "2026-05-14T10:33:20.595Z"
+  "updatedAt": "2026-05-14T12:14:54.578Z"
 }
