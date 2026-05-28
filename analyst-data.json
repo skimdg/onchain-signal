@@ -4,17 +4,17 @@
       "id": "dancoininvestor",
       "bullPct": 33,
       "prevBullPct": 33,
-      "summary": "약세 포지션. 최근: Bitcoin Bottom Near? CryptoQuant Signals Bitcoin Capitulatio / BTC Long-Term Holders Selling at a Lo",
+      "summary": "약세 포지션. 최근: Bitcoin Bottom Near? CryptoQuant Signals Bitcoin Capitulatio / Analyst: $100K Level Holds Fate of Bi",
       "headlines": [
         "2026.3.31. — Bitcoin Bottom Near? CryptoQuant Signals Bitcoin Capitulation as 92% Holders in ",
         "2026.3.31. — BTC Long-Term Holders Selling at a Loss: Final Capitulation Phase May Be Here - "
       ],
       "sourceUrls": [
         "https://news.google.com/rss/articles/CBMivAFBVV95cUxNc2lvMW4xVW45b0JhaklxQXY3OE1Gajczb3Z5ZXBzZDJ3cjZsZnpOdWtEdTFBcEpBZ3o0OGloTXd2UXFhcUZSSzJDYy05X0pRSWN3TEF6RTkzQURqYWRIUU1xT3dFY1JIU3RJT2V0ZmlZNVpxUW94V0tIVFZ2aGV6dm1XQTk3ZS1mbGpuWkRzQ2ZDR2NkeXRaY1JFSks2SDE2T1Y5TDZwcjNlbnJqRGNBb1ZLUzdrcDJVaUR5Rg?oc=5",
-        "https://news.google.com/rss/articles/CBMipAFBVV95cUxPSEY4dVJIQ014SVU1UTVXbWJYWUl2VHZDZmpPc01NYmRKLTRLdVFkV2RPV2tfd0NpUE1SZURqOGhKbW9jWUQ3Qi1zaEZDWFBKNS1mZ2ZIaUJuOFUwUC1MbVJVTU1yZFVXX294akIydFRmeDZzYm1Ba245QnkzOFhNNTdJaXRIbDQ0LXFPdVREZGdFSUh2NW5qcWZrY1BhMkdGRkRQUQ?oc=5",
-        "https://news.google.com/rss/articles/CBMifEFVX3lxTE9HVTVDbXVEdU5PRnE0V2p4ZWNIMklVSk83R21nWkk3V2Y1Wjhyd0FucEgyM0xJTDUzNk84YjcySzVnaVBwRGdJZFVCWXZ4d0JjMDhzRmF6czdlYV9pSVdiMTNQSTRiMC1QTUVPdS1ycWhranZhMzNpWmtGZVc?oc=5"
+        "https://news.google.com/rss/articles/CBMifEFVX3lxTE9HVTVDbXVEdU5PRnE0V2p4ZWNIMklVSk83R21nWkk3V2Y1Wjhyd0FucEgyM0xJTDUzNk84YjcySzVnaVBwRGdJZFVCWXZ4d0JjMDhzRmF6czdlYV9pSVdiMTNQSTRiMC1QTUVPdS1ycWhranZhMzNpWmtGZVc?oc=5",
+        "https://news.google.com/rss/articles/CBMipAFBVV95cUxPSEY4dVJIQ014SVU1UTVXbWJYWUl2VHZDZmpPc01NYmRKLTRLdVFkV2RPV2tfd0NpUE1SZURqOGhKbW9jWUQ3Qi1zaEZDWFBKNS1mZ2ZIaUJuOFUwUC1MbVJVTU1yZFVXX294akIydFRmeDZzYm1Ba245QnkzOFhNNTdJaXRIbDQ0LXFPdVREZGdFSUh2NW5qcWZrY1BhMkdGRkRQUQ?oc=5"
       ],
-      "lastScan": "2026-05-27T23:22:37.829Z",
+      "lastScan": "2026-05-28T23:23:53.777Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -198,14 +198,14 @@
       "id": "alexkruger",
       "bullPct": 50,
       "prevBullPct": 50,
-      "summary": "중립 포지션. 최근: Bitcoin (BTC) in 'Supercycle': Economist Alex Kruger - Binan / Bitcoin Bottom In? Economist Alex Krü",
+      "summary": "중립 포지션. 최근: Bitcoin (BTC) in 'Supercycle': Economist Alex Kruger - Binan / Economist Alex Kruger Warns Russia Us",
       "headlines": [],
       "sourceUrls": [
         "https://news.google.com/rss/articles/CBMiY0FVX3lxTE5oZ2JfbXJSSlB6c2pjYzRtbWtHbjBtYmFYSWtwS3U1TDVYc3VLbGVPMWhOQmZNRDFLVGJ2UUhmMEdDdVJpZTQ5UVB2blJPWmlfdTlSekthMjdjaEdqZVBkYTlDMA?oc=5",
-        "https://news.google.com/rss/articles/CBMiWEFVX3lxTFBzMUhrV0JWVlRndWt0LWd3WFVJMTRNaTZvcDVuVEQ2cER1cUZYcjgyUk9xcl9WY3hQWWpDUWFHbkViX0NibC1wRnU1MWR5ZGVVdXpvQUVaRkI?oc=5",
-        "https://news.google.com/rss/articles/CBMi1AFBVV95cUxQc2s3RWpzVHNUMHo4SXJtRW5yMzNpamgxNVZGYU50Z3JhNDFhaDRncHoxMno1ZWpHeXctakRsakJuU241VEZFYld3YWZqN29MLW5pdzJCaHpfQzMzSmpNWmhLWlFwRUJPZXJfRWpsbHRBa2pRLWl3ZllCT2h6NjdZODBwX0R3Y29vdENfb1k0QURTZWNMTkhXdUR5TV9uNEtSNDNvNU9ZMlJaT21SZ1M4aTJoeFFwLVdTbXJaOVFLenBUU1VkVUpnTGhOMHFnZFB1cF9RONIB2gFBVV95cUxNVEJzT1RiU3NBUHJtT2Q1aHJiRTd5UFM0UWFSN0h6Z2xrSmdUQmZnQlRGQndxV0VOelFzMTQyckRvN0JlQXB4ZUJaR09UMXd0bk43N1pkNVBvbVU4YXN0QUwzMU9UV2xIcEdrblVaVXNxWThaVmZhWFRxT25PLXVMRUpnWmswMnZDTjVkOFZWUkdQSWtSS1k1b1pyaHBzLVhaSVVkOTA5OE43ZkxSVnpRUUNiN0d5U3ZZVVIyVXNuRk9YNmJ5WHRMVndUTVpRbmVNVkpvWkZ2bGstZw?oc=5"
+        "https://news.google.com/rss/articles/CBMi1AFBVV95cUxQc2s3RWpzVHNUMHo4SXJtRW5yMzNpamgxNVZGYU50Z3JhNDFhaDRncHoxMno1ZWpHeXctakRsakJuU241VEZFYld3YWZqN29MLW5pdzJCaHpfQzMzSmpNWmhLWlFwRUJPZXJfRWpsbHRBa2pRLWl3ZllCT2h6NjdZODBwX0R3Y29vdENfb1k0QURTZWNMTkhXdUR5TV9uNEtSNDNvNU9ZMlJaT21SZ1M4aTJoeFFwLVdTbXJaOVFLenBUU1VkVUpnTGhOMHFnZFB1cF9RONIB2gFBVV95cUxNVEJzT1RiU3NBUHJtT2Q1aHJiRTd5UFM0UWFSN0h6Z2xrSmdUQmZnQlRGQndxV0VOelFzMTQyckRvN0JlQXB4ZUJaR09UMXd0bk43N1pkNVBvbVU4YXN0QUwzMU9UV2xIcEdrblVaVXNxWThaVmZhWFRxT25PLXVMRUpnWmswMnZDTjVkOFZWUkdQSWtSS1k1b1pyaHBzLVhaSVVkOTA5OE43ZkxSVnpRUUNiN0d5U3ZZVVIyVXNuRk9YNmJ5WHRMVndUTVpRbmVNVkpvWkZ2bGstZw?oc=5",
+        "https://news.google.com/rss/articles/CBMi1AFBVV95cUxNVlZoeHRvOUlHZTBkX2xJT1N3SGdfQmVoRHRDTXBVNi1kdk1QZ0YxLWxLOFJtZjFyQ0tsQjc0eHZOT092NDBBOWhNTXJwekFDSEFmMWpqUTJ0bXA3YmloTW12ckc0N0N4bk9sQ0FYeXlHaFpGZkNMcy1lM1ZtcXNfRExUemxFY1QyaEl4Qk0xcm95d29hbFBJS0d3emozUEJ4Z3pGM1pYR3BZZkQ3T3pWVFVYY3ZPYm9xNGgxdHk2eGFjR3g0TllnNmJqeDZpNjNvbzdfb9IB2gFBVV95cUxORlJJaW1hajlrWkRTUXNXRkI5R1RPUU9mT3hkSkVIRERscWNQdEFSRnlSdW1qSWQ3dHZzYmp2SnpFY0VSbXI4bS03U25waTh6TjVOS0Y4RnI4TF9XZDhHQzNqTEFnWF84d2NLbW9SbzZwMktKQ0NOWFNEUjRGVHZmV0EtTlFPbmcxQTVRQ0UydEM4ZTBOWi1EZHFoVVpmSThybWJxMTZocWZYMXlIZXlUMkxWLVp1MjIySDhsUVMtb0hCSXA2SlBZVmszMDNSaWxTblhZYWlJRzVmUQ?oc=5"
       ],
-      "lastScan": "2026-05-27T23:23:29.571Z",
+      "lastScan": "2026-05-28T23:24:44.128Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -220,7 +220,7 @@
         "https://news.google.com/rss/articles/CBMi0wFBVV95cUxPejgtZHVqR19KcXY5akl6UG9McktISFpNMG9ucGhRR2NYM0NnaTZHMkZVQjd3UHk5dmtZMmozOG11LVdMSE9iazlFZjVTU2V2dHh1eF9aVnNEUzRkZXczeExWZG5ZY2ZTSjUzdlB4dmtsVHFGVUxqRVhTV1FlaGp3MXNjb0NCdXlSTkUzamJELVpCc2JqZ2s1VTB5cDBuYXNpOHVfLU5oampGY21HaGkyT0ltakFyOW1NRFU4TE0tTU5oZzhGd2RYRXB0UnlfOVJvVHlR?oc=5",
         "https://news.google.com/rss/articles/CBMiqwFBVV95cUxPNFJkaWdFMXJ4NTA0VEs3RGVjS1dHOVltVFhhUERxQ1FsR2NESjByUHYzVlZLaGhzb1BGN3dHeHhiOEZXVEdmSWpQSFRabUlUQ1lMcUVmUG9ZenplaU1EYlBvOTduRjdCVmVoVF9CTDgwZzAzRC1COVI1aEZuUHFGTjQ3LXZHbno4VHp0dFBpQWowbm41SUlMc2hOOWsyQW9DMTBOM19GS3UzU1k?oc=5"
       ],
-      "lastScan": "2026-05-27T23:23:34.451Z",
+      "lastScan": "2026-05-28T23:24:48.846Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -228,13 +228,16 @@
       "id": "ecoinometrics",
       "bullPct": 90,
       "prevBullPct": 90,
-      "summary": "강세 포지션. 최근: Ecoinometrics: 30-day flows in Bitcoin ETF are back in the p / Ecoinometrics Warns Bitcoin at Risk i",
-      "headlines": [],
+      "summary": "강세 포지션. 최근: Ecoinometrics: 30-day flows in Bitcoin ETF are back in the p / Ecoinometrics: BTC is approaching one",
+      "headlines": [
+        "2026.4.28. — Ecoinometrics: BTC is approaching one of its key technical boundaries. - Binance"
+      ],
       "sourceUrls": [
         "https://news.google.com/rss/articles/CBMiY0FVX3lxTE4zbXhtRUZhN1hyTW95UmNmY2t5TUthaW92akN2bzdGaml3aVg2R3M3T3hnWkF2eFhncFJiTFZ6YWJTeXhRX1dYYU1TcFhRSzBfS05IX2FqdmJXN3NTdjF6ZFRqUQ?oc=5",
+        "https://news.google.com/rss/articles/CBMiaEFVX3lxTE1vcTFfekNQejZCYUpIY0ZRb1FLaEU5SEpWS1M2NnNXNmp5Y2pLSk9aYVNJRmJEblVIdnhOWkUxRlBHckE3WnIwWmpBSjdieFJNU3pETHFHWkFGM0dLWkc1TDlrQWd0RmJN?oc=5",
         "https://news.google.com/rss/articles/CBMilAFBVV95cUxPa3VnemxwbUd6T1JWc3RqcURhN3NUSU1uTVhfSmlvdXpaWHJuZzFBYlAwNklPcGUtckZWVXRVOHd1RHV0MGhNLTJjRXgzclk1SEZjYWNWRzczNE05RE5ta0phT284SmNQUURsUWhtOE9ZUWZ3ZERRVVRVQkhSUmU5amYzTWxfVHhhRzZPeEJWb2tNaS1L?oc=5"
       ],
-      "lastScan": "2026-05-27T23:23:39.902Z",
+      "lastScan": "2026-05-28T23:24:53.666Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -247,12 +250,12 @@
       "sourceUrls": [
         "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQWWR5T3hHQnd5QVZQNU9DdFFycXJZRG9XTGMwUzA1Zk5UaHBabDVzRjJmcWl6X1VJQjhkdzdKcUVMQXB5Z1ozNldNTFFld0tiNGV1Z2lIRnA1a05ERzZNR2dTMmhWLVdTeDFhMlJxVklDT1FLdkFZUm8wTEpieGdIODBuS25IY0dMM3lhd1lSRHU0Ynh1UmgzZUpWc1N4MTJxRUxjY2JaM3RLNEtGbEctNDhQdlduQzVFQlFR0gHAAUFVX3lxTFBUWmVrTTF0b3pITEJfUmhfVGF4bENtb1BDSTZVUWVieXJ3ZWdVSkZNQy1XSDc5V0tHa3J1UWRZM0tYaG9GSjBlWHVVQ0tQQzdoNVdyTVFYdnA3OWRObU9XVlFLUW43emNwMHpmUWhndE9mSkJzN3VFRWxqMXZZZkl4RmQwRnBJbk9kc2RGeEFWWlJPdVVHRWJRWFVPWG9ETVJ5MXcyM21ZQmJGVWJKQTV1V1dTSHpMZWVqUFZlYU5Wcg?oc=5"
       ],
-      "lastScan": "2026-05-27T23:23:44.746Z",
+      "lastScan": "2026-05-28T23:24:58.747Z",
       "scanning": false,
       "dataSource": "gnews"
     }
   ],
   "avgBull": 54,
-  "updatedAt": "2026-05-27T23:23:46.247Z",
-  "updatedAtKST": "2026. 5. 28. AM 8:23:46"
+  "updatedAt": "2026-05-28T23:25:00.248Z",
+  "updatedAtKST": "2026. 5. 29. AM 8:25:00"
 }
