@@ -13,7 +13,7 @@
     "reserveRisk": "강력매수",
     "utxo1m": "강HODL",
     "utxo7yr": "정상",
-    "etfFlow": "순유출"
+    "etfFlow": "강유출(기관매도)"
   },
   "analysts": {
     "dancoininvestor": {
@@ -77,9 +77,9 @@
       "stance": "강세"
     }
   },
-  "btcPrice": 62832,
+  "btcPrice": 62748,
   "fg": 10,
   "lastMorningDate": null,
   "lastEveningDate": null,
-  "updatedAt": "2026-06-09T09:26:32.277Z"
+  "updatedAt": "2026-06-09T12:19:38.942Z"
 }
