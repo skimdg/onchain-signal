@@ -11,7 +11,7 @@
         "https://news.google.com/rss/articles/CBMipAFBVV95cUxPSEY4dVJIQ014SVU1UTVXbWJYWUl2VHZDZmpPc01NYmRKLTRLdVFkV2RPV2tfd0NpUE1SZURqOGhKbW9jWUQ3Qi1zaEZDWFBKNS1mZ2ZIaUJuOFUwUC1MbVJVTU1yZFVXX294akIydFRmeDZzYm1Ba245QnkzOFhNNTdJaXRIbDQ0LXFPdVREZGdFSUh2NW5qcWZrY1BhMkdGRkRQUQ?oc=5",
         "https://news.google.com/rss/articles/CBMiqwFBVV95cUxQQ3RQWmZQdTZYbHgwNW56N1RvMTdtaHllRzBCU2FXOGtRRmJkbkhaWkFXV2VNSzBLNndVb2ZaRFJ4d2JpM2M0MXJibVdqR2lqTEVGNjhWcnJJdDR1MGtFYmFZN2FYRWhQN2ljX2tyRldibFVlQ2NsYWtmVFJndVYydmJZVDhhODN4b3BSSmxLRF9Ua1dscWtuWkpNb1I5a1pkOS1CRThnamNVaUk?oc=5"
       ],
-      "lastScan": "2026-06-22T23:26:10.001Z",
+      "lastScan": "2026-06-23T23:13:55.043Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -187,20 +187,20 @@
       "id": "alexkruger",
       "bullPct": 50,
       "prevBullPct": 50,
-      "summary": "중립 포지션. 최근: Crypto Failed as an Asset Class, Say Economist Alex Kruger - / Crypto Is a 'Failed Asset,' Slams Ale",
+      "summary": "중립 포지션. 최근: Crypto Is a 'Failed Asset,' Slams Alex Krüger — Here's Why O / Economist Alex Krüger Calls Crypto A ",
       "headlines": [
-        "2026.6.18. — Crypto Failed as an Asset Class, Say Economist Alex Kruger - CryptoRank",
         "2026.6.4. — Crypto Is a 'Failed Asset,' Slams Alex Krüger — Here's Why Other Industry Leader",
         "2026.6.3. — Economist Alex Krüger Calls Crypto A 'Failed Asset Class' — But Says Bitcoin And",
+        "2026.6.18. — Crypto Failed as an Asset Class, Say Economist Alex Kruger - CryptoRank",
         "2026.6.4. — Crypto Is a 'Failed Asset,' Slams Alex Krüger — Here's Why Other Industry Leader",
         "2026.6.3. — Economist Alex Krüger calls crypto a 'failed asset class' — but says bitcoin and"
       ],
       "sourceUrls": [
-        "https://news.google.com/rss/articles/CBMimwFBVV95cUxPd0M2VFllMUlOdzA5cmk1SmgxRkt3RHpaRGRROXhpcEctUkVzaUNqVnhYNTZqMnl3bDBrTThxQ3dZYkpIamJCM21sYnpYODBzakFqRnFCeXEwUlkwaUtGMEkzQTc1cFZvNndrMjA5MksyWFBQLWdQSWRxeVFUdmxSNEZjWV9PSDNHV2pZNDZKbkJNanBGQXdhUlIxUQ?oc=5",
         "https://news.google.com/rss/articles/CBMimwFBVV95cUxPNjZ0ZHZmYS1nWU84S0dOQTBlck9TOEpNSUV3TmxjQUF3MThRTFZhNmZKb1V5Y2xwRDFRbW92TzJOWlB5anNPOF96czNTV2tZWG4tNkFTS19Eb2poRUNZRlRUZjZsMllSazFZVFdiOUp5aDVmUzBCM1ZYZDJ1UlhMU2YtQV94cERZNHJSbFMwcGJKc3RlQ0t0dFlhbw?oc=5",
-        "https://news.google.com/rss/articles/CBMi0gFBVV95cUxOZ203b25MU1hzQUJQNUI4ejVYYXVlNkZjWUxnYnJLZnZMZFk2MWRZdDRtUkh4WlBpeHJaX0VJRGlGLTFEdy1aaFJuLVBpYktqWVJEbzZ4MWNZNXhRSkJZbVZvQnoxOGE0dzZFaWZyNEdHbU1OX2toT0ZONXRGUmdsOExNcDRvX0ItVm5NTHJoRjRMVFk4QWhNQmU3MEdIX19VN0Y1c3otTnFzX0N6RGcyS3B1SDNvNnFwQklYVF9RQi1ndEFUTjhmM2hnbV9QYnRKT0E?oc=5"
+        "https://news.google.com/rss/articles/CBMi0gFBVV95cUxOZ203b25MU1hzQUJQNUI4ejVYYXVlNkZjWUxnYnJLZnZMZFk2MWRZdDRtUkh4WlBpeHJaX0VJRGlGLTFEdy1aaFJuLVBpYktqWVJEbzZ4MWNZNXhRSkJZbVZvQnoxOGE0dzZFaWZyNEdHbU1OX2toT0ZONXRGUmdsOExNcDRvX0ItVm5NTHJoRjRMVFk4QWhNQmU3MEdIX19VN0Y1c3otTnFzX0N6RGcyS3B1SDNvNnFwQklYVF9RQi1ndEFUTjhmM2hnbV9QYnRKT0E?oc=5",
+        "https://news.google.com/rss/articles/CBMimwFBVV95cUxPd0M2VFllMUlOdzA5cmk1SmgxRkt3RHpaRGRROXhpcEctUkVzaUNqVnhYNTZqMnl3bDBrTThxQ3dZYkpIamJCM21sYnpYODBzakFqRnFCeXEwUlkwaUtGMEkzQTc1cFZvNndrMjA5MksyWFBQLWdQSWRxeVFUdmxSNEZjWV9PSDNHV2pZNDZKbkJNanBGQXdhUlIxUQ?oc=5"
       ],
-      "lastScan": "2026-06-22T23:27:02.633Z",
+      "lastScan": "2026-06-23T23:14:53.559Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -208,15 +208,16 @@
       "id": "crypnuevo",
       "bullPct": 50,
       "prevBullPct": 50,
-      "summary": "중립 포지션. 최근: VettedLabs: CrypNuevo Launches Crypto Review Platform - bloc / CrypNuevo Analyzes $GOLD Price Drop f",
+      "summary": "중립 포지션. 최근: Trader SZ, Trader XO, Hsaka, CrypNuevo And Tree of Alpha: A  / VettedLabs: CrypNuevo Launches Crypto",
       "headlines": [
         "2026.6.22. — VettedLabs: CrypNuevo Launches Crypto Review Platform - blockchain.news"
       ],
       "sourceUrls": [
+        "https://news.google.com/rss/articles/CBMiWEFVX3lxTE9XYTZ3V2ZGRjZRVnh1LTFqLU1wTkNhUzJKYVFtS3RmYjNaMGR3QTIySG9RRjl2ekd6X3lOODJFWThORWlXOXM0bWRJMlRfcHh2ZFhYZHIwUl8?oc=5",
         "https://news.google.com/rss/articles/CBMijwFBVV95cUxOazliVUlRdmVEdmhwYXhlYzJTR0c2VlhxbF96bS1Balk4ZXJHb1RKNnF6c19zN3RwY2FmWHozNU1BanZpNk9ONE1oWVAzSllaTG1YYlVZTDJUcG1JY0ZXU2VtSDg0QVczNk1ONHY3MkZHOVJ2dURpQVY0MmxNNzhOaFYwN0NGQVZoSFVGWDdjMA?oc=5",
         "https://news.google.com/rss/articles/CBMinwFBVV95cUxQY1dER1NEdkRvWkJpdEZpSEFwNDl2dTFQQnhMcmQtQXQtNkhvb3A0VXJKTHlSTUxUaWpEVlZ1ekctZHExTWh6TkZ0SVVOeDZZUUM0WHllbm1rVUo1SkJZbjR0V1JyZ3d0LVJpcHA1bDFIcUlPUHBPX29sb0VmUkFLaEZHcFBWNVdyZlZuaVpXUXRNdzRiZmxFblFxYXczWHc?oc=5"
       ],
-      "lastScan": "2026-06-22T23:27:07.413Z",
+      "lastScan": "2026-06-23T23:14:58.749Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -250,6 +251,6 @@
     }
   ],
   "avgBull": 54,
-  "updatedAt": "2026-06-22T23:27:19.323Z",
-  "updatedAtKST": "2026. 6. 23. AM 8:27:19"
+  "updatedAt": "2026-06-23T23:15:10.673Z",
+  "updatedAtKST": "2026. 6. 24. AM 8:15:10"
 }
