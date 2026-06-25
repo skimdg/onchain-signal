@@ -6,7 +6,7 @@
     "mvrv": "저평가",
     "nupl": "희망(Hope)",
     "sopr": "손익분기",
-    "funding": "약베어",
+    "funding": "중립",
     "puell": "저평가",
     "lthSopr": "LTH항복",
     "sthSopr": "손익분기",
@@ -65,8 +65,8 @@
       "stance": "중립"
     },
     "crypnuevo": {
-      "bullPct": 50,
-      "stance": "중립"
+      "bullPct": 90,
+      "stance": "강세"
     },
     "ecoinometrics": {
       "bullPct": 90,
@@ -77,9 +77,9 @@
       "stance": "강세"
     }
   },
-  "btcPrice": 59708,
+  "btcPrice": 59741,
   "fg": 12,
   "lastMorningDate": null,
   "lastEveningDate": null,
-  "updatedAt": "2026-06-25T22:42:22.984Z"
+  "updatedAt": "2026-06-25T23:57:03.189Z"
 }
