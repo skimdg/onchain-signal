@@ -1,6 +1,6 @@
 {
   "cycleZone": "하락장(20~40)",
-  "cycleScore": 29,
+  "cycleScore": 27,
   "zones": {
     "fg": "극도공포",
     "mvrv": "저평가",
@@ -77,9 +77,9 @@
       "stance": "강세"
     }
   },
-  "btcPrice": 58520,
-  "fg": 15,
+  "btcPrice": 58540,
+  "fg": 11,
   "lastMorningDate": null,
   "lastEveningDate": null,
-  "updatedAt": "2026-06-30T23:00:59.736Z"
+  "updatedAt": "2026-07-01T00:18:27.491Z"
 }
