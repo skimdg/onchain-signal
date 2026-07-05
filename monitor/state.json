@@ -5,10 +5,10 @@
     "fg": "극도공포",
     "mvrv": "저평가",
     "nupl": "희망(Hope)",
-    "sopr": "손익분기",
+    "sopr": "건전이익실현",
     "funding": "중립",
     "puell": "저평가",
-    "lthSopr": "LTH손실",
+    "lthSopr": "LTH항복",
     "sthSopr": "건전",
     "reserveRisk": "강력매수",
     "utxo1m": "강HODL",
@@ -77,9 +77,9 @@
       "stance": "강세"
     }
   },
-  "btcPrice": 63519,
+  "btcPrice": 63584,
   "fg": 23,
   "lastMorningDate": null,
   "lastEveningDate": null,
-  "updatedAt": "2026-07-05T22:45:18.132Z"
+  "updatedAt": "2026-07-05T23:52:27.649Z"
 }
