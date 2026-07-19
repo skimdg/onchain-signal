@@ -9,7 +9,7 @@
     "funding": "중립",
     "puell": "저평가",
     "lthSopr": "LTH항복",
-    "sthSopr": "손익분기",
+    "sthSopr": "건전",
     "reserveRisk": "강력매수",
     "utxo1m": "강HODL",
     "utxo7yr": "정상",
@@ -77,9 +77,9 @@
       "stance": "강세"
     }
   },
-  "btcPrice": 64733,
+  "btcPrice": 64702,
   "fg": 28,
   "lastMorningDate": null,
   "lastEveningDate": null,
-  "updatedAt": "2026-07-19T22:30:55.603Z"
+  "updatedAt": "2026-07-19T23:36:30.546Z"
 }
