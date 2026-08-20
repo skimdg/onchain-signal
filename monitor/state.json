@@ -5,7 +5,7 @@
     "fg": "탐욕",
     "mvrv": "저평가",
     "nupl": "희망(Hope)",
-    "sopr": "손익분기",
+    "sopr": "건전이익실현",
     "funding": "중립",
     "puell": "저평가",
     "lthSopr": "LTH항복",
@@ -77,9 +77,9 @@
       "stance": "강세"
     }
   },
-  "btcPrice": 72723,
+  "btcPrice": 72683,
   "fg": 62,
   "lastMorningDate": null,
   "lastEveningDate": null,
-  "updatedAt": "2026-08-20T22:43:14.756Z"
+  "updatedAt": "2026-08-20T23:01:30.939Z"
 }
