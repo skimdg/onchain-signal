@@ -14,7 +14,7 @@
         "https://news.google.com/rss/articles/CBMiiwFBVV95cUxNVFlvb25BNUtNR243UHRnMVV1UmpHTkYydFZJaS1ySHRhUUJJZW9oYUZ6XzdYNl93LWxVN1Y4a1Y1a0RFYWZsMlR6azNtcElrNnNQVDZRLThLVXU1T0VFSi0yOG1nTjE1T294ZE1qamtXeHZjaGQ3dTIzWHd4ZWszOGZtMFVRNlZtNUhZ?oc=5",
         "https://news.google.com/rss/articles/CBMiqAFBVV95cUxNWW5GVUZsNk1VMXprd2JySm0ydU5PX055WEZMUWtCS3dfaHg0T3pWMnFkZUNfbkNPRldJWkhSX0NyaGZ1Y1B4dy1qWFdlcjhEcGp5UHNyMHB0OC1Fb1V5WVVSc1ZucUpTQlNLcmwxdGdHcWY0aEthT09CbnpWX0ZYbVN3akEzSUR2NEVZYi1WeWVWNFF3anktZlEtV25LTTM0a3ZBNElucFc?oc=5"
       ],
-      "lastScan": "2026-08-22T22:29:09.903Z",
+      "lastScan": "2026-08-23T22:29:11.594Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -193,7 +193,7 @@
         "https://news.google.com/rss/articles/CBMi0gFBVV95cUxOZ203b25MU1hzQUJQNUI4ejVYYXVlNkZjWUxnYnJLZnZMZFk2MWRZdDRtUkh4WlBpeHJaX0VJRGlGLTFEdy1aaFJuLVBpYktqWVJEbzZ4MWNZNXhRSkJZbVZvQnoxOGE0dzZFaWZyNEdHbU1OX2toT0ZONXRGUmdsOExNcDRvX0ItVm5NTHJoRjRMVFk4QWhNQmU3MEdIX19VN0Y1c3otTnFzX0N6RGcyS3B1SDNvNnFwQklYVF9RQi1ndEFUTjhmM2hnbV9QYnRKT0E?oc=5",
         "https://news.google.com/rss/articles/CBMijgFBVV95cUxNQzVlLVNkcFNtWXpYczE3VEQ2NnFEbmVWVE41Q09iYUdCM0U1dkZHNUlGWkVockpzcnJGR2hWM01vOWl5Y3lBLVg0d3gtTXNYNmx5S1FmUFdUS1N6Rkc1dEF4dV9TeU5iRFFULU5Bd1pZSVZnaERTYVdaNngyQ0FEcENUSW9CZTU1QnRlZVln0gGTAUFVX3lxTE5ROEp4Skc4aHgtQUJtYXAtbE1LZkkzX3AtTUM5S3dqU2QtSVcxMHVuOFMxWW8zWGU3b0dUMzJNUUxxd2ZJOUtCbTBfYTItTVNCVlJlX2UyZWhlT3dVZVNkUEpvd19PRHFWSG5HWlQ3NkpGQS1Gc3VqckNTaHcyOGxRUm9XalRjUFpzNzU1X0EwR0w0Zw?oc=5"
       ],
-      "lastScan": "2026-08-22T22:30:06.321Z",
+      "lastScan": "2026-08-23T22:30:03.470Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -208,7 +208,7 @@
         "https://news.google.com/rss/articles/CBMinwFBVV95cUxQY1dER1NEdkRvWkJpdEZpSEFwNDl2dTFQQnhMcmQtQXQtNkhvb3A0VXJKTHlSTUxUaWpEVlZ1ekctZHExTWh6TkZ0SVVOeDZZUUM0WHllbm1rVUo1SkJZbjR0V1JyZ3d0LVJpcHA1bDFIcUlPUHBPX29sb0VmUkFLaEZHcFBWNVdyZlZuaVpXUXRNdzRiZmxFblFxYXczWHc?oc=5",
         "https://news.google.com/rss/articles/CBMikAFBVV95cUxNZWREbVlJeDB5ZHBBbUVpcE0wbmpQNU5abExXZ0ktVTRmTG04Tm1GaGx2UzhKRU9iekYxdHFwNG13aHhjd1hKd05IVVd5aVluMU5EaUQtajNJemhkUktPbFJsQTY1ZDRfaTVqTVFRYTJEV05CUDdFYnM0VExETlJ2UDVuRHJZNFFCM0toUHFNdGU?oc=5"
       ],
-      "lastScan": "2026-08-22T22:30:11.277Z",
+      "lastScan": "2026-08-23T22:30:08.468Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -244,6 +244,6 @@
     }
   ],
   "avgBull": 57,
-  "updatedAt": "2026-08-22T22:30:22.327Z",
-  "updatedAtKST": "2026. 8. 23. AM 7:30:22"
+  "updatedAt": "2026-08-23T22:30:20.007Z",
+  "updatedAtKST": "2026. 8. 24. AM 7:30:20"
 }
