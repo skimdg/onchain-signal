@@ -17,8 +17,8 @@
   },
   "analysts": {
     "dancoininvestor": {
-      "bullPct": 33,
-      "stance": "약세"
+      "bullPct": 90,
+      "stance": "강세"
     },
     "gaah_im": {
       "bullPct": 10,
@@ -77,9 +77,9 @@
       "stance": "강세"
     }
   },
-  "btcPrice": 78909,
+  "btcPrice": 78871,
   "fg": 73,
   "lastMorningDate": null,
   "lastEveningDate": null,
-  "updatedAt": "2026-08-24T22:12:10.868Z"
+  "updatedAt": "2026-08-24T22:41:48.298Z"
 }
