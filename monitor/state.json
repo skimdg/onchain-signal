@@ -1,14 +1,14 @@
 {
   "cycleZone": "회복(40~60)",
-  "cycleScore": 44,
+  "cycleScore": 49,
   "zones": {
     "fg": "탐욕",
     "mvrv": "저평가",
     "nupl": "낙관(Optimism)",
     "sopr": "건전이익실현",
     "funding": "중립",
-    "puell": "저평가",
-    "lthSopr": "LTH손실",
+    "puell": "중립",
+    "lthSopr": "초기상승",
     "sthSopr": "건전",
     "reserveRisk": "강력매수",
     "utxo1m": "강HODL",
@@ -77,9 +77,9 @@
       "stance": "강세"
     }
   },
-  "btcPrice": 79651,
-  "fg": 74,
+  "btcPrice": 79629,
+  "fg": 73,
   "lastMorningDate": null,
   "lastEveningDate": null,
-  "updatedAt": "2026-09-04T23:06:33.665Z"
+  "updatedAt": "2026-09-05T00:54:13.888Z"
 }
