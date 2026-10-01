@@ -7,7 +7,7 @@
     "nupl": "낙관(Optimism)",
     "sopr": "건전이익실현",
     "funding": "중립",
-    "puell": "저평가",
+    "puell": "중립",
     "lthSopr": "초기상승",
     "sthSopr": "건전",
     "reserveRisk": "강력매수",
@@ -77,9 +77,9 @@
       "stance": "강세"
     }
   },
-  "btcPrice": 83604,
-  "fg": 71,
+  "btcPrice": 83464,
+  "fg": 74,
   "lastMorningDate": null,
   "lastEveningDate": null,
-  "updatedAt": "2026-09-30T23:44:24.905Z"
+  "updatedAt": "2026-10-01T02:26:32.721Z"
 }
