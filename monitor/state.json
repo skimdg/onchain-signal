@@ -69,17 +69,17 @@
       "stance": "강세"
     },
     "ecoinometrics": {
-      "bullPct": 90,
-      "stance": "강세"
+      "bullPct": 10,
+      "stance": "약세"
     },
     "rektcapital": {
       "bullPct": 90,
       "stance": "강세"
     }
   },
-  "btcPrice": 82976,
-  "fg": 64,
+  "btcPrice": 82891,
+  "fg": 61,
   "lastMorningDate": null,
   "lastEveningDate": null,
-  "updatedAt": "2026-10-10T22:03:53.887Z"
+  "updatedAt": "2026-10-11T00:57:27.528Z"
 }
