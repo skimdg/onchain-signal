@@ -11,7 +11,7 @@
     "lthSopr": "LTH항복",
     "sthSopr": "건전",
     "reserveRisk": "강력매수",
-    "utxo1m": "강HODL",
+    "utxo1m": "건전",
     "utxo7yr": "정상",
     "etfFlow": "강유출(기관매도)"
   },
@@ -77,9 +77,9 @@
       "stance": "강세"
     }
   },
-  "btcPrice": 75966,
+  "btcPrice": 75848,
   "fg": 28,
   "lastMorningDate": null,
   "lastEveningDate": null,
-  "updatedAt": "2026-11-08T15:37:59.223Z"
+  "updatedAt": "2026-11-08T19:56:20.956Z"
 }
