@@ -5,16 +5,13 @@
       "bullPct": 90,
       "prevBullPct": 90,
       "summary": "강세 포지션. 최근: Bitcoin and XRP Head for Strongest Weekly Close Since 2024:  / Why Is The Crypto Market Up Today? - ",
-      "headlines": [
-        "2026.9.17. — Why Is The Crypto Market Up Today? - CryptoRank",
-        "2026.9.17. — From Bear to Bull: Analyst Says Bitcoin UTXO Data Points to a Cycle Shift - Cryp"
-      ],
+      "headlines": [],
       "sourceUrls": [
         "https://news.google.com/rss/articles/CBMieEFVX3lxTE94emNRd0phYmZvVk9va2NNQjJ5Mi1WVGtnZV9MNXcwbktFMDZNZWtlb1p0X25Qck1xbVEwZEstcm9vMjZpRmhhUlRic2puUnhZTHNzMlprREpZTmR1bHJpR1kxMzdHWUNGQmpzLXRaQ0plNnBLTGxpRw?oc=5",
         "https://news.google.com/rss/articles/CBMie0FVX3lxTE90ZGlnSEZLWDg5Mzh4dERiV3RTWkUxMEdOZ1F5cnBlTTQ5VENlNjN3ajBEZjliM3NPNG1UalNSVU5mU1gxSzNIdFdpdXkxUE9TZUFwRm5VLTdWY2pRQjlqNTFNdlhpYTZfbjFsd2xuSzY3XzRiV0dyVHhMMA?oc=5",
         "https://news.google.com/rss/articles/CBMinwFBVV95cUxPeWR2R0Y1cl9qNWJSX3dRUW1uMlVGNk9jZnJTUVE4dTBVUFhPMmFaUHJtay1Fby16R09DU25NSzBaQ29XZDM5bEdRMG1oVTNhM2NwampYS3NqQ0ZEUldEc29CYnpqMDRQS1ZJZjR3ODIyQVBObVJEM3pOcy1OMGd6WDF1UXB3MXlUejdhVG9aSWsySUxBaEQ0b0w0RWpNRDA?oc=5"
       ],
-      "lastScan": "2026-11-16T01:47:06.805Z",
+      "lastScan": "2026-11-17T04:24:03.550Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -165,14 +162,16 @@
       "id": "route2fi",
       "bullPct": 50,
       "prevBullPct": 50,
-      "summary": "중립 포지션. 최근: Binance Hacker Sits on $1.4 Billion in Bitcoin, Triple a Wee",
+      "summary": "중립 포지션. 최근: Binance Hacker Sits on $1.4 Billion in Bitcoin, Triple a Wee / TAO Receives Attention From Route 2 F",
       "headlines": [
-        "2026.10.30. — Binance Hacker Sits on $1.4 Billion in Bitcoin, Triple a Week of ETF Buying, as "
+        "2026.10.30. — Binance Hacker Sits on $1.4 Billion in Bitcoin, Triple a Week of ETF Buying, as ",
+        "2026.9.25. — TAO Receives Attention From Route 2 FI as Altcoins Surge - Bitget"
       ],
       "sourceUrls": [
-        "https://news.google.com/rss/articles/CBMickFVX3lxTE1mY1F6N1RIdVMxYXFkdEZzQnhaUTVUQjhiZHpmcElfMnBQc25jeDJsbnVZNy1RNUtEM3R5blNOdExYZVlRSy1Yb2J3UjdtWlhNa01mamdBc2pUbDFBeURJWHJoSjVSbjJ1WUI1SzhBUU5PUdIBd0FVX3lxTE41QS00TURYeVJyOGdMR19yRnNjckU1ME8ycEFWMWcydkhNZTNtNXE0VldXTzRaNzlfOHBOUFUtN3NTcFRvT2lobTRjR0VVVm5sYlYwNkZxQXpGNFdKbnRxVmlXWlJXOEphRktURUJucmp6eUpIZ1c4?oc=5"
+        "https://news.google.com/rss/articles/CBMickFVX3lxTE1mY1F6N1RIdVMxYXFkdEZzQnhaUTVUQjhiZHpmcElfMnBQc25jeDJsbnVZNy1RNUtEM3R5blNOdExYZVlRSy1Yb2J3UjdtWlhNa01mamdBc2pUbDFBeURJWHJoSjVSbjJ1WUI1SzhBUU5PUdIBd0FVX3lxTE41QS00TURYeVJyOGdMR19yRnNjckU1ME8ycEFWMWcydkhNZTNtNXE0VldXTzRaNzlfOHBOUFUtN3NTcFRvT2lobTRjR0VVVm5sYlYwNkZxQXpGNFdKbnRxVmlXWlJXOEphRktURUJucmp6eUpIZ1c4?oc=5",
+        "https://news.google.com/rss/articles/CBMiXkFVX3lxTFBDdDNoRTBYNUNLcFdyblhNN0ptS2t6b1R3NWdLRnBjUEg4LTh3MjVVR2tVeGxSOG16ZzdPVFg1RE9fWkVaWUhCeUtvcUlzcVRkQk1XU1R0dWo4aTJpa1E?oc=5"
       ],
-      "lastScan": "2026-11-16T01:47:59.868Z",
+      "lastScan": "2026-11-17T04:25:04.894Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -189,7 +188,7 @@
         "https://news.google.com/rss/articles/CBMilwFBVV95cUxNX1NQN0xSWTdhTVJ6ekhJck85OWZtbnRDdWhCSTJHQ0xVblNHZUhjWklFUUE1NDQ0MVlOd0IyQmtIOTR4VmtfM3RlY1NoQzN0UkFBNS1pYm0zWnpsWmxZUkFWUU9tWHBSSjJnOUhta2VvemFiUlZuSUZEYlkzX0c5d3FXQjNuaWs1b1U3M2g2NDlmdEFGd2ZJ?oc=5",
         "https://news.google.com/rss/articles/CBMiuAFBVV95cUxOcFZHTGJ1cEtQTGY0TlhnZnhkdGhKZUlmc1V1UFh1cE9qQzRGbnlsUmJxZ1ZvUWotbzRtZVJHWlAtUGFVdThqZXZxdkR6ejlHUjB1S3IxdWtBNVMwREVJOXpvUHZRZDc1a09PQWlsU19CajA4VU8xUDJ5Q0hVNng5ckowQjBuOUQzM2ktQlU5QUNLQThweU1KZ2gwQnVHUEJIUVR1ZjlKaGdieWRGRWgwVnB3YkxFNmFo?oc=5"
       ],
-      "lastScan": "2026-11-16T01:48:05.983Z",
+      "lastScan": "2026-11-17T04:25:10.121Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -204,7 +203,7 @@
       "sourceUrls": [
         "https://news.google.com/rss/articles/CBMiigFBVV95cUxPTVNJanVVeHJYVlFUSTFiZTZnZktBWkhWNnFlVEJ4eVpjVVBkdEM2dWVLUEpQcGZaNmpfSTgxaGJSNDdzaC1idFA0RnR3UEdFaGFIY1ROeUNWczc2ZG1XOEJrYXJqeXMyZlVYXzNGMG10dkNqc1N1dXRwX1dzc2wwWTdUYUxrTWFPQXc?oc=5"
       ],
-      "lastScan": "2026-11-16T01:48:11.551Z",
+      "lastScan": "2026-11-17T04:25:15.869Z",
       "scanning": false,
       "dataSource": "gnews"
     },
@@ -240,6 +239,6 @@
     }
   ],
   "avgBull": 55,
-  "updatedAt": "2026-11-16T01:48:24.218Z",
-  "updatedAtKST": "2026. 11. 16. AM 10:48:24"
+  "updatedAt": "2026-11-17T04:25:29.581Z",
+  "updatedAtKST": "2026. 11. 17. PM 1:25:29"
 }
