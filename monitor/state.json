@@ -7,7 +7,7 @@
     "nupl": "희망(Hope)",
     "sopr": "손익분기",
     "funding": "중립",
-    "puell": "중립",
+    "puell": "저평가",
     "lthSopr": "LTH항복",
     "sthSopr": "손익분기",
     "reserveRisk": "강력매수",
@@ -77,9 +77,9 @@
       "stance": "강세"
     }
   },
-  "btcPrice": 60988,
+  "btcPrice": 61491,
   "fg": 11,
   "lastMorningDate": null,
   "lastEveningDate": null,
-  "updatedAt": "2026-11-23T01:41:19.838Z"
+  "updatedAt": "2026-11-23T09:44:55.433Z"
 }
