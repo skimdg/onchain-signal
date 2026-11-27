@@ -11,9 +11,9 @@
     "lthSopr": "LTH항복",
     "sthSopr": "손익분기",
     "reserveRisk": "강력매수",
-    "utxo1m": "강HODL",
+    "utxo1m": "건전",
     "utxo7yr": "정상",
-    "etfFlow": "순유출"
+    "etfFlow": "강유출(기관매도)"
   },
   "analysts": {
     "dancoininvestor": {
@@ -77,9 +77,9 @@
       "stance": "강세"
     }
   },
-  "btcPrice": 61565,
+  "btcPrice": 59859,
   "fg": 12,
   "lastMorningDate": null,
   "lastEveningDate": null,
-  "updatedAt": "2026-11-27T11:10:39.491Z"
+  "updatedAt": "2026-11-27T19:54:43.334Z"
 }
